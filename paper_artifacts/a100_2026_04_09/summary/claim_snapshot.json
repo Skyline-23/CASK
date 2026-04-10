@@ -1,0 +1,17 @@
+{
+  "headline": {
+    "aime25": {
+      "fullkv_acc": 2.1,
+      "triattention_acc": 1.7,
+      "horizonkv_acc": 1.7,
+      "horizonkv_vs_fullkv": -0.40000000000000013,
+      "horizonkv_vs_triattention": 0.0,
+      "horizonkv_vs_fullkv_output_tps": 0.8988258375713487,
+      "horizonkv_vs_triattention_output_tps": 0.9965420211721866
+    }
+  },
+  "headline_mean_delta": {
+    "horizonkv_vs_fullkv": -0.40000000000000013,
+    "horizonkv_vs_triattention": 0.0
+  }
+}

@@ -1,0 +1,63 @@
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+*.so
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment and tooling
+.venv/
+.claude/
+.workflow/
+.env
+*.log
+.cache/
+
+# Experiment outputs and logs
+outputs/
+output_multi/
+experiments/outputs/
+experiments/vllm_pair/
+experiments/logs/
+experiments/configs/
+experiments/models/
+experiments/stats/
+experiments/bundle/
+experiments/paper_support/
+experiments/reports/
+experiments/frontier/
+experiments/score_dumps/
+experiments/selection_dumps/
+experiments/orchestration/*.log
+experiments/orchestration/*.txt
+experiments/orchestration/*.json
+experiments/*.log
+logs/
+tmp_eval/
+
+# Data files (symlinks handled separately)
+data/*.jsonl
+brumo_2025.jsonl
+aime25.jsonl
+
+# Binary artifacts
+*.jar
+
+# Internal verification configs (not for public release)
+scripts/configs/aime25_llama_budget512_a6000_verify.yaml
+
+# External baseline checkouts
+external/
+
+# Misc
+prompt.txt

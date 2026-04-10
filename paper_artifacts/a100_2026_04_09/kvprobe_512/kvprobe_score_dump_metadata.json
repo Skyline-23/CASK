@@ -1,0 +1,134 @@
+{
+  "horizonkv": [
+    {
+      "absolute_position": 640,
+      "allow_prefill_compression": false,
+      "budget": 512,
+      "count_prompt_tokens": true,
+      "decode_positions_shape": [
+        559
+      ],
+      "event_index": 0,
+      "event_local_reduction": 0.19999999999999996,
+      "horizon_mode": "adaptive",
+      "keep_indices_shape": [
+        8,
+        512
+      ],
+      "kv_cache_len_before_event": 640,
+      "norm_mode": "rms2",
+      "per_head_pruning": true,
+      "prefill_length": 81,
+      "raw_head_matrix_shape": [
+        1152,
+        559
+      ],
+      "retained_after_event": 512,
+      "retained_reduction_vs_full_absolute_position": 0.19999999999999996,
+      "scored_head_matrix_shape": [
+        1152,
+        559
+      ],
+      "selection_mode": "per_head",
+      "source_pt_basename": "shard00_run000_sample00000_event0000.pt"
+    },
+    {
+      "absolute_position": 768,
+      "allow_prefill_compression": false,
+      "budget": 512,
+      "count_prompt_tokens": true,
+      "decode_positions_shape": [
+        559
+      ],
+      "event_index": 1,
+      "event_local_reduction": 0.19999999999999996,
+      "horizon_mode": "adaptive",
+      "keep_indices_shape": [
+        8,
+        512
+      ],
+      "kv_cache_len_before_event": 640,
+      "norm_mode": "rms2",
+      "per_head_pruning": true,
+      "prefill_length": 81,
+      "raw_head_matrix_shape": [
+        1152,
+        559
+      ],
+      "retained_after_event": 512,
+      "retained_reduction_vs_full_absolute_position": 0.33333333333333337,
+      "scored_head_matrix_shape": [
+        1152,
+        559
+      ],
+      "selection_mode": "per_head",
+      "source_pt_basename": "shard00_run000_sample00000_event0001.pt"
+    }
+  ],
+  "triattention": [
+    {
+      "absolute_position": 640,
+      "allow_prefill_compression": false,
+      "budget": 512,
+      "count_prompt_tokens": true,
+      "decode_positions_shape": [
+        559
+      ],
+      "event_index": 0,
+      "event_local_reduction": 0.19999999999999996,
+      "horizon_mode": "fixed",
+      "keep_indices_shape": [
+        8,
+        512
+      ],
+      "kv_cache_len_before_event": 640,
+      "norm_mode": "tri",
+      "per_head_pruning": true,
+      "prefill_length": 81,
+      "raw_head_matrix_shape": [
+        1152,
+        559
+      ],
+      "retained_after_event": 512,
+      "retained_reduction_vs_full_absolute_position": 0.19999999999999996,
+      "scored_head_matrix_shape": [
+        1152,
+        559
+      ],
+      "selection_mode": "per_head",
+      "source_pt_basename": "shard00_run000_sample00000_event0000.pt"
+    },
+    {
+      "absolute_position": 768,
+      "allow_prefill_compression": false,
+      "budget": 512,
+      "count_prompt_tokens": true,
+      "decode_positions_shape": [
+        559
+      ],
+      "event_index": 1,
+      "event_local_reduction": 0.19999999999999996,
+      "horizon_mode": "fixed",
+      "keep_indices_shape": [
+        8,
+        512
+      ],
+      "kv_cache_len_before_event": 640,
+      "norm_mode": "tri",
+      "per_head_pruning": true,
+      "prefill_length": 81,
+      "raw_head_matrix_shape": [
+        1152,
+        559
+      ],
+      "retained_after_event": 512,
+      "retained_reduction_vs_full_absolute_position": 0.33333333333333337,
+      "scored_head_matrix_shape": [
+        1152,
+        559
+      ],
+      "selection_mode": "per_head",
+      "source_pt_basename": "shard00_run000_sample00000_event0001.pt"
+    }
+  ]
+}
