@@ -1,0 +1,123 @@
+﻿{
+    "dataset_slice":  "AIME25_ref6",
+    "model":  "Qwen3-8B",
+    "hardware":  "H100 PCIe",
+    "methods":  [
+                    "triattention",
+                    "cask"
+                ],
+    "budgets":  [
+                    256,
+                    384,
+                    512
+                ],
+    "same_budget_headline":  "CASK beats TriAttention on top1/top5/mean_nll at 256, 384, and 512, but is less aggressive on terminal savings at the same budget.",
+    "crossing_notes":  [
+                           {
+                               "comparison":  "cask@384 vs triattention@512",
+                               "cask_better_top1":  true,
+                               "cask_better_top5":  true,
+                               "cask_better_nll":  true,
+                               "cask_better_saved_ratio":  true
+                           },
+                           {
+                               "comparison":  "cask@256 vs triattention@384",
+                               "cask_better_top1":  false,
+                               "cask_better_top5":  false,
+                               "cask_better_nll":  false,
+                               "cask_better_saved_ratio":  false
+                           }
+                       ],
+    "rows":  [
+                 {
+                     "dataset_slice":  "AIME25_ref6",
+                     "method":  "cask",
+                     "budget":  256,
+                     "top1_pct":  86.767578,
+                     "top5_pct":  97.884115,
+                     "strict_prefix_pct":  1.708984,
+                     "mean_nll":  0.503561278,
+                     "first_mismatch":  17.5,
+                     "saved_ratio_pct":  55.869248,
+                     "records_compared":  6,
+                     "guard_records":  1,
+                     "mean_compression_events":  3.5,
+                     "source_json":  "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\frontier\\Qwen3-8B\\h100_aime25_fidelity_gate_20260410\\cask_budget_256.json"
+                 },
+                 {
+                     "dataset_slice":  "AIME25_ref6",
+                     "method":  "cask",
+                     "budget":  384,
+                     "top1_pct":  90.283203,
+                     "top5_pct":  99.072266,
+                     "strict_prefix_pct":  1.708984,
+                     "mean_nll":  0.314717632,
+                     "first_mismatch":  17.5,
+                     "saved_ratio_pct":  52.050644,
+                     "records_compared":  6,
+                     "guard_records":  1,
+                     "mean_compression_events":  3.166667,
+                     "source_json":  "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\frontier\\Qwen3-8B\\h100_aime25_fidelity_gate_20260410\\cask_budget_384.json"
+                 },
+                 {
+                     "dataset_slice":  "AIME25_ref6",
+                     "method":  "cask",
+                     "budget":  512,
+                     "top1_pct":  91.682943,
+                     "top5_pct":  99.593099,
+                     "strict_prefix_pct":  1.708984,
+                     "mean_nll":  0.254033019,
+                     "first_mismatch":  17.5,
+                     "saved_ratio_pct":  37.246165,
+                     "records_compared":  6,
+                     "guard_records":  1,
+                     "mean_compression_events":  2.333333,
+                     "source_json":  "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\frontier\\Qwen3-8B\\h100_aime25_fidelity_gate_20260410\\cask_budget_512.json"
+                 },
+                 {
+                     "dataset_slice":  "AIME25_ref6",
+                     "method":  "triattention",
+                     "budget":  256,
+                     "top1_pct":  85.709635,
+                     "top5_pct":  97.770182,
+                     "strict_prefix_pct":  1.708984,
+                     "mean_nll":  0.500381546,
+                     "first_mismatch":  17.5,
+                     "saved_ratio_pct":  63.370808,
+                     "records_compared":  6,
+                     "guard_records":  0,
+                     "mean_compression_events":  null,
+                     "source_json":  "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\frontier\\Qwen3-8B\\h100_aime25_fidelity_gate_20260410\\triattention_budget_256.json"
+                 },
+                 {
+                     "dataset_slice":  "AIME25_ref6",
+                     "method":  "triattention",
+                     "budget":  384,
+                     "top1_pct":  89.095052,
+                     "top5_pct":  98.746745,
+                     "strict_prefix_pct":  1.708984,
+                     "mean_nll":  0.35563559,
+                     "first_mismatch":  17.5,
+                     "saved_ratio_pct":  59.55562,
+                     "records_compared":  6,
+                     "guard_records":  0,
+                     "mean_compression_events":  null,
+                     "source_json":  "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\frontier\\Qwen3-8B\\h100_aime25_fidelity_gate_20260410\\triattention_budget_384.json"
+                 },
+                 {
+                     "dataset_slice":  "AIME25_ref6",
+                     "method":  "triattention",
+                     "budget":  512,
+                     "top1_pct":  89.941406,
+                     "top5_pct":  99.023438,
+                     "strict_prefix_pct":  1.708984,
+                     "mean_nll":  0.321388529,
+                     "first_mismatch":  17.5,
+                     "saved_ratio_pct":  44.763978,
+                     "records_compared":  6,
+                     "guard_records":  0,
+                     "mean_compression_events":  null,
+                     "source_json":  "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\frontier\\Qwen3-8B\\h100_aime25_fidelity_gate_20260410\\triattention_budget_512.json"
+                 }
+             ]
+}

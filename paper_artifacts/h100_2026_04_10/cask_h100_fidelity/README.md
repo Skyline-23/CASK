@@ -17,21 +17,30 @@ Not tracked here:
 Current scope:
 - model: `Qwen3-8B`
 - hardware: `H100 PCIe`
-- dataset slice: `AIME24` reference replay on `6` examples
+- dataset slices:
+  - `AIME24` reference replay on `6` examples
+  - `AIME25` reference replay on `6` examples
 - methods: `triattention`, `cask`
 - budgets: `256`, `384`, `512`
 
 Primary files:
 - `aime24_ref6_h100_fidelity_summary.csv`
 - `aime24_ref6_h100_fidelity_summary.json`
+- `aime25_ref6_h100_fidelity_summary.csv`
+- `aime25_ref6_h100_fidelity_summary.json`
 - `MANIFEST.sha256`
 
-Headline read from the packaged AIME24 H100 gate:
-- same-budget: `cask` beats `triattention` on `top1`, `top5`, and `mean_nll`
-  at `256`, `384`, and `512`
-- crossing: `cask @ 256` is already ahead of `triattention @ 384`
-- crossing: `cask @ 384` is ahead of `triattention @ 512` while preserving
+Headline read from the packaged H100 gates:
+- `AIME24`: same-budget `cask` beats `triattention` on `top1`, `top5`, and
+  `mean_nll` at `256`, `384`, and `512`
+- `AIME24`: `cask @ 256` is already ahead of `triattention @ 384`
+- `AIME24`: `cask @ 384` is ahead of `triattention @ 512` while preserving
   much higher KV savings
+- `AIME25`: same-budget `cask` again beats `triattention` on `top1`, `top5`,
+  and `mean_nll` at `256`, `384`, and `512`
+- `AIME25`: `cask @ 384` is ahead of `triattention @ 512`
+- `AIME25`: `cask @ 256` does not beat `triattention @ 384`, so the crossing
+  pattern is real but weaker than on `AIME24`
 
 Important caveat:
 - these are **fidelity** assets, not final benchmark-accuracy claims
@@ -40,5 +49,6 @@ Important caveat:
 
 Raw provenance:
 - all summary rows include `source_json`
-- current raw source root:
-  `experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/`
+- current raw source roots:
+  - `experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/`
+  - `experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/`

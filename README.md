@@ -126,6 +126,8 @@ The tracked local summary lives here:
 - `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/README.md`
 - `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/aime24_ref6_h100_fidelity_summary.csv`
 - `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/aime24_ref6_h100_fidelity_summary.json`
+- `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/aime25_ref6_h100_fidelity_summary.csv`
+- `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/aime25_ref6_h100_fidelity_summary.json`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/longbench_qasper_prompt_heavy_witness.md`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_stage_summary.csv`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_output_sanity.csv`
@@ -152,6 +154,7 @@ High-level read:
 - `2wikimqa`: the prompt-heavy picture is mixed under teacher-forced `top1`, but `cask` still improves `top5`/`mean_nll` and is far closer to the `fullkv` greedy output than `triattention`. A small `prefix_coverage_ratio=0.0625` reserve improves this boundary case, while `0.125` does not.
 - `hexagon`: on a tracked math witness, `triattention @ 104` fails while `cask @ 104` still produces the correct answer `42`, giving a compact reasoning-side answer-flip example.
 - `AIME24 H100 ref6`: `cask` now wins the same-budget full-KV replay gate at `256`, `384`, and `512`, and also shows two explicit crossing points: `cask @ 256 > triattention @ 384` and `cask @ 384 > triattention @ 512`.
+- `AIME25 H100 ref6`: `cask` again wins the same-budget full-KV replay gate at `256`, `384`, and `512`. The crossing is weaker than on `AIME24`, but `cask @ 384 > triattention @ 512` still holds on `top1`, `top5`, and `mean_nll`.
 - `math_actual_accuracy_subset.md`: small `math500` bridge check showing that `cask` doubles draw-level exact match (`2/12 -> 4/12`) on a 3-witness subset at `budget = 104`, driven by a `hexagon` robustness gain (`2/4 -> 4/4`).
 - `prompt_heavy_stage_and_output_summary.md`: consolidates the prompt-heavy stage decomposition, the `2wikimqa` coverage-reserve ablation, and the output-level sanity table.
 - `submission_gate_checks.md`: small add-on package covering one LongBench witness, one representative-mode ablation, and prompt-heavy boundary checks.
