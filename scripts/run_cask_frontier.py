@@ -7,6 +7,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, List
@@ -45,6 +46,7 @@ def parse_args() -> tuple[argparse.Namespace, list[str]]:
     parser.add_argument("--attn-implementation", default=None, choices=["eager", "flash_attention_2", "sdpa"])
     parser.add_argument("--load-dtype", default=None, choices=["bfloat16", "float16"])
     parser.add_argument("--stats-path", type=Path, default=None)
+    parser.add_argument("--job-parallel", type=int, default=1)
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument("--manifest-output", type=Path, default=None)
     parser.add_argument("--summary-json", type=Path, default=None)
@@ -52,6 +54,8 @@ def parse_args() -> tuple[argparse.Namespace, list[str]]:
     parser.add_argument("--baseline-method", default="triattention", choices=METHODS)
     parser.add_argument("--dry-run", action="store_true")
     args, passthrough = parser.parse_known_args()
+    if args.job_parallel < 1:
+        raise SystemExit("--job-parallel must be >= 1")
     return args, passthrough
 
 
@@ -131,6 +135,50 @@ def run_command(cmd: list[str], *, dry_run: bool) -> None:
     subprocess.check_call(cmd, cwd=str(REPO_ROOT))
 
 
+def run_entries(entries: list[dict[str, Any]], *, dry_run: bool, job_parallel: int) -> None:
+    if dry_run:
+        for entry in entries:
+            command = entry.get("command")
+            if command:
+                print(" ".join(command))
+        return
+
+    running: list[tuple[subprocess.Popen[Any], dict[str, Any]]] = []
+
+    def drain_one() -> None:
+        while True:
+            for index, (proc, entry) in enumerate(running):
+                ret = proc.poll()
+                if ret is None:
+                    continue
+                running.pop(index)
+                entry["return_code"] = ret
+                entry["status"] = "completed" if ret == 0 else "failed"
+                if ret != 0:
+                    raise SystemExit(
+                        f"[error] Frontier job failed: dataset={entry['dataset']} "
+                        f"method={entry['method']} budget={entry['budget']} status={ret}"
+                    )
+                return
+            time.sleep(1.0)
+
+    for entry in entries:
+        if entry.get("status") == "skipped_existing":
+            continue
+        command = entry.get("command")
+        if not command:
+            continue
+        print(" ".join(command))
+        proc = subprocess.Popen(command, cwd=str(REPO_ROOT))
+        entry["status"] = "running"
+        running.append((proc, entry))
+        if len(running) >= job_parallel:
+            drain_one()
+
+    while running:
+        drain_one()
+
+
 def main() -> None:
     args, passthrough = parse_args()
     frontier_tag = sanitize_tag(args.frontier_tag or f"frontier_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
@@ -159,16 +207,13 @@ def main() -> None:
 
                 cmd = build_command(args, dataset, method, budget, frontier_tag, passthrough)
                 entry["command"] = cmd
-                entry["status"] = "planned" if args.dry_run else "ran"
-                run_command(cmd, dry_run=args.dry_run)
-                if not args.dry_run:
-                    resolved_run_dir = resolve_run_dir(args.model, dataset, method, budget, frontier_tag)
-                    entry["run_dir"] = str(resolved_run_dir.resolve()) if resolved_run_dir is not None else None
+                entry["status"] = "planned" if args.dry_run else "pending"
                 entries.append(entry)
 
     payload = {
         "model": args.model,
         "frontier_tag": frontier_tag,
+        "job_parallel": args.job_parallel,
         "datasets": list(args.datasets),
         "methods": list(args.methods),
         "budgets": [int(value) for value in args.budgets],
@@ -176,6 +221,22 @@ def main() -> None:
     }
     manifest_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"frontier_manifest={manifest_path.resolve()}")
+
+    run_entries(entries, dry_run=args.dry_run, job_parallel=args.job_parallel)
+
+    if not args.dry_run:
+        for entry in entries:
+            if entry.get("status") != "completed":
+                continue
+            resolved_run_dir = resolve_run_dir(
+                args.model,
+                entry["dataset"],
+                entry["method"],
+                entry["budget"],
+                frontier_tag,
+            )
+            entry["run_dir"] = str(resolved_run_dir.resolve()) if resolved_run_dir is not None else None
+        manifest_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if args.dry_run or (args.summary_json is None and args.summary_csv is None):
         return
