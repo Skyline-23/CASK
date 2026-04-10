@@ -1,0 +1,5 @@
+task,label,final_answer_match,exact_output_match,normalized_output_match,sequence_ratio,prefix_token_ratio,prefix_char_ratio,output_token_ratio,output_token_delta,candidate_terminal_saved_ratio,candidate_compression_events,report_path
+qasper,TriAttention @ 512,0.0,0.0,0.0,0.04201680672268908,0.01818181818181818,0.016467065868263474,1.0,0.0,,,C:\Users\Skyline23\Downloads\triattention\experiments\reports\qasper_output_fidelity_vs_fullkv_tri512.json
+qasper,CASK @ 512,0.0,0.0,0.0,0.1735159817351598,0.045454545454545456,0.04790419161676647,1.0,0.0,0.0,0.0,C:\Users\Skyline23\Downloads\triattention\experiments\reports\qasper_output_fidelity_vs_fullkv_cask512.json
+2wikimqa,TriAttention @ 512,0.0,0.0,0.0,0.08333333333333333,0.125,0.1,1.0,0.0,,,C:\Users\Skyline23\Downloads\triattention\experiments\reports\2wikimqa_output_fidelity_vs_fullkv_tri512.json
+2wikimqa,CASK @ 384,0.0,0.0,0.0,0.7027027027027027,0.625,0.5666666666666667,1.0,0.0,0.0,0.0,C:\Users\Skyline23\Downloads\triattention\experiments\reports\2wikimqa_output_fidelity_vs_fullkv_cask384.json

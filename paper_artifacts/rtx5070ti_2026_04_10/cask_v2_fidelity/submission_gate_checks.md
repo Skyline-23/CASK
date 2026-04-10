@@ -27,6 +27,19 @@ Interpretation:
 - It should be cited as **two-stage coverage evidence**, not as decode-merge
   evidence.
 
+Stage-contribution summary:
+
+| Method | Budget | Ref-Length Saved Ratio | Prefix Events | Decode Events | Stage Profile |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `triattention @ 384` | `384` | `0.8786` | `0` | `0` | `eviction_only_baseline` |
+| `triattention @ 512` | `512` | `0.8481` | `0` | `0` | `eviction_only_baseline` |
+| `cask @ 384` | `384` | `0.8786` | `1` | `0` | `prefix_only_active` |
+| `cask @ 384 (coverage 0.0625)` | `384` | `0.8786` | `1` | `0` | `prefix_only_active` |
+| `cask @ 256` | `256` | `0.9090` | `1` | `0` | `prefix_only_active` |
+
+This is the cleanest evidence that the current prompt-heavy gain comes from the
+two-stage prefix policy rather than from decode-stage merge.
+
 ## 2. Output-level sanity on `qasper @ 512`
 
 Greedy generation compared to the `fullkv` output:
@@ -78,6 +91,19 @@ Interpretation:
   prompt-heavy story: the gain is real, but not every task yields the same kind
   of win.
 
+Coverage-reserve ablation:
+
+| Variant | Coverage Ratio | Top-1 | Top-5 | Mean NLL | First Mismatch |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `cask @ 384` | `0` | `0.5313` | `0.8438` | `2.5322` | `2` |
+| `cask @ 384` | `0.0625` | `0.5625` | `0.8438` | `2.4323` | `2` |
+| `cask @ 384` | `0.125` | `0.5625` | `0.8438` | `2.5400` | `2` |
+
+This ablation supports the current reverse-engineering story:
+- score-only prefix eviction was leaving `2wikimqa` under-covered
+- a small coverage reserve fixes part of that drift
+- pushing the reserve further does not keep helping
+
 ## 4. Representative-mode ablation on `hexagon @ 104`
 
 Teacher-forced replay against `fullkv`:
@@ -98,6 +124,8 @@ The current package is enough for a **submission-facing draft**:
 - same-budget fidelity advantage exists across the tracked math witnesses,
   plus one strong LongBench prompt-heavy crossing witness
 - two-stage coverage is now supported by an actual LongBench example
+- prompt-heavy stage contribution is now explicitly decomposed into prefix-only
+  gains versus decode-active gains
 - one implementation ablation supports the current representative default
 - one boundary-case prompt-heavy task shows `cask` can still be much closer to
   `fullkv` under actual greedy decoding even when teacher-forced `top1` does

@@ -124,6 +124,9 @@ The tracked local summary lives here:
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/teacher_forced_budget_sweep_summary.csv`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/teacher_forced_budget_sweep_summary.json`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/longbench_qasper_prompt_heavy_witness.md`
+- `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_stage_summary.csv`
+- `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_output_sanity.csv`
+- `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_stage_and_output_summary.md`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/submission_gate_checks.md`
 
 That sweep covers:
@@ -139,8 +142,9 @@ High-level read:
 - `geometry434`: CASK wins at `104`, `128`, and `192`; `160` is essentially parity.
 - `hexagon`: CASK is clearly stronger at `104` and `192`, with near-parity at `128` and `160`.
 - `qasper`: CASK shows a prompt-heavy budget crossing. Both `cask @ 384` and `cask @ 256` outperform `triattention @ 512` on the tracked teacher-forced fidelity metrics, although this witness is still prefix-stage-only rather than decode-merge evidence.
-- `2wikimqa`: the prompt-heavy picture is mixed under teacher-forced `top1`, but `cask` still improves `top5`/`mean_nll` and is far closer to the `fullkv` greedy output than `triattention`, so this task is better treated as a boundary case than as a negative example.
-- `submission_gate_checks.md`: small add-on package covering one LongBench witness, one representative-mode ablation, and one actual-output sanity check.
+- `2wikimqa`: the prompt-heavy picture is mixed under teacher-forced `top1`, but `cask` still improves `top5`/`mean_nll` and is far closer to the `fullkv` greedy output than `triattention`. A small `prefix_coverage_ratio=0.0625` reserve improves this boundary case, while `0.125` does not.
+- `prompt_heavy_stage_and_output_summary.md`: consolidates the prompt-heavy stage decomposition, the `2wikimqa` coverage-reserve ablation, and the output-level sanity table.
+- `submission_gate_checks.md`: small add-on package covering one LongBench witness, one representative-mode ablation, and prompt-heavy boundary checks.
 
 `first_mismatch` is useful, but it should be plotted together with `top1` or `mean_nll`, not interpreted alone.
 
@@ -150,6 +154,7 @@ High-level read:
 - `scripts/worker.py`: HuggingFace execution path for all supported methods.
 - `scripts/replay_reference_fidelity.py`: teacher-forced fidelity harness.
 - `scripts/compare_kv_fidelity.py`: output-level fidelity comparison helper.
+- `scripts/build_prompt_heavy_artifacts.py`: promotes selected prompt-heavy replay reports into tracked paper-facing tables.
 - `triattention/methods/triattention.py`: TriAttention baseline.
 - `triattention/methods/cask.py`: CASK mainline implementation.
 - `paper_artifacts/`: tracked paper-facing summaries and frozen experiment snapshots.
