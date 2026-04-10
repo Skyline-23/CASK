@@ -4,7 +4,23 @@ This note records the extra checks added after the initial witness sweep to
 estimate whether the current CASK paper package is strong enough for
 submission.
 
-## 1. LongBench prompt-heavy witness: `qasper` budget crossing
+## 1. Prompt-heavy decode-active witness: `multi_news`
+
+Teacher-forced replay against `fullkv`:
+
+| Method | Top-1 | Top-5 | Mean NLL | First Mismatch | Ref-Length Saved Ratio | Prefix Events | Decode Events |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `triattention @ 384` | `0.5371` | `0.8125` | `2.0676` | `2` | `0.8408` | `0` | `0` |
+| `cask @ 384` | `0.6582` | `0.9043` | `1.4737` | `2` | `0.8411` | `2` | `2` |
+
+Interpretation:
+- This is the cleanest prompt-heavy witness where **both** CASK stages are active.
+- At the same physical budget, CASK substantially improves `top1`, `top5`, and
+  `mean_nll` over TriAttention.
+- This closes the gap left by `qasper`: the prompt-heavy story is no longer
+  limited to prefix-only evidence.
+
+## 2. LongBench prompt-heavy witness: `qasper` budget crossing
 
 Teacher-forced replay against `fullkv`:
 
@@ -40,7 +56,7 @@ Stage-contribution summary:
 This is the cleanest evidence that the current prompt-heavy gain comes from the
 two-stage prefix policy rather than from decode-stage merge.
 
-## 2. Output-level sanity on `qasper @ 512`
+## 3. Output-level sanity on `qasper @ 512`
 
 Greedy generation compared to the `fullkv` output:
 
@@ -60,7 +76,7 @@ Interpretation:
 - It is still useful as a sanity check because `cask` remains materially closer
   to `fullkv` than `triattention` in actual greedy decoding.
 
-## 3. Boundary-case prompt-heavy witness: `2wikimqa`
+## 4. Boundary-case prompt-heavy witness: `2wikimqa`
 
 Teacher-forced replay against `fullkv`:
 
@@ -104,7 +120,7 @@ This ablation supports the current reverse-engineering story:
 - a small coverage reserve fixes part of that drift
 - pushing the reserve further does not keep helping
 
-## 4. Representative-mode ablation on `hexagon @ 104`
+## 5. Representative-mode ablation on `hexagon @ 104`
 
 Teacher-forced replay against `fullkv`:
 
@@ -122,10 +138,12 @@ Interpretation:
 
 The current package is enough for a **submission-facing draft**:
 - same-budget fidelity advantage exists across the tracked math witnesses,
-  plus one strong LongBench prompt-heavy crossing witness
-- two-stage coverage is now supported by an actual LongBench example
-- prompt-heavy stage contribution is now explicitly decomposed into prefix-only
-  gains versus decode-active gains
+  plus both a decode-active prompt-heavy witness and a strong prompt-heavy
+  crossing witness
+- two-stage coverage is now supported by actual LongBench examples in both the
+  prefix-only and decode-active regimes
+- prompt-heavy stage contribution is now explicitly decomposed into prefix-only,
+  decode-active, and boundary-case behavior
 - one implementation ablation supports the current representative default
 - one boundary-case prompt-heavy task shows `cask` can still be much closer to
   `fullkv` under actual greedy decoding even when teacher-forced `top1` does

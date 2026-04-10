@@ -141,6 +141,7 @@ High-level read:
 - `geometry248`: CASK beats TriAttention on `top1` and `mean_nll` at every tested budget.
 - `geometry434`: CASK wins at `104`, `128`, and `192`; `160` is essentially parity.
 - `hexagon`: CASK is clearly stronger at `104` and `192`, with near-parity at `128` and `160`.
+- `multi_news`: CASK now has a prompt-heavy **decode-active** witness. At the same `384` budget, both stages fire and CASK substantially improves `top1`, `top5`, and `mean_nll` over `triattention`.
 - `qasper`: CASK shows a prompt-heavy budget crossing. Both `cask @ 384` and `cask @ 256` outperform `triattention @ 512` on the tracked teacher-forced fidelity metrics, although this witness is still prefix-stage-only rather than decode-merge evidence.
 - `2wikimqa`: the prompt-heavy picture is mixed under teacher-forced `top1`, but `cask` still improves `top5`/`mean_nll` and is far closer to the `fullkv` greedy output than `triattention`. A small `prefix_coverage_ratio=0.0625` reserve improves this boundary case, while `0.125` does not.
 - `prompt_heavy_stage_and_output_summary.md`: consolidates the prompt-heavy stage decomposition, the `2wikimqa` coverage-reserve ablation, and the output-level sanity table.

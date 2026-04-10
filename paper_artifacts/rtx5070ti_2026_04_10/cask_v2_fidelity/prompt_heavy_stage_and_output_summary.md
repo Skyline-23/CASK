@@ -2,7 +2,19 @@
 
 This file promotes the prompt-heavy evidence from raw replay reports into tracked paper artifacts.
 
-## 1. Prompt-heavy stage contribution
+## 1. Decode-active prompt-heavy witness
+
+| Task | Method | Budget | Top-1 | Top-5 | Mean NLL | First Mismatch | Ref-Length Saved Ratio | Prefix Events | Decode Events | Stage Profile |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `multi_news` | `TriAttention @ 384` | `384` | `53.7%` | `81.2%` | `2.068` | `2` | `84.1%` | `0` | `0` | `eviction_only_baseline` |
+| `multi_news` | `CASK @ 384 (coverage 0.0625)` | `384` | `65.8%` | `90.4%` | `1.474` | `2` | `84.1%` | `2` | `2` | `two_stage_active` |
+
+Interpretation:
+- `multi_news @ 384` is the clean decode-active prompt-heavy witness.
+- `cask` fires both stage-1 prefix eviction and stage-2 decode consolidation (`prefix_events = 2`, `decode_events = 2`).
+- At the same physical budget, `cask` substantially improves `top1`, `top5`, and `mean_nll` over `triattention`.
+
+## 2. Prompt-heavy stage contribution
 
 | Task | Method | Budget | Top-1 | Top-5 | Mean NLL | First Mismatch | Ref-Length Saved Ratio | Prefix Events | Decode Events | Stage Profile |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
@@ -17,7 +29,7 @@ Interpretation:
 - Every `cask` row above is `prefix_only_active`; decode merge does not fire on this witness.
 - The crossing therefore comes from the two-stage prompt-aware prefix policy, not from decode-stage consolidation.
 
-## 2. Prefix coverage reserve ablation on `2wikimqa`
+## 3. Prefix coverage reserve ablation on `2wikimqa`
 
 | Variant | Coverage Ratio | Top-1 | Top-5 | Mean NLL | First Mismatch | Stage Profile |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -31,7 +43,7 @@ Interpretation:
 - A small coverage reserve (`0.0625`) improves `top1` and `mean_nll` relative to score-only prefix eviction.
 - Increasing the reserve to `0.125` does not help further, which suggests the correction is real but should stay small.
 
-## 3. Output-level sanity
+## 4. Output-level sanity
 
 | Task | Method | Final Answer Match | Sequence Ratio | Prefix Token Ratio |
 | --- | --- | ---: | ---: | ---: |

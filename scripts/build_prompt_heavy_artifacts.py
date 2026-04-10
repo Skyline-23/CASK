@@ -12,6 +12,18 @@ ARTIFACT_DIR = ROOT / "paper_artifacts" / "rtx5070ti_2026_04_10" / "cask_v2_fide
 
 TEACHER_FORCED_SPECS = [
     {
+        "task": "multi_news",
+        "variant": "tri_384",
+        "label": "TriAttention @ 384",
+        "report": "multi_news_teacher_forced_fidelity_vs_fullkv_tri384.json",
+    },
+    {
+        "task": "multi_news",
+        "variant": "cask_384_cov",
+        "label": "CASK @ 384 (coverage 0.0625)",
+        "report": "multi_news_teacher_forced_fidelity_vs_fullkv_cask384.json",
+    },
+    {
         "task": "qasper",
         "variant": "tri_384",
         "label": "TriAttention @ 384",
@@ -188,6 +200,7 @@ def fmt_num(value: float | None, digits: int = 3) -> str:
 
 
 def build_markdown(teacher_rows: list[dict], output_rows: list[dict]) -> str:
+    multi_news_rows = [row for row in teacher_rows if row["task"] == "multi_news"]
     qasper_rows = [row for row in teacher_rows if row["task"] == "qasper"]
     wiki_rows = [row for row in teacher_rows if row["task"] == "2wikimqa"]
     lines: list[str] = []
@@ -195,7 +208,24 @@ def build_markdown(teacher_rows: list[dict], output_rows: list[dict]) -> str:
     lines.append("")
     lines.append("This file promotes the prompt-heavy evidence from raw replay reports into tracked paper artifacts.")
     lines.append("")
-    lines.append("## 1. Prompt-heavy stage contribution")
+    lines.append("## 1. Decode-active prompt-heavy witness")
+    lines.append("")
+    lines.append("| Task | Method | Budget | Top-1 | Top-5 | Mean NLL | First Mismatch | Ref-Length Saved Ratio | Prefix Events | Decode Events | Stage Profile |")
+    lines.append("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+    for row in multi_news_rows:
+        lines.append(
+            f"| `multi_news` | `{row['label']}` | `{row['budget']}` | `{fmt_pct(row['top1'])}` | "
+            f"`{fmt_pct(row['top5'])}` | `{fmt_num(row['mean_nll'])}` | `{int(row['first_mismatch'])}` | "
+            f"`{fmt_pct(row['reference_terminal_saved_ratio'])}` | `{row['prefix_events'] or 0}` | "
+            f"`{row['decode_events'] or 0}` | `{row['stage_profile']}` |"
+        )
+    lines.append("")
+    lines.append("Interpretation:")
+    lines.append("- `multi_news @ 384` is the clean decode-active prompt-heavy witness.")
+    lines.append("- `cask` fires both stage-1 prefix eviction and stage-2 decode consolidation (`prefix_events = 2`, `decode_events = 2`).")
+    lines.append("- At the same physical budget, `cask` substantially improves `top1`, `top5`, and `mean_nll` over `triattention`.")
+    lines.append("")
+    lines.append("## 2. Prompt-heavy stage contribution")
     lines.append("")
     lines.append("| Task | Method | Budget | Top-1 | Top-5 | Mean NLL | First Mismatch | Ref-Length Saved Ratio | Prefix Events | Decode Events | Stage Profile |")
     lines.append("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
@@ -212,7 +242,7 @@ def build_markdown(teacher_rows: list[dict], output_rows: list[dict]) -> str:
     lines.append("- Every `cask` row above is `prefix_only_active`; decode merge does not fire on this witness.")
     lines.append("- The crossing therefore comes from the two-stage prompt-aware prefix policy, not from decode-stage consolidation.")
     lines.append("")
-    lines.append("## 2. Prefix coverage reserve ablation on `2wikimqa`")
+    lines.append("## 3. Prefix coverage reserve ablation on `2wikimqa`")
     lines.append("")
     lines.append("| Variant | Coverage Ratio | Top-1 | Top-5 | Mean NLL | First Mismatch | Stage Profile |")
     lines.append("| --- | ---: | ---: | ---: | ---: | ---: | --- |")
@@ -229,7 +259,7 @@ def build_markdown(teacher_rows: list[dict], output_rows: list[dict]) -> str:
     lines.append("- A small coverage reserve (`0.0625`) improves `top1` and `mean_nll` relative to score-only prefix eviction.")
     lines.append("- Increasing the reserve to `0.125` does not help further, which suggests the correction is real but should stay small.")
     lines.append("")
-    lines.append("## 3. Output-level sanity")
+    lines.append("## 4. Output-level sanity")
     lines.append("")
     lines.append("| Task | Method | Final Answer Match | Sequence Ratio | Prefix Token Ratio |")
     lines.append("| --- | --- | ---: | ---: | ---: |")
