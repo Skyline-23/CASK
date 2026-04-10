@@ -1,0 +1,7 @@
+dataset,budget,method,top1,top5,strict_prefix,first_mismatch,mean_nll,saved_ratio,cache_ratio,ref_saved_ratio,records,compression_events,guards,source_json
+aime24_ref6,256,cask,88.4277,99.1536,0.8464,8.6667,0.358687,65.2786,34.7214,65.308,6,4.0,0,experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/cask_budget_256.json
+aime24_ref6,384,cask,90.7552,99.7396,0.8464,8.6667,0.268154,61.5538,38.4462,61.5865,6,3.6667,0,experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/cask_budget_384.json
+aime24_ref6,512,cask,91.6829,99.9023,0.8464,8.6667,0.232812,43.5191,56.4809,43.567,6,2.6667,0,experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/cask_budget_512.json
+aime24_ref6,256,triattention,86.1003,98.0306,0.8464,8.6667,0.46332,65.308,34.692,65.308,6,0.0,0,experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/triattention_budget_256.json
+aime24_ref6,384,triattention,88.265,98.8607,0.8464,8.6667,0.382914,61.5865,38.4135,61.5865,6,0.0,0,experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/triattention_budget_384.json
+aime24_ref6,512,triattention,89.4206,99.1048,0.8464,8.6667,0.332736,43.567,56.433,43.567,6,0.0,0,experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/triattention_budget_512.json

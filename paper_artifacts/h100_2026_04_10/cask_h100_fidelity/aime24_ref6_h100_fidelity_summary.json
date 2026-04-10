@@ -1,0 +1,226 @@
+{
+  "same_budget": {
+    "256": {
+      "triattention": {
+        "dataset": "aime24_ref6",
+        "budget": 256,
+        "method": "triattention",
+        "top1": 86.1003,
+        "top5": 98.0306,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.46332,
+        "saved_ratio": 65.308,
+        "cache_ratio": 34.692,
+        "ref_saved_ratio": 65.308,
+        "records": 6,
+        "compression_events": 0.0,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/triattention_budget_256.json"
+      },
+      "cask": {
+        "dataset": "aime24_ref6",
+        "budget": 256,
+        "method": "cask",
+        "top1": 88.4277,
+        "top5": 99.1536,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.358687,
+        "saved_ratio": 65.2786,
+        "cache_ratio": 34.7214,
+        "ref_saved_ratio": 65.308,
+        "records": 6,
+        "compression_events": 4.0,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/cask_budget_256.json"
+      },
+      "cask_minus_triattention": {
+        "top1": 2.3274,
+        "top5": 1.123,
+        "strict_prefix": 0.0,
+        "first_mismatch": 0.0,
+        "mean_nll": -0.104633,
+        "saved_ratio": -0.0294
+      }
+    },
+    "384": {
+      "triattention": {
+        "dataset": "aime24_ref6",
+        "budget": 384,
+        "method": "triattention",
+        "top1": 88.265,
+        "top5": 98.8607,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.382914,
+        "saved_ratio": 61.5865,
+        "cache_ratio": 38.4135,
+        "ref_saved_ratio": 61.5865,
+        "records": 6,
+        "compression_events": 0.0,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/triattention_budget_384.json"
+      },
+      "cask": {
+        "dataset": "aime24_ref6",
+        "budget": 384,
+        "method": "cask",
+        "top1": 90.7552,
+        "top5": 99.7396,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.268154,
+        "saved_ratio": 61.5538,
+        "cache_ratio": 38.4462,
+        "ref_saved_ratio": 61.5865,
+        "records": 6,
+        "compression_events": 3.6667,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/cask_budget_384.json"
+      },
+      "cask_minus_triattention": {
+        "top1": 2.4902,
+        "top5": 0.8789,
+        "strict_prefix": 0.0,
+        "first_mismatch": 0.0,
+        "mean_nll": -0.11476,
+        "saved_ratio": -0.0327
+      }
+    },
+    "512": {
+      "triattention": {
+        "dataset": "aime24_ref6",
+        "budget": 512,
+        "method": "triattention",
+        "top1": 89.4206,
+        "top5": 99.1048,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.332736,
+        "saved_ratio": 43.567,
+        "cache_ratio": 56.433,
+        "ref_saved_ratio": 43.567,
+        "records": 6,
+        "compression_events": 0.0,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/triattention_budget_512.json"
+      },
+      "cask": {
+        "dataset": "aime24_ref6",
+        "budget": 512,
+        "method": "cask",
+        "top1": 91.6829,
+        "top5": 99.9023,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.232812,
+        "saved_ratio": 43.5191,
+        "cache_ratio": 56.4809,
+        "ref_saved_ratio": 43.567,
+        "records": 6,
+        "compression_events": 2.6667,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/cask_budget_512.json"
+      },
+      "cask_minus_triattention": {
+        "top1": 2.2623,
+        "top5": 0.7975,
+        "strict_prefix": 0.0,
+        "first_mismatch": 0.0,
+        "mean_nll": -0.099924,
+        "saved_ratio": -0.0479
+      }
+    }
+  },
+  "budget_crossing": {
+    "cask_256_vs_tri_384": {
+      "cask": {
+        "dataset": "aime24_ref6",
+        "budget": 256,
+        "method": "cask",
+        "top1": 88.4277,
+        "top5": 99.1536,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.358687,
+        "saved_ratio": 65.2786,
+        "cache_ratio": 34.7214,
+        "ref_saved_ratio": 65.308,
+        "records": 6,
+        "compression_events": 4.0,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/cask_budget_256.json"
+      },
+      "triattention": {
+        "dataset": "aime24_ref6",
+        "budget": 384,
+        "method": "triattention",
+        "top1": 88.265,
+        "top5": 98.8607,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.382914,
+        "saved_ratio": 61.5865,
+        "cache_ratio": 38.4135,
+        "ref_saved_ratio": 61.5865,
+        "records": 6,
+        "compression_events": 0.0,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/triattention_budget_384.json"
+      },
+      "delta": {
+        "top1": 0.1627,
+        "top5": 0.2929,
+        "mean_nll": -0.024227,
+        "saved_ratio": 3.6921
+      }
+    },
+    "cask_384_vs_tri_512": {
+      "cask": {
+        "dataset": "aime24_ref6",
+        "budget": 384,
+        "method": "cask",
+        "top1": 90.7552,
+        "top5": 99.7396,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.268154,
+        "saved_ratio": 61.5538,
+        "cache_ratio": 38.4462,
+        "ref_saved_ratio": 61.5865,
+        "records": 6,
+        "compression_events": 3.6667,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/cask_budget_384.json"
+      },
+      "triattention": {
+        "dataset": "aime24_ref6",
+        "budget": 512,
+        "method": "triattention",
+        "top1": 89.4206,
+        "top5": 99.1048,
+        "strict_prefix": 0.8464,
+        "first_mismatch": 8.6667,
+        "mean_nll": 0.332736,
+        "saved_ratio": 43.567,
+        "cache_ratio": 56.433,
+        "ref_saved_ratio": 43.567,
+        "records": 6,
+        "compression_events": 0.0,
+        "guards": 0,
+        "source_json": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/triattention_budget_512.json"
+      },
+      "delta": {
+        "top1": 1.3346,
+        "top5": 0.6348,
+        "mean_nll": -0.064582,
+        "saved_ratio": 17.9868
+      }
+    }
+  },
+  "provenance": {
+    "frontier_dir": "experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410",
+    "created_at": "2026-04-10T23:38:38"
+  }
+}
