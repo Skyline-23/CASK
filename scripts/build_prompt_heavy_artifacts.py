@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import csv
 import json
+import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from triattention.benchmarks.longbench.metrics import DATASET_TO_METRIC
+
 REPORTS_DIR = ROOT / "experiments" / "reports"
 ARTIFACT_DIR = ROOT / "paper_artifacts" / "rtx5070ti_2026_04_10" / "cask_v2_fidelity"
 
@@ -82,6 +87,16 @@ TEACHER_FORCED_SPECS = [
 
 OUTPUT_FIDELITY_SPECS = [
     {
+        "task": "multi_news",
+        "label": "TriAttention @ 384",
+        "report": "multi_news_output_fidelity_vs_fullkv_tri384.json",
+    },
+    {
+        "task": "multi_news",
+        "label": "CASK @ 384",
+        "report": "multi_news_output_fidelity_vs_fullkv_cask384.json",
+    },
+    {
         "task": "qasper",
         "label": "TriAttention @ 512",
         "report": "qasper_output_fidelity_vs_fullkv_tri512.json",
@@ -100,6 +115,45 @@ OUTPUT_FIDELITY_SPECS = [
         "task": "2wikimqa",
         "label": "CASK @ 384",
         "report": "2wikimqa_output_fidelity_vs_fullkv_cask384.json",
+    },
+]
+
+
+TASK_METRIC_SPECS = [
+    {
+        "task": "qasper",
+        "label": "TriAttention @ 512",
+        "merged_jsonl": ROOT / "experiments" / "outputs" / "longbench_qasper" / "Qwen3-8B" / "sample1" / "triattention" / "merged" / "merged.jsonl",
+    },
+    {
+        "task": "qasper",
+        "label": "CASK @ 512",
+        "merged_jsonl": ROOT / "experiments" / "outputs" / "longbench_qasper" / "Qwen3-8B" / "sample1" / "cask" / "merged" / "merged.jsonl",
+    },
+    {
+        "task": "2wikimqa",
+        "label": "TriAttention @ 512",
+        "merged_jsonl": ROOT / "experiments" / "outputs" / "longbench_2wikimqa" / "Qwen3-8B" / "sample1" / "triattention" / "merged" / "merged.jsonl",
+    },
+    {
+        "task": "2wikimqa",
+        "label": "CASK @ 384",
+        "merged_jsonl": ROOT / "experiments" / "outputs" / "longbench_2wikimqa" / "Qwen3-8B" / "sample1" / "cask" / "merged" / "merged.jsonl",
+    },
+    {
+        "task": "multi_news",
+        "label": "TriAttention @ 384",
+        "merged_jsonl": ROOT / "experiments" / "outputs" / "longbench_multi_news" / "Qwen3-8B" / "sample1" / "triattention" / "merged" / "merged.jsonl",
+    },
+    {
+        "task": "multi_news",
+        "label": "CASK @ 384",
+        "merged_jsonl": ROOT / "experiments" / "outputs" / "longbench_multi_news" / "Qwen3-8B" / "sample1" / "cask" / "merged" / "merged.jsonl",
+    },
+    {
+        "task": "multi_news",
+        "label": "FullKV",
+        "merged_jsonl": ROOT / "experiments" / "outputs" / "longbench_multi_news" / "Qwen3-8B" / "sample1" / "fullkv" / "merged" / "merged.jsonl",
     },
 ]
 
@@ -178,6 +232,32 @@ def build_output_rows() -> list[dict]:
     return rows
 
 
+def build_task_metric_rows() -> list[dict]:
+    rows: list[dict] = []
+    for spec in TASK_METRIC_SPECS:
+        merged_path = spec["merged_jsonl"]
+        record = json.loads(merged_path.read_text(encoding="utf-8").splitlines()[0])
+        metric_fn = DATASET_TO_METRIC[spec["task"]]
+        answers = record.get("answers") or []
+        prediction = record.get("output", "")
+        score = max(
+            (
+                metric_fn(prediction, answer, all_classes=record.get("all_classes"))
+                for answer in answers
+            ),
+            default=None,
+        )
+        rows.append(
+            {
+                "task": spec["task"],
+                "label": spec["label"],
+                "task_metric": score,
+                "merged_jsonl": str(merged_path.resolve()),
+            }
+        )
+    return rows
+
+
 def write_csv(path: Path, rows: list[dict]) -> None:
     if not rows:
         return
@@ -199,7 +279,7 @@ def fmt_num(value: float | None, digits: int = 3) -> str:
     return f"{value:.{digits}f}"
 
 
-def build_markdown(teacher_rows: list[dict], output_rows: list[dict]) -> str:
+def build_markdown(teacher_rows: list[dict], output_rows: list[dict], task_metric_rows: list[dict]) -> str:
     multi_news_rows = [row for row in teacher_rows if row["task"] == "multi_news"]
     qasper_rows = [row for row in teacher_rows if row["task"] == "qasper"]
     wiki_rows = [row for row in teacher_rows if row["task"] == "2wikimqa"]
@@ -274,6 +354,19 @@ def build_markdown(teacher_rows: list[dict], output_rows: list[dict]) -> str:
     lines.append("- `qasper` is the clean crossing witness.")
     lines.append("- `2wikimqa` is the mixed but informative boundary case that motivated the coverage-reserve correction.")
     lines.append("")
+    lines.append("## 5. Single-example task metric sanity")
+    lines.append("")
+    lines.append("| Task | Method | Task Metric |")
+    lines.append("| --- | --- | ---: |")
+    for row in task_metric_rows:
+        lines.append(
+            f"| `{row['task']}` | `{row['label']}` | `{fmt_num(row['task_metric'])}` |"
+        )
+    lines.append("")
+    lines.append("Interpretation:")
+    lines.append("- These single-example task metrics are not a substitute for a full benchmark matrix.")
+    lines.append("- They do show that the observed fidelity gains on `qasper` and `multi_news` correspond to better task-visible outputs, while `2wikimqa` remains the honest boundary case.")
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -282,18 +375,23 @@ def main() -> None:
 
     teacher_rows = build_teacher_forced_rows()
     output_rows = build_output_rows()
+    task_metric_rows = build_task_metric_rows()
 
     teacher_json = ARTIFACT_DIR / "prompt_heavy_stage_summary.json"
     teacher_csv = ARTIFACT_DIR / "prompt_heavy_stage_summary.csv"
     output_json = ARTIFACT_DIR / "prompt_heavy_output_sanity.json"
     output_csv = ARTIFACT_DIR / "prompt_heavy_output_sanity.csv"
+    task_metric_json = ARTIFACT_DIR / "prompt_heavy_task_metrics.json"
+    task_metric_csv = ARTIFACT_DIR / "prompt_heavy_task_metrics.csv"
     markdown_path = ARTIFACT_DIR / "prompt_heavy_stage_and_output_summary.md"
 
     teacher_json.write_text(json.dumps(teacher_rows, indent=2), encoding="utf-8")
     output_json.write_text(json.dumps(output_rows, indent=2), encoding="utf-8")
+    task_metric_json.write_text(json.dumps(task_metric_rows, indent=2), encoding="utf-8")
     write_csv(teacher_csv, teacher_rows)
     write_csv(output_csv, output_rows)
-    markdown_path.write_text(build_markdown(teacher_rows, output_rows), encoding="utf-8")
+    write_csv(task_metric_csv, task_metric_rows)
+    markdown_path.write_text(build_markdown(teacher_rows, output_rows, task_metric_rows), encoding="utf-8")
 
 
 if __name__ == "__main__":

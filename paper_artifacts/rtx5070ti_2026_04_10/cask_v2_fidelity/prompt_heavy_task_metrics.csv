@@ -1,0 +1,8 @@
+task,label,task_metric,merged_jsonl
+qasper,TriAttention @ 512,0.01492537313432836,C:\Users\Skyline23\Downloads\triattention\experiments\outputs\longbench_qasper\Qwen3-8B\sample1\triattention\merged\merged.jsonl
+qasper,CASK @ 512,0.07547169811320754,C:\Users\Skyline23\Downloads\triattention\experiments\outputs\longbench_qasper\Qwen3-8B\sample1\cask\merged\merged.jsonl
+2wikimqa,TriAttention @ 512,0.0,C:\Users\Skyline23\Downloads\triattention\experiments\outputs\longbench_2wikimqa\Qwen3-8B\sample1\triattention\merged\merged.jsonl
+2wikimqa,CASK @ 384,0.0,C:\Users\Skyline23\Downloads\triattention\experiments\outputs\longbench_2wikimqa\Qwen3-8B\sample1\cask\merged\merged.jsonl
+multi_news,TriAttention @ 384,0.0,C:\Users\Skyline23\Downloads\triattention\experiments\outputs\longbench_multi_news\Qwen3-8B\sample1\triattention\merged\merged.jsonl
+multi_news,CASK @ 384,0.1393728174575388,C:\Users\Skyline23\Downloads\triattention\experiments\outputs\longbench_multi_news\Qwen3-8B\sample1\cask\merged\merged.jsonl
+multi_news,FullKV,0.17846153383649718,C:\Users\Skyline23\Downloads\triattention\experiments\outputs\longbench_multi_news\Qwen3-8B\sample1\fullkv\merged\merged.jsonl

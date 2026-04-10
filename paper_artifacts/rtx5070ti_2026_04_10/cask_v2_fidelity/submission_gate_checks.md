@@ -20,6 +20,18 @@ Interpretation:
 - This closes the gap left by `qasper`: the prompt-heavy story is no longer
   limited to prefix-only evidence.
 
+Actual-generation sanity on the same witness:
+
+| Method | Sequence Ratio vs `fullkv` | Task Metric |
+| --- | ---: | ---: |
+| `triattention @ 384` | `0.0000` | `0.0000` |
+| `cask @ 384` | `0.1690` | `0.1394` |
+| `fullkv` | `1.0000` | `0.1785` |
+
+This is still single-example evidence, but it shows that the same-budget
+fidelity gain on `multi_news` also translates into a meaningfully better
+generated summary.
+
 ## 2. LongBench prompt-heavy witness: `qasper` budget crossing
 
 Teacher-forced replay against `fullkv`:
@@ -144,6 +156,8 @@ The current package is enough for a **submission-facing draft**:
   prefix-only and decode-active regimes
 - prompt-heavy stage contribution is now explicitly decomposed into prefix-only,
   decode-active, and boundary-case behavior
+- prompt-heavy actual generation now shows at least one same-budget decode-active
+  witness where fidelity gains also map to a better task-visible output
 - one implementation ablation supports the current representative default
 - one boundary-case prompt-heavy task shows `cask` can still be much closer to
   `fullkv` under actual greedy decoding even when teacher-forced `top1` does

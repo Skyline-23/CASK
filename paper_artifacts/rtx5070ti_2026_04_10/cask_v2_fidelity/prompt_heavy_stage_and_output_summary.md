@@ -47,6 +47,8 @@ Interpretation:
 
 | Task | Method | Final Answer Match | Sequence Ratio | Prefix Token Ratio |
 | --- | --- | ---: | ---: | ---: |
+| `multi_news` | `TriAttention @ 384` | `0.0%` | `0.000` | `0.000` |
+| `multi_news` | `CASK @ 384` | `0.0%` | `0.169` | `0.081` |
 | `qasper` | `TriAttention @ 512` | `0.0%` | `0.042` | `0.018` |
 | `qasper` | `CASK @ 512` | `0.0%` | `0.174` | `0.045` |
 | `2wikimqa` | `TriAttention @ 512` | `0.0%` | `0.083` | `0.125` |
@@ -56,3 +58,19 @@ Interpretation:
 - The prompt-heavy story is not just teacher-forced: under actual greedy decoding, `cask` stays materially closer to the `fullkv` continuation than `triattention` on both tracked tasks.
 - `qasper` is the clean crossing witness.
 - `2wikimqa` is the mixed but informative boundary case that motivated the coverage-reserve correction.
+
+## 5. Single-example task metric sanity
+
+| Task | Method | Task Metric |
+| --- | --- | ---: |
+| `qasper` | `TriAttention @ 512` | `0.015` |
+| `qasper` | `CASK @ 512` | `0.075` |
+| `2wikimqa` | `TriAttention @ 512` | `0.000` |
+| `2wikimqa` | `CASK @ 384` | `0.000` |
+| `multi_news` | `TriAttention @ 384` | `0.000` |
+| `multi_news` | `CASK @ 384` | `0.139` |
+| `multi_news` | `FullKV` | `0.178` |
+
+Interpretation:
+- These single-example task metrics are not a substitute for a full benchmark matrix.
+- They do show that the observed fidelity gains on `qasper` and `multi_news` correspond to better task-visible outputs, while `2wikimqa` remains the honest boundary case.

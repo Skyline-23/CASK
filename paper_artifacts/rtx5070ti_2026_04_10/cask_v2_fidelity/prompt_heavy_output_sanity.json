@@ -1,5 +1,35 @@
 [
   {
+    "task": "multi_news",
+    "label": "TriAttention @ 384",
+    "final_answer_match": 0.0,
+    "exact_output_match": 0.0,
+    "normalized_output_match": 0.0,
+    "sequence_ratio": 0.0,
+    "prefix_token_ratio": 0.0,
+    "prefix_char_ratio": 0.0016891891891891893,
+    "output_token_ratio": 1.0,
+    "output_token_delta": 0.0,
+    "candidate_terminal_saved_ratio": null,
+    "candidate_compression_events": null,
+    "report_path": "C:\\Users\\Skyline23\\Downloads\\triattention\\experiments\\reports\\multi_news_output_fidelity_vs_fullkv_tri384.json"
+  },
+  {
+    "task": "multi_news",
+    "label": "CASK @ 384",
+    "final_answer_match": 0.0,
+    "exact_output_match": 0.0,
+    "normalized_output_match": 0.0,
+    "sequence_ratio": 0.16897856242118536,
+    "prefix_token_ratio": 0.08142493638676845,
+    "prefix_char_ratio": 0.0789695945945946,
+    "output_token_ratio": 1.0,
+    "output_token_delta": 0.0,
+    "candidate_terminal_saved_ratio": 0.33464052287581697,
+    "candidate_compression_events": 2.0,
+    "report_path": "C:\\Users\\Skyline23\\Downloads\\triattention\\experiments\\reports\\multi_news_output_fidelity_vs_fullkv_cask384.json"
+  },
+  {
     "task": "qasper",
     "label": "TriAttention @ 512",
     "final_answer_match": 0.0,
