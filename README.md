@@ -123,18 +123,21 @@ The tracked local summary lives here:
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/README.md`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/teacher_forced_budget_sweep_summary.csv`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/teacher_forced_budget_sweep_summary.json`
+- `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/longbench_qasper_prompt_heavy_witness.md`
 
 That sweep covers:
 
 - witnesses: `hexagon`, `geometry248`, `geometry434`
 - budgets: `104`, `128`, `160`, `192`
 - methods: `triattention`, `cask`
+- plus one prompt-heavy LongBench witness: `qasper @ 512`
 
 High-level read:
 
 - `geometry248`: CASK beats TriAttention on `top1` and `mean_nll` at every tested budget.
 - `geometry434`: CASK wins at `104`, `128`, and `192`; `160` is essentially parity.
 - `hexagon`: CASK is clearly stronger at `104` and `192`, with near-parity at `128` and `160`.
+- `qasper @ 512`: CASK improves same-budget prompt-heavy fidelity over TriAttention, but this witness is prefix-stage-only and should be read as two-stage coverage evidence rather than decode-merge evidence.
 
 `first_mismatch` is useful, but it should be plotted together with `top1` or `mean_nll`, not interpreted alone.
 

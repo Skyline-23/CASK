@@ -32,7 +32,7 @@ def load_shard(path: Path, expect_meta: bool) -> List[Dict]:
             print(f"[merge] skip {path}, meta status={meta.get('status')}.")
             return []
     items: List[Dict] = []
-    with path.open() as fp:
+    with path.open(encoding="utf-8") as fp:
         for line in fp:
             items.append(json.loads(line))
     return items
@@ -69,7 +69,7 @@ def main() -> None:
     all_items.sort(key=sort_key)
 
     merged_path = merged_dir / "merged.jsonl"
-    with merged_path.open("w") as fp:
+    with merged_path.open("w", encoding="utf-8") as fp:
         for item in all_items:
             fp.write(json.dumps(item, ensure_ascii=False) + "\n")
     print(f"Merged {len(all_items)} records into {merged_path}")

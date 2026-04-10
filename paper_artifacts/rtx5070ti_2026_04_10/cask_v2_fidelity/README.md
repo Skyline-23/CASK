@@ -9,10 +9,12 @@ Scope:
 - candidates: `triattention`, `cask`
 - budgets: `104`, `128`, `160`, `192`
 - witnesses: `hexagon`, `geometry248`, `geometry434`
+- additional prompt-heavy LongBench witness: `qasper @ 512`
 
 Primary files:
 - `teacher_forced_budget_sweep_summary.csv`
 - `teacher_forced_budget_sweep_summary.json`
+- `longbench_qasper_prompt_heavy_witness.md`
 
 Columns:
 - `problem`: local witness label
@@ -31,6 +33,7 @@ High-level takeaways:
 - `geometry248`: CASK v2 beats TriAttention on `top1` and `mean_nll` at every tested budget, while TriAttention keeps slightly higher terminal savings.
 - `geometry434`: CASK v2 wins on `104`, `128`, and `192`; `160` is effectively parity and should be treated as a tradeoff point.
 - `hexagon`: CASK clearly wins at `104` and `192`, while `128` and `160` are close-to-parity budgets.
+- `qasper @ 512`: CASK improves prompt-heavy same-budget fidelity over TriAttention on `top1`, `top5`, `strict_prefix`, `mean_nll`, and `first_mismatch`; this witness isolates the prefix stage because decode-stage merge does not activate.
 - `first_mismatch` is useful for charts but should not be interpreted alone; on `geometry248` it is non-monotonic across budgets, so the chart should be paired with `top1` or `mean_nll`.
 
 Provenance:
