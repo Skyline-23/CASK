@@ -138,7 +138,7 @@ High-level read:
 - `geometry248`: CASK beats TriAttention on `top1` and `mean_nll` at every tested budget.
 - `geometry434`: CASK wins at `104`, `128`, and `192`; `160` is essentially parity.
 - `hexagon`: CASK is clearly stronger at `104` and `192`, with near-parity at `128` and `160`.
-- `qasper @ 512`: CASK improves same-budget prompt-heavy fidelity over TriAttention, but this witness is prefix-stage-only and should be read as two-stage coverage evidence rather than decode-merge evidence.
+- `qasper`: CASK shows a prompt-heavy budget crossing. Both `cask @ 384` and `cask @ 256` outperform `triattention @ 512` on the tracked teacher-forced fidelity metrics, although this witness is still prefix-stage-only rather than decode-merge evidence.
 - `submission_gate_checks.md`: small add-on package covering one LongBench witness, one representative-mode ablation, and one actual-output sanity check.
 
 `first_mismatch` is useful, but it should be plotted together with `top1` or `mean_nll`, not interpreted alone.

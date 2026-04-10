@@ -4,17 +4,23 @@ This note records the extra checks added after the initial witness sweep to
 estimate whether the current CASK paper package is strong enough for
 submission.
 
-## 1. LongBench prompt-heavy witness: `qasper @ 512`
+## 1. LongBench prompt-heavy witness: `qasper` budget crossing
 
 Teacher-forced replay against `fullkv`:
 
 | Method | Top-1 | Top-5 | Strict Prefix | Mean NLL | First Mismatch |
 | --- | ---: | ---: | ---: | ---: | ---: |
+| `cask @ 256` | `0.6953` | `0.9531` | `0.0313` | `1.2583` | `4` |
+| `cask @ 384` | `0.7656` | `0.9531` | `0.0469` | `1.0135` | `6` |
+| `triattention @ 384` | `0.6719` | `0.9063` | `0.0156` | `1.3659` | `2` |
 | `triattention @ 512` | `0.6563` | `0.9063` | `0.0156` | `1.3839` | `2` |
 | `cask @ 512` | `0.7578` | `0.9453` | `0.0469` | `1.1091` | `6` |
 
 Interpretation:
-- `cask` is clearly better on same-budget prompt-heavy fidelity.
+- `cask @ 384` beats `triattention @ 512` on every tracked fidelity metric while
+  using `25%` less physical budget.
+- `cask @ 256` still beats `triattention @ 512`, giving a `50%` budget-crossing
+  example on this prompt-heavy LongBench witness.
 - This witness is **prefix-stage dominated**:
   - `prefix_compression_events = 1`
   - `compression_events = 0`
