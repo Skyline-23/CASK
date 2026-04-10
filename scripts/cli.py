@@ -490,6 +490,7 @@ def build_config(
         elif mode == "cask":
             runner_args.setdefault("triattention_horizon_mode", "fixed")
             runner_args.setdefault("triattention_norm_mode", "tri")
+            runner_args.setdefault("cask_prefix_coverage_ratio", 0.0625)
             runner_args.setdefault("cask_protected_core_ratio", 0.5)
             runner_args.setdefault("cask_min_protected_core_tokens", 1)
             runner_args.setdefault("cask_core_selection_mode", "vote")
@@ -910,6 +911,7 @@ def build_run_one_cli_overrides(args: argparse.Namespace) -> dict | None:
         "triattention_kernel_s0": args.triattention_kernel_s0,
         "triattention_kernel_s1": args.triattention_kernel_s1,
         "triattention_norm_lambda": args.triattention_norm_lambda,
+        "cask_prefix_coverage_ratio": args.cask_prefix_coverage_ratio,
         "cask_protected_core_ratio": args.cask_protected_core_ratio,
         "cask_min_protected_core_tokens": args.cask_min_protected_core_tokens,
         "cask_core_selection_mode": args.cask_core_selection_mode,
@@ -1103,6 +1105,12 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the scalar multiplier applied to the selected norm coefficient.",
+    )
+    run_one_parser.add_argument(
+        "--cask-prefix-coverage-ratio",
+        type=float,
+        default=None,
+        help="Override the fraction of prefix budget reserved for evenly spaced coverage anchors in stage-1 eviction.",
     )
     run_one_parser.add_argument(
         "--cask-protected-core-ratio",

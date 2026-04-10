@@ -47,7 +47,38 @@ Interpretation:
 - It is still useful as a sanity check because `cask` remains materially closer
   to `fullkv` than `triattention` in actual greedy decoding.
 
-## 3. Representative-mode ablation on `hexagon @ 104`
+## 3. Boundary-case prompt-heavy witness: `2wikimqa`
+
+Teacher-forced replay against `fullkv`:
+
+| Method | Top-1 | Top-5 | Mean NLL | First Mismatch |
+| --- | ---: | ---: | ---: | ---: |
+| `triattention @ 512` | `0.5938` | `0.6875` | `3.5010` | `2` |
+| `cask @ 384` | `0.5625` | `0.8438` | `2.4323` | `2` |
+
+Greedy output comparison:
+
+| Method | Sequence Ratio vs `fullkv` | Prefix Token Ratio vs `fullkv` |
+| --- | ---: | ---: |
+| `triattention @ 512` | `0.0833` | `0.1250` |
+| `cask @ 384` | `0.7027` | `0.6250` |
+
+Observed outputs:
+- `fullkv`: `Based on Passage 2, the wife of Francis I Rákóczi, Jelena Zrinska, was born in Gyulafehérv`
+- `triattention @ 512`: collapses into repeated `Based on on on ...`
+- `cask @ 384`: keeps the answer structure and supporting relation, but still drifts to an incorrect surface form
+
+Interpretation:
+- This is a **boundary case**, not a clean win.
+- Under teacher-forced replay, `cask` improves `top5` and `mean_nll` but does
+  not beat `triattention` on `top1`.
+- Under actual greedy decoding, `cask` is dramatically closer to the `fullkv`
+  output than `triattention`.
+- This task is therefore best used to show the current limit of the prefix-only
+  prompt-heavy story: the gain is real, but not every task yields the same kind
+  of win.
+
+## 4. Representative-mode ablation on `hexagon @ 104`
 
 Teacher-forced replay against `fullkv`:
 
@@ -65,11 +96,12 @@ Interpretation:
 
 The current package is enough for a **submission-facing draft**:
 - same-budget fidelity advantage exists across the tracked math witnesses,
-  plus one LongBench prompt-heavy witness
+  plus one strong LongBench prompt-heavy crossing witness
 - two-stage coverage is now supported by an actual LongBench example
 - one implementation ablation supports the current representative default
-- one output-level sanity check shows `cask` remains closer to `fullkv` than
-  `triattention`, even when exact answer match is not achieved
+- one boundary-case prompt-heavy task shows `cask` can still be much closer to
+  `fullkv` under actual greedy decoding even when teacher-forced `top1` does
+  not flip
 
 It is still not a fully closed large-scale empirical package. The strongest
 current claim remains:

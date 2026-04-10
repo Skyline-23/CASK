@@ -30,6 +30,7 @@ from .triattention import (
 class CASKConfig(TriAttentionConfig):
     """Configuration for phase-2 CASK."""
 
+    prefix_coverage_ratio: float = 0.0625
     recent_window_size: int = 128
     protected_core_ratio: float = 0.5
     min_protected_core_tokens: int = 1
@@ -67,6 +68,7 @@ class CASK(TriAttention):
     def __init__(self, config: CASKConfig) -> None:
         super().__init__(config)
         self.recent_window_size = int(config.recent_window_size)
+        self.prefix_coverage_ratio = float(config.prefix_coverage_ratio)
         self.protected_core_ratio = float(config.protected_core_ratio)
         self.min_protected_core_tokens = int(config.min_protected_core_tokens)
         self.core_selection_mode = str(config.core_selection_mode).strip().lower()
@@ -88,6 +90,8 @@ class CASK(TriAttention):
         self.use_phase_markers = bool(config.use_phase_markers)
         if not (0.0 <= self.protected_core_ratio <= 1.0):
             raise ValueError("protected_core_ratio must be in [0, 1]")
+        if not (0.0 <= self.prefix_coverage_ratio <= 1.0):
+            raise ValueError("prefix_coverage_ratio must be in [0, 1]")
         if self.min_protected_core_tokens < 0:
             raise ValueError("min_protected_core_tokens must be >= 0")
         if self.core_selection_mode not in {"vote", "score"}:
@@ -133,6 +137,7 @@ class CASK(TriAttention):
 
     def _reset_runtime_stats(self) -> None:
         self.runtime_stats = {
+            "prefix_coverage_ratio": self.prefix_coverage_ratio,
             "core_selection_mode": self.core_selection_mode,
             "merge_operator": self.merge_operator,
             "prefix_stage_mode": "triattention_eviction",
@@ -262,8 +267,52 @@ class CASK(TriAttention):
             ) * 1e-6
             scored_matrix = scored_matrix + noise
         combined_scores = scored_matrix.max(dim=0).values
-        keep_relative = self._select_union_based(scored_matrix, combined_scores, prefix_budget)
-        return [int(idx) for idx in keep_relative.detach().to("cpu").tolist()]
+        coverage_budget = min(
+            prefix_budget // 2,
+            max(0, int(round(prefix_budget * self.prefix_coverage_ratio))),
+        )
+        if coverage_budget <= 0:
+            keep_relative = self._select_union_based(scored_matrix, combined_scores, prefix_budget)
+            return [int(idx) for idx in keep_relative.detach().to("cpu").tolist()]
+
+        anchor_positions = torch.linspace(
+            0,
+            prefix_length - 1,
+            steps=coverage_budget,
+            device=scored_matrix.device,
+        )
+        anchor_indices = sorted(
+            {
+                int(round(float(pos.item())))
+                for pos in anchor_positions
+            }
+        )
+        if not anchor_indices:
+            keep_relative = self._select_union_based(scored_matrix, combined_scores, prefix_budget)
+            return [int(idx) for idx in keep_relative.detach().to("cpu").tolist()]
+
+        selected = set(anchor_indices)
+        remaining_budget = max(0, prefix_budget - len(selected))
+        if remaining_budget > 0:
+            available_mask = torch.ones(prefix_length, device=scored_matrix.device, dtype=torch.bool)
+            available_mask[torch.tensor(anchor_indices, device=scored_matrix.device, dtype=torch.long)] = False
+            available_count = int(available_mask.sum().item())
+            if available_count > 0:
+                available_matrix = scored_matrix[:, available_mask]
+                available_scores = combined_scores[available_mask]
+                take = min(remaining_budget, available_count)
+                keep_relative = self._select_union_based(available_matrix, available_scores, take)
+                available_indices = torch.arange(prefix_length, device=scored_matrix.device)[available_mask]
+                selected.update(int(idx) for idx in available_indices[keep_relative].detach().to("cpu").tolist())
+
+        if len(selected) < prefix_budget:
+            score_order = torch.argsort(combined_scores, descending=True)
+            for idx in score_order.detach().to("cpu").tolist():
+                selected.add(int(idx))
+                if len(selected) >= prefix_budget:
+                    break
+
+        return sorted(selected)[:prefix_budget]
 
     def _apply_prefix_eviction_stage(
         self,
@@ -1442,6 +1491,7 @@ def apply_cask_patch(
     use_slack_trigger: bool = False,
     disable_mlr: bool = False,
     disable_trig: bool = False,
+    prefix_coverage_ratio: float = 0.0625,
     recent_window_size: int = 128,
     protected_core_ratio: float = 0.5,
     min_protected_core_tokens: int = 1,
@@ -1483,6 +1533,7 @@ def apply_cask_patch(
         disable_trig=disable_trig,
         horizon_mode="fixed",
         norm_mode="tri",
+        prefix_coverage_ratio=prefix_coverage_ratio,
         recent_window_size=recent_window_size,
         protected_core_ratio=protected_core_ratio,
         min_protected_core_tokens=min_protected_core_tokens,
@@ -1660,7 +1711,7 @@ def apply_cask_patch(
     model.forward = MethodType(cask_forward, model)
     print(
         f"[CASK] Applied two-stage compression (budget={kv_budget}, "
-        f"recent_window={recent_window_size}, core_ratio={protected_core_ratio}, "
+        f"prefix_coverage_ratio={prefix_coverage_ratio}, recent_window={recent_window_size}, core_ratio={protected_core_ratio}, "
         f"core_selection_mode={core_selection_mode}, "
         f"merge_operator={merge_operator}, "
         f"merge_local_window={merge_local_window}, similarity_threshold={merge_similarity_threshold}, "

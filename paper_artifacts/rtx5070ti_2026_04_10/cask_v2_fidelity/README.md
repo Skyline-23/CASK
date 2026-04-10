@@ -35,6 +35,7 @@ High-level takeaways:
 - `geometry434`: CASK v2 wins on `104`, `128`, and `192`; `160` is effectively parity and should be treated as a tradeoff point.
 - `hexagon`: CASK clearly wins at `104` and `192`, while `128` and `160` are close-to-parity budgets.
 - `qasper`: CASK now shows a prompt-heavy budget crossing; `cask @ 384` and even `cask @ 256` both outperform `triattention @ 512` on the tracked teacher-forced fidelity metrics, while isolating the value of the prefix stage in the two-stage design.
+- `2wikimqa`: CASK is mixed under teacher-forced `top1`, but still improves `top5`/`mean_nll` and stays dramatically closer to `fullkv` under actual greedy decoding, so it serves as a useful boundary case.
 - `submission_gate_checks.md` consolidates the extra prompt-heavy witness, one output-level sanity check, and one representative-mode ablation used to judge submission readiness.
 - `first_mismatch` is useful for charts but should not be interpreted alone; on `geometry248` it is non-monotonic across budgets, so the chart should be paired with `top1` or `mean_nll`.
 

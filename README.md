@@ -13,7 +13,7 @@ The repository name and the Python namespace still reflect the historical `Horiz
 CASK uses **2-stage compression**:
 
 1. **Stage 1: prefix compression**
-   Prompt-heavy runs first shrink the prefix with **TriAttention eviction** so the decode path is not dead on arrival.
+   Prompt-heavy runs first shrink the prefix with **TriAttention eviction plus a small coverage reserve** so the decode path is not dead on arrival and long prompts do not collapse to a purely score-ranked prefix.
 2. **Stage 2: decode compression**
    Decode-time tokens are split into a **protected core** and **mergeable scratch**. Core tokens are preserved. Scratch tokens are locally consolidated with the KeepKV-style merge operator under CASK's selection policy.
 
@@ -139,6 +139,7 @@ High-level read:
 - `geometry434`: CASK wins at `104`, `128`, and `192`; `160` is essentially parity.
 - `hexagon`: CASK is clearly stronger at `104` and `192`, with near-parity at `128` and `160`.
 - `qasper`: CASK shows a prompt-heavy budget crossing. Both `cask @ 384` and `cask @ 256` outperform `triattention @ 512` on the tracked teacher-forced fidelity metrics, although this witness is still prefix-stage-only rather than decode-merge evidence.
+- `2wikimqa`: the prompt-heavy picture is mixed under teacher-forced `top1`, but `cask` still improves `top5`/`mean_nll` and is far closer to the `fullkv` greedy output than `triattention`, so this task is better treated as a boundary case than as a negative example.
 - `submission_gate_checks.md`: small add-on package covering one LongBench witness, one representative-mode ablation, and one actual-output sanity check.
 
 `first_mismatch` is useful, but it should be plotted together with `top1` or `mean_nll`, not interpreted alone.

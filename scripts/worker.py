@@ -588,6 +588,14 @@ def parse_arguments() -> argparse.Namespace:
         help="Scalar multiplier applied to the selected TriAttention norm coefficient.",
     )
     parser.add_argument(
+        "--cask_prefix_coverage_ratio",
+        "--cask-prefix-coverage-ratio",
+        dest="cask_prefix_coverage_ratio",
+        type=float,
+        default=0.0625,
+        help="Fraction of the prefix budget reserved for evenly spaced coverage anchors during stage-1 eviction.",
+    )
+    parser.add_argument(
         "--cask_protected_core_ratio",
         "--cask-protected-core-ratio",
         dest="cask_protected_core_ratio",
@@ -971,6 +979,7 @@ def main(args: argparse.Namespace) -> None:
                 use_slack_trigger=args.slack_budget_trigger,
                 disable_mlr=args.disable_mlr,
                 disable_trig=args.disable_trig,
+                prefix_coverage_ratio=args.cask_prefix_coverage_ratio,
                 recent_window_size=args.window_size,
                 protected_core_ratio=args.cask_protected_core_ratio,
                 min_protected_core_tokens=args.cask_min_protected_core_tokens,

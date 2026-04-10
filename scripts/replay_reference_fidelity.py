@@ -114,6 +114,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--triattention-norm-lambda", type=float, default=1.0)
 
     parser.add_argument("--cask-protected-core-ratio", type=float, default=0.5)
+    parser.add_argument("--cask-prefix-coverage-ratio", type=float, default=0.0625)
     parser.add_argument("--cask-min-protected-core-tokens", type=int, default=1)
     parser.add_argument(
         "--cask-core-selection-mode",
@@ -198,6 +199,7 @@ def apply_candidate_method(
             use_slack_trigger=args.slack_budget_trigger,
             disable_mlr=args.disable_mlr,
             disable_trig=args.disable_trig,
+            prefix_coverage_ratio=args.cask_prefix_coverage_ratio,
             recent_window_size=args.window_size,
             protected_core_ratio=args.cask_protected_core_ratio,
             min_protected_core_tokens=args.cask_min_protected_core_tokens,
