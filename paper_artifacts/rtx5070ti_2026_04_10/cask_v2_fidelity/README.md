@@ -15,6 +15,7 @@ Primary files:
 - `teacher_forced_budget_sweep_summary.csv`
 - `teacher_forced_budget_sweep_summary.json`
 - `longbench_qasper_prompt_heavy_witness.md`
+- `submission_gate_checks.md`
 
 Columns:
 - `problem`: local witness label
@@ -34,6 +35,7 @@ High-level takeaways:
 - `geometry434`: CASK v2 wins on `104`, `128`, and `192`; `160` is effectively parity and should be treated as a tradeoff point.
 - `hexagon`: CASK clearly wins at `104` and `192`, while `128` and `160` are close-to-parity budgets.
 - `qasper @ 512`: CASK improves prompt-heavy same-budget fidelity over TriAttention on `top1`, `top5`, `strict_prefix`, `mean_nll`, and `first_mismatch`; this witness isolates the prefix stage because decode-stage merge does not activate.
+- `submission_gate_checks.md` consolidates the extra prompt-heavy witness, one output-level sanity check, and one representative-mode ablation used to judge submission readiness.
 - `first_mismatch` is useful for charts but should not be interpreted alone; on `geometry248` it is non-monotonic across budgets, so the chart should be paired with `top1` or `mean_nll`.
 
 Provenance:

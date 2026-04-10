@@ -124,6 +124,7 @@ The tracked local summary lives here:
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/teacher_forced_budget_sweep_summary.csv`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/teacher_forced_budget_sweep_summary.json`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/longbench_qasper_prompt_heavy_witness.md`
+- `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/submission_gate_checks.md`
 
 That sweep covers:
 
@@ -138,6 +139,7 @@ High-level read:
 - `geometry434`: CASK wins at `104`, `128`, and `192`; `160` is essentially parity.
 - `hexagon`: CASK is clearly stronger at `104` and `192`, with near-parity at `128` and `160`.
 - `qasper @ 512`: CASK improves same-budget prompt-heavy fidelity over TriAttention, but this witness is prefix-stage-only and should be read as two-stage coverage evidence rather than decode-merge evidence.
+- `submission_gate_checks.md`: small add-on package covering one LongBench witness, one representative-mode ablation, and one actual-output sanity check.
 
 `first_mismatch` is useful, but it should be plotted together with `top1` or `mean_nll`, not interpreted alone.
 
