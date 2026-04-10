@@ -127,6 +127,7 @@ The tracked local summary lives here:
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_stage_summary.csv`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_output_sanity.csv`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_task_metrics.csv`
+- `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/math_actual_accuracy_subset.md`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_stage_and_output_summary.md`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/submission_gate_checks.md`
 
@@ -146,6 +147,8 @@ High-level read:
 - `multi_news`: that same witness also shows an actual-generation gain, not just a replay gain. `sequence_ratio` rises from `0.000` to `0.169`, and the single-example task metric rises from `0.000` to `0.139` against `fullkv = 0.178`.
 - `qasper`: CASK shows a prompt-heavy budget crossing. Both `cask @ 384` and `cask @ 256` outperform `triattention @ 512` on the tracked teacher-forced fidelity metrics, although this witness is still prefix-stage-only rather than decode-merge evidence.
 - `2wikimqa`: the prompt-heavy picture is mixed under teacher-forced `top1`, but `cask` still improves `top5`/`mean_nll` and is far closer to the `fullkv` greedy output than `triattention`. A small `prefix_coverage_ratio=0.0625` reserve improves this boundary case, while `0.125` does not.
+- `hexagon`: on a tracked math witness, `triattention @ 104` fails while `cask @ 104` still produces the correct answer `42`, giving a compact reasoning-side answer-flip example.
+- `math_actual_accuracy_subset.md`: small `math500` bridge check showing that `cask` doubles draw-level exact match (`2/12 -> 4/12`) on a 3-witness subset at `budget = 104`, driven by a `hexagon` robustness gain (`2/4 -> 4/4`).
 - `prompt_heavy_stage_and_output_summary.md`: consolidates the prompt-heavy stage decomposition, the `2wikimqa` coverage-reserve ablation, and the output-level sanity table.
 - `submission_gate_checks.md`: small add-on package covering one LongBench witness, one representative-mode ablation, and prompt-heavy boundary checks.
 

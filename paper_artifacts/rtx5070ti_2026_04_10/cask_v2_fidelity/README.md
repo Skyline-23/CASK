@@ -21,6 +21,7 @@ Primary files:
 - `prompt_heavy_output_sanity.json`
 - `prompt_heavy_task_metrics.csv`
 - `prompt_heavy_task_metrics.json`
+- `math_actual_accuracy_subset.md`
 - `prompt_heavy_stage_and_output_summary.md`
 - `submission_gate_checks.md`
 
@@ -45,6 +46,8 @@ High-level takeaways:
 - `multi_news`: the same witness also improves actual-generation quality: `sequence_ratio` rises from `0.000` to `0.169`, and the single-example LongBench task metric rises from `0.000` to `0.139` against `fullkv = 0.178`.
 - `qasper`: CASK now shows a prompt-heavy budget crossing; `cask @ 384` and even `cask @ 256` both outperform `triattention @ 512` on the tracked teacher-forced fidelity metrics, while isolating the value of the prefix stage in the two-stage design.
 - `2wikimqa`: CASK is mixed under teacher-forced `top1`, but still improves `top5`/`mean_nll` and stays dramatically closer to `fullkv` under actual greedy decoding. The new prompt-heavy summary files also show that a small prefix coverage reserve (`0.0625`) is a useful correction while a larger one (`0.125`) is not.
+- `hexagon`: on the reasoning-side actual witness, `triattention @ 104` fails while `cask @ 104` still produces the correct answer `42`, giving a compact example where the fidelity gap maps to a real answer flip.
+- `math_actual_accuracy_subset.md`: the smallest math-side bridge check now shows `cask` doubling draw-level exact match (`2/12 -> 4/12`) on a 3-witness subset at `budget = 104`, driven by a `hexagon` robustness gain (`2/4 -> 4/4`) even though subset-level `pass@4` stays tied.
 - `prompt_heavy_stage_and_output_summary.md`: consolidates the prompt-heavy stage decomposition, the `2wikimqa` prefix-coverage ablation, and the output-level sanity table into one tracked note.
 - `submission_gate_checks.md` consolidates the extra prompt-heavy witness, one output-level sanity check, and one representative-mode ablation used to judge submission readiness.
 - `first_mismatch` is useful for charts but should not be interpreted alone; on `geometry248` it is non-monotonic across budgets, so the chart should be paired with `top1` or `mean_nll`.

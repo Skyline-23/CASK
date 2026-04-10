@@ -146,6 +146,60 @@ Interpretation:
   better than `weighted_latest`.
 - This is a small but useful ablation that supports the current default.
 
+## 6. Reasoning-task sanity on `hexagon @ 104`
+
+Actual generation on the tracked math witness:
+
+| Method | Extracted Answer | Correct |
+| --- | --- | ---: |
+| `fullkv` | `42` | `1` |
+| `triattention @ 104` | repeated `7...` tail | `0` |
+| `triattention @ 192` | `42` | `1` |
+| `cask @ 104` | `42` | `1` |
+
+Interpretation:
+- This is the cleanest reasoning-side example where a low-budget fidelity gain
+  also maps to an actual answer flip.
+- At `budget = 104`, `triattention` collapses and fails, while `cask` still
+  produces the correct final answer.
+- This complements the prompt-heavy evidence by showing that CASK is not only
+  improving continuation fidelity but can also preserve answer correctness at a
+  lower budget on at least one concrete math witness.
+
+## 7. Small `math500` actual-accuracy bridge subset
+
+Actual generation on a 3-witness subset at `budget = 104`, `sample4`,
+`stop_on_final_answer=true`:
+
+| Witness | TriAttention | CASK |
+| --- | ---: | ---: |
+| `hexagon` | `2/4` | `4/4` |
+| `geometry/248` | `0/4` | `0/4` |
+| `geometry/434` | `0/4` | `0/4` |
+
+Aggregate:
+
+| Metric | TriAttention | CASK |
+| --- | ---: | ---: |
+| draw-level exact match | `2/12` | `4/12` |
+| problem-level `pass@4` | `1/3` | `1/3` |
+
+Prompt-control rerun on `geometry/434`:
+
+| Prompt Style | TriAttention | CASK |
+| --- | ---: | ---: |
+| current answer-stabilized prompt | `0/4` | `0/4` |
+
+Interpretation:
+- This is not a headline benchmark win; it is a bridge check from replay
+  fidelity to actual answer extraction.
+- The strongest signal is `hexagon`, where `cask @ 104` succeeds on all 4
+  draws while `triattention @ 104` succeeds on only 2.
+- At the subset level, CASK doubles draw-level exact match (`2/12 -> 4/12`)
+  but does not yet improve `pass@4` (`1/3 -> 1/3`).
+- The `geometry/434` control rerun shows that its failure is not just a stale
+  prompt-format artifact.
+
 ## Bottom line
 
 The current package is enough for a **submission-facing draft**:
@@ -158,6 +212,10 @@ The current package is enough for a **submission-facing draft**:
   decode-active, and boundary-case behavior
 - prompt-heavy actual generation now shows at least one same-budget decode-active
   witness where fidelity gains also map to a better task-visible output
+- reasoning-side actual generation now includes one low-budget math witness
+  where CASK preserves the correct answer while TriAttention does not
+- the smallest math-side sample-based bridge check now shows a draw-level exact
+  match gain (`2/12 -> 4/12`) even though subset-level `pass@4` is still tied
 - one implementation ablation supports the current representative default
 - one boundary-case prompt-heavy task shows `cask` can still be much closer to
   `fullkv` under actual greedy decoding even when teacher-forced `top1` does
