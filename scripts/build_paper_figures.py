@@ -10,6 +10,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -375,6 +376,17 @@ def build_witness_map_figure(outdir: Path) -> str:
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9.5, 8.4))
     y_positions = list(range(len(WITNESS_TASKS)))
 
+    def annotate_value(ax: plt.Axes, x_value: float, y_value: float, text: str, color: str) -> None:
+        ax.annotate(
+            text,
+            xy=(x_value, y_value),
+            xytext=(4, 0),
+            textcoords="offset points",
+            fontsize=6.4,
+            color=color,
+            va="center",
+        )
+
     for idx, (task, role, color) in enumerate(WITNESS_TASKS):
         if task in {"vcsum", "qmsum", "gov_report"}:
             tri_256 = extra_rows[(task, 256, "triattention")]
@@ -396,6 +408,11 @@ def build_witness_map_figure(outdir: Path) -> str:
         ax1.scatter(delta_top1_384, idx + 0.12, marker="D", s=60, color=color, zorder=5, edgecolors="white", linewidth=0.5, alpha=0.7)
         ax2.scatter(delta_nll_256, idx - 0.12, marker="o", s=80, color=color, zorder=5, edgecolors="white", linewidth=0.5)
         ax2.scatter(delta_nll_384, idx + 0.12, marker="D", s=60, color=color, zorder=5, edgecolors="white", linewidth=0.5, alpha=0.7)
+
+        annotate_value(ax1, delta_top1_256, idx - 0.12, f"{delta_top1_256:+.1f}", color)
+        annotate_value(ax1, delta_top1_384, idx + 0.12, f"{delta_top1_384:+.1f}", color)
+        annotate_value(ax2, delta_nll_256, idx - 0.12, f"{delta_nll_256:+.2f}", color)
+        annotate_value(ax2, delta_nll_384, idx + 0.12, f"{delta_nll_384:+.2f}", color)
 
         cask_384_decode = int(cask_384.get("decode_events") or 0)
         cask_384_prefix = int(cask_384.get("prefix_events") or 0)
@@ -426,7 +443,17 @@ def build_witness_map_figure(outdir: Path) -> str:
     ax2.set_yticklabels(labels, fontsize=8)
     ax1.set_xlabel("Delta Top-1 (%p)")
     ax1.set_title("Top-1 Delta (CASK - TriAttention)", fontweight="bold")
-    ax1.legend(["Budget 256", "Budget 384"], loc="lower right", framealpha=0.9, fontsize=8)
+    ax1.legend(
+        handles=[
+            Line2D([0], [0], marker="o", color="none", markerfacecolor="#6B7280", markeredgecolor="white", markersize=8, label="Budget 256"),
+            Line2D([0], [0], marker="D", color="none", markerfacecolor="#9CA3AF", markeredgecolor="white", markersize=7, label="Budget 384"),
+        ],
+        loc="lower right",
+        framealpha=0.9,
+        fontsize=8,
+        title="Budget",
+        title_fontsize=8,
+    )
     ax1.set_xlim(-8.0, 18.5)
 
     ax2.set_xlabel("Delta Mean NLL")
