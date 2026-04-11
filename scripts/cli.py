@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CLI helpers for the TriAttention experiments wrapper (defaults-driven)."""
+"""CLI helpers for the CASK experiments wrapper (defaults-driven)."""
 from __future__ import annotations
 
 import argparse
@@ -22,7 +22,7 @@ import torch
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = REPO_ROOT.parent
 EXP_ROOT = REPO_ROOT / "experiments"
-CONFIG_ROOT = REPO_ROOT / "triattention" / "configs" / "shared"
+CONFIG_ROOT = REPO_ROOT / "cask" / "configs" / "shared"
 DEFAULTS_PATH = CONFIG_ROOT / "defaults.yaml"
 BUDGETS_PATH = CONFIG_ROOT / "budgets.yaml"
 RUNNER_DEFAULTS_PATH = CONFIG_ROOT / "runner_defaults.yaml"
@@ -31,7 +31,7 @@ LOGS_DIR = EXP_ROOT / "logs"
 OUTPUTS_DIR = EXP_ROOT / "outputs"
 STATS_DIR = EXP_ROOT / "stats"
 DATA_DIR = REPO_ROOT / "data"
-PACKAGED_STATS_ROOT = REPO_ROOT / "triattention" / "calibration"
+PACKAGED_STATS_ROOT = REPO_ROOT / "cask" / "calibration"
 
 MODEL_SPECS: Dict[str, str] = {
     "DeepSeek-R1-Distill-Qwen-7B": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
@@ -760,7 +760,7 @@ def build_stats(
     if not input_path.exists():
         raise SystemExit(f"Input file not found: {input_path}")
 
-    out_dir = Path(output_dir) if output_dir else REPO_ROOT / "triattention" / "calibration"
+    out_dir = Path(output_dir) if output_dir else REPO_ROOT / "cask" / "calibration"
     model_list = normalize_selection(models, list(MODEL_SPECS.keys()), "model")
 
     commands: List[Dict[str, object]] = []

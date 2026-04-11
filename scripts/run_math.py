@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from triattention.integration.monkeypatch import replace_llama, replace_qwen2, replace_qwen3
+from cask.integration.monkeypatch import replace_llama, replace_qwen2, replace_qwen3
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -262,3 +262,4 @@ if __name__ == "__main__":
         ]
 
     main(args)
+

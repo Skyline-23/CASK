@@ -13,14 +13,14 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from triattention.benchmarks.dfs.scripts.prompt_utils import build_prompt
+from cask.benchmarks.dfs.scripts.prompt_utils import build_prompt
 
 
 WORKER_PATH = REPO_ROOT / "scripts" / "worker.py"
 MERGE_PATH = REPO_ROOT / "scripts" / "merge_shards.py"
-DFS_EVAL_PATH = REPO_ROOT / "triattention" / "benchmarks" / "dfs" / "scripts" / "eval_dfs_state_query_raw.py"
+DFS_EVAL_PATH = REPO_ROOT / "cask" / "benchmarks" / "dfs" / "scripts" / "eval_dfs_state_query_raw.py"
 DEFAULT_DFS_DATASET = (
-    REPO_ROOT / "triattention" / "benchmarks" / "dfs" / "datasets" / "legacy" / "dfs_state_query_100.json"
+    REPO_ROOT / "cask" / "benchmarks" / "dfs" / "datasets" / "legacy" / "dfs_state_query_100.json"
 )
 
 
@@ -38,7 +38,7 @@ def parse_args() -> tuple[argparse.Namespace, list[str]]:
         "--stats-path",
         type=Path,
         default=None,
-        help="TriAttention/HorizonKV stats file forwarded to worker as --triattention_stats_file.",
+        help="TriAttention/CASK stats file forwarded to worker as --triattention_stats_file.",
     )
     args, passthrough = parser.parse_known_args()
     return args, passthrough
@@ -132,3 +132,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

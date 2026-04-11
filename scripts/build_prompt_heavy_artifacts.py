@@ -9,10 +9,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from triattention.benchmarks.longbench.metrics import DATASET_TO_METRIC
+from cask.benchmarks.longbench.metrics import DATASET_TO_METRIC
 
 REPORTS_DIR = ROOT / "experiments" / "reports"
-ARTIFACT_DIR = ROOT / "paper_artifacts" / "rtx5070ti_2026_04_10" / "cask_v2_fidelity"
+ARTIFACT_DIR = ROOT / "artifacts" / "rtx5070ti_2026_04_10" / "cask_v2_fidelity"
 
 TEACHER_FORCED_SAVED_RATIO_OVERRIDES = {
     ("2wikimqa", "tri_512"): 0.0,
@@ -417,3 +417,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

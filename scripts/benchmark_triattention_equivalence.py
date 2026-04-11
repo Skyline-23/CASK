@@ -16,7 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from triattention.methods.pruning_utils import (
+from cask.methods.pruning_utils import (
     build_rotary,
     compute_frequency_scaling,
     compute_frequency_statistics_from_means,
@@ -205,3 +205,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

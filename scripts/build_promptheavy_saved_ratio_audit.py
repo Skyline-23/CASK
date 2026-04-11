@@ -9,7 +9,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTIER_ROOT = ROOT / "experiments" / "frontier" / "Qwen3-8B"
-DEFAULT_OUTPUT_DIR = ROOT / "paper_artifacts" / "h100_2026_04_11" / "promptheavy_saved_ratio_audit"
+DEFAULT_OUTPUT_DIR = ROOT / "artifacts" / "h100_2026_04_11" / "promptheavy_saved_ratio_audit"
 
 
 def resolve_default_manifest() -> Path:
@@ -176,3 +176,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

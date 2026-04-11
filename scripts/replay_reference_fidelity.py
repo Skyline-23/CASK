@@ -61,7 +61,7 @@ def parse_args() -> argparse.Namespace:
         dest="triattention_stats_file",
         type=str,
         default=None,
-        help="Stats file for triattention/horizonkv/cask.",
+        help="Stats file for cask/horizonkv/cask.",
     )
     parser.add_argument("--load-dtype", default="float16")
     parser.add_argument("--attn-implementation", default="sdpa")
@@ -177,7 +177,7 @@ def apply_candidate_method(
         model_path_value = args.model_path.replace("\\", "/")
 
     if method == "cask":
-        from triattention.methods.cask import apply_cask_patch
+        from cask.methods.cask import apply_cask_patch
 
         phase_marker_token_ids = (
             build_cask_phase_marker_token_ids(tokenizer)
@@ -220,7 +220,7 @@ def apply_candidate_method(
         )
         return
 
-    from triattention.methods.triattention import apply_triattention_patch
+    from cask.methods.triattention import apply_triattention_patch
 
     apply_triattention_patch(
         model,
@@ -572,3 +572,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

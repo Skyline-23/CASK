@@ -79,7 +79,7 @@ def build_command(
         cmd.extend(["--budget", str(int(budget))])
     if method in {"triattention", "horizonkv", "cask"}:
         if args.triattention_stats_file is None:
-            raise SystemExit("--triattention-stats-file is required for triattention/horizonkv/cask.")
+            raise SystemExit("--triattention-stats-file is required for cask/horizonkv/cask.")
         cmd.extend(["--triattention-stats-file", str(args.triattention_stats_file)])
     cmd.extend(passthrough)
     return cmd
@@ -174,3 +174,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

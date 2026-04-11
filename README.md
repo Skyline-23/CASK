@@ -15,7 +15,8 @@ CASK treats reasoning-time KV compression as a **behavior-preserving selective c
 | Prompt-heavy policy | Stage 1 prefix eviction, then Stage 2 decode consolidation |
 | Primary runner | `python scripts/cli.py run-one ... --method cask` |
 | Main replay harness | `scripts/replay_reference_fidelity.py` |
-| Command provenance | `paper_artifacts/COMMAND_MAP.md` |
+| Command provenance | `artifacts/COMMAND_MAP.md` |
+| Figure assets | `docs/assets/` |
 
 ## Method Summary
 
@@ -58,7 +59,7 @@ The tables below report both fidelity and **terminal saved ratio** so the qualit
 | `AIME25 ref6` | `512` | `89.94` | `91.68` | `0.321` | `0.254` | `44.76%` | `37.25%` |
 
 Detail:
-[H100 reasoning replay package](paper_artifacts/h100_2026_04_10/cask_h100_fidelity/README.md)
+[H100 reasoning replay package](artifacts/h100_2026_04_10/cask_h100_fidelity/README.md)
 
 ### Prompt-Heavy Replay Highlights
 
@@ -70,7 +71,7 @@ Detail:
 | `2wikimqa` | `384` | `59.38` | `56.25` | `3.415` | `2.397` | `94.41%` | retained boundary |
 
 Detail:
-[Prompt-heavy replay readout](paper_artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/promptheavy_replay_readout.md)
+[Prompt-heavy replay readout](artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/promptheavy_replay_readout.md)
 
 ### Output-Level Bridge Highlights
 
@@ -81,7 +82,7 @@ Detail:
 | `hotpotqa` | `CASK @ 256` vs `TriAttention @ 256` | `1.000 = 1.000` | `1.000 = 1.000` | `27.27 = 27.27` | `97.57%` | non-regression parity |
 
 Detail:
-[H100 actual-output bridge package](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md)
+[H100 actual-output bridge package](artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md)
 
 ## Current Read
 
@@ -96,19 +97,19 @@ Detail:
 ## Artifact Index
 
 Start here:
-[paper_artifacts/README.md](paper_artifacts/README.md)
+[artifacts/README.md](artifacts/README.md)
 
 Command trace:
-[paper_artifacts/COMMAND_MAP.md](paper_artifacts/COMMAND_MAP.md)
+[artifacts/COMMAND_MAP.md](artifacts/COMMAND_MAP.md)
 
 ### Which package should you open?
 
 | If you want to know... | Open this | Why this is the right package |
 | --- | --- | --- |
-| whether CASK wins the main reasoning replay gate | [H100 reasoning replay gate](paper_artifacts/h100_2026_04_10/cask_h100_fidelity/README.md) | contains the `AIME24` / `AIME25` synchronized replay tables and crossing read |
-| whether replay gains show up in actual generation | [H100 actual-output bridge](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md) | contains the tracked `qasper`, `multi_news`, and `hotpotqa` output bridge rows |
-| how to read the full prompt-heavy story | [H100 prompt-heavy follow-up](paper_artifacts/h100_2026_04_11/README.md) | separates replay-level decode-active wins from output-level bridge rows and `prefix_budget_exhausted` boundaries |
-| which figures are current and ready to paste into the draft | [H100 figure pack](paper_artifacts/h100_2026_04_11/figures/README.md) | bundles the synchronized PNG/PDF versions of the reasoning gate, prompt-heavy, bridge, and method-overview figures |
+| whether CASK wins the main reasoning replay gate | [H100 reasoning replay gate](artifacts/h100_2026_04_10/cask_h100_fidelity/README.md) | contains the `AIME24` / `AIME25` synchronized replay tables and crossing read |
+| whether replay gains show up in actual generation | [H100 actual-output bridge](artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md) | contains the tracked `qasper`, `multi_news`, and `hotpotqa` output bridge rows |
+| how to read the full prompt-heavy story | [H100 prompt-heavy follow-up](artifacts/h100_2026_04_11/README.md) | separates replay-level decode-active wins from output-level bridge rows and `prefix_budget_exhausted` boundaries |
+| which figures are current and ready to paste into the draft | [Figure asset pack](docs/assets/README.md) | bundles the synchronized PNG/PDF versions of the reasoning gate, prompt-heavy, bridge, and method-overview figures |
 
 ### Package Roles
 
@@ -135,8 +136,8 @@ For Linux benchmarking and vLLM runtime work, install the matching CUDA, FlashAt
 | Task | Command |
 | --- | --- |
 | FullKV reference | `python scripts/cli.py run-one --model Qwen3-8B --dataset math500 --method fullkv` |
-| TriAttention baseline | `python scripts/cli.py run-one --model Qwen3-8B --dataset math500 --method triattention --budget 104 --stats-path triattention/calibration/for_aime24_experiment/qwen3_8b.pt` |
-| CASK mainline | `python scripts/cli.py run-one --model Qwen3-8B --dataset math500 --method cask --budget 104 --stats-path triattention/calibration/for_aime24_experiment/qwen3_8b.pt` |
+| TriAttention baseline | `python scripts/cli.py run-one --model Qwen3-8B --dataset math500 --method triattention --budget 104 --stats-path cask/calibration/for_aime24_experiment/qwen3_8b.pt` |
+| CASK mainline | `python scripts/cli.py run-one --model Qwen3-8B --dataset math500 --method cask --budget 104 --stats-path cask/calibration/for_aime24_experiment/qwen3_8b.pt` |
 | Teacher-forced replay | `python scripts/replay_reference_fidelity.py --reference ... --model-path ... --method cask --budget 104 --triattention-stats-file ...` |
 
 Replay example:
@@ -147,7 +148,7 @@ python scripts/replay_reference_fidelity.py \
     --model-path experiments/models/Qwen3-8B \
     --method cask \
     --budget 104 \
-    --triattention-stats-file triattention/calibration/for_aime24_experiment/qwen3_8b.pt \
+    --triattention-stats-file cask/calibration/for_aime24_experiment/qwen3_8b.pt \
     --attn-implementation sdpa \
     --count-prompt-tokens true \
     --slack-budget-trigger true \
@@ -166,11 +167,11 @@ python scripts/replay_reference_fidelity.py \
 | `scripts/compare_kv_fidelity.py` | output-level comparison helper |
 | `scripts/build_promptheavy_saved_ratio_audit.py` | package prompt-heavy replay summaries |
 | `scripts/build_actual_bridge_artifacts.py` | package actual-output bridge summaries |
-| `scripts/build_paper_figures.py` | generate the current paper-facing H100 figure pack |
-| `triattention/methods/triattention.py` | TriAttention baseline implementation |
-| `triattention/methods/cask.py` | CASK implementation |
-| `paper_artifacts/` | tracked paper-facing summaries |
-| `docs/` | supporting notes for the current repo |
+| `scripts/build_paper_figures.py` | generate the current paper-facing figure pack under `docs/assets/` |
+| `cask/methods/triattention.py` | TriAttention baseline implementation |
+| `cask/methods/cask.py` | CASK implementation |
+| `artifacts/` | tracked paper-facing summaries |
+| `docs/assets/` | paper-facing rendered figures |
 
 ## Provenance
 
@@ -179,3 +180,4 @@ This codebase started from the TriAttention implementation and now serves as the
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE).
+

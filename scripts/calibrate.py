@@ -4,7 +4,7 @@
 Runs a single forward pass on plain text input, hooks into every attention
 layer to capture query states, inverts RoPE, and computes per-head frequency
 statistics.  The resulting .pt file can be loaded directly by
-``triattention.pruning_utils.load_head_frequency_stats``.
+``cask.pruning_utils.load_head_frequency_stats``.
 
 Usage
 -----
@@ -27,7 +27,7 @@ from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 
 # ---------------------------------------------------------------------------
-# Helpers imported from triattention (kept local to make script self-contained)
+# Helpers imported from cask (kept local to make script self-contained)
 # ---------------------------------------------------------------------------
 
 def _determine_rope_style(config: AutoConfig) -> str:
@@ -530,7 +530,7 @@ def calibrate(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Calibrate HorizonKV / TriAttention frequency statistics from plain text."
+        description="Calibrate CASK / TriAttention frequency statistics from plain text."
     )
     parser.add_argument(
         "--model", required=True,
@@ -596,3 +596,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

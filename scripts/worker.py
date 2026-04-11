@@ -25,8 +25,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 
-from triattention.integration.monkeypatch import replace_llama, replace_qwen2, replace_qwen3
-from triattention.common.prompt_utils import (
+from cask.integration.monkeypatch import replace_llama, replace_qwen2, replace_qwen3
+from cask.common.prompt_utils import (
     DEFAULT_SYSTEM_PROMPT,
     PROMPT_TEMPLATE,
     build_prompt,
@@ -410,7 +410,7 @@ def parse_arguments() -> argparse.Namespace:
         "--triattention_stats_file",
         type=str,
         default=None,
-        help="Stats file for TriAttention-family scoring (required for triattention/horizonkv/cask).",
+        help="Stats file for TriAttention-family scoring (required for cask/horizonkv/cask).",
     )
     parser.add_argument(
         "--round_window",
@@ -964,7 +964,7 @@ def main(args: argparse.Namespace) -> None:
                 raise ValueError("cask does not support adaptive/variational horizon modes.")
             if norm_mode != "tri":
                 raise ValueError("cask does not support RMS2 or other norm overrides.")
-            from triattention.methods.cask import apply_cask_patch
+            from cask.methods.cask import apply_cask_patch
             phase_marker_token_ids = (
                 build_cask_phase_marker_token_ids(tokenizer)
                 if args.cask_use_phase_markers
@@ -1006,7 +1006,7 @@ def main(args: argparse.Namespace) -> None:
                 score_dump_max_events=args.triattention_score_dump_max_events,
             )
         else:
-            from triattention.methods.triattention import apply_triattention_patch
+            from cask.methods.triattention import apply_triattention_patch
 
             apply_triattention_patch(
                 model,
@@ -1184,3 +1184,4 @@ if __name__ == "__main__":
     args = parse_arguments()
     set_seed(args.seed)
     main(args)
+

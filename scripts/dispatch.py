@@ -21,7 +21,7 @@ import yaml
 
 DEFAULT_CONFIG = REPO_ROOT / "configs" / "dispatch_default.yaml"
 MERGE_SCRIPT = REPO_ROOT / "scripts" / "merge_shards.py"
-MULTI_EVAL_MODULE = "triattention.evaluation.eval_math_multi"
+MULTI_EVAL_MODULE = "cask.evaluation.eval_math_multi"
 PATH_ARG_KEYS = {"output_dir", "dataset_path", "model_path", "tokenizer_path", "triattention_score_dump_dir"}
 RUNNER_EXCLUDE_KEYS = {"num_samples_by_dataset"}
 
@@ -714,3 +714,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

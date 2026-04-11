@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="triattention",
+    name="cask",
     version="0.1.0",
-    description="HorizonKV: head-adaptive horizon averaging for KV cache compression",
-    author="HorizonKV contributors",
-    url="https://github.com/Skyline-23/horizonkv",
+    description="CASK: Core-Aware Selective KV Compression for Reasoning Traces",
+    author="CASK contributors",
+    url="https://github.com/Skyline-23/CASK",
     packages=find_packages(),
     python_requires=">=3.10",
     install_requires=[
@@ -44,7 +44,9 @@ setup(
     },
     entry_points={
         "vllm.general_plugins": [
-            "triattention = triattention.vllm.plugin:register_triattention_backend",
+            "cask = cask.vllm.plugin:register_triattention_backend",
         ],
     },
 )
+
+

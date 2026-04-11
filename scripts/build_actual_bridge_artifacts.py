@@ -8,7 +8,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 METRICS_DIR = ROOT / "experiments" / "frontier" / "Qwen3-8B" / "h100_actual_bridge_metrics_20260411"
-OUTPUT_DIR = ROOT / "paper_artifacts" / "h100_2026_04_11" / "cask_h100_actual_bridge"
+OUTPUT_DIR = ROOT / "artifacts" / "h100_2026_04_11" / "cask_h100_actual_bridge"
 
 
 ACTUAL_BRIDGE_SPECS = [
@@ -196,7 +196,7 @@ def build_readme(bridge_rows: list[dict[str, Any]], stage_rows: list[dict[str, A
     lines: list[str] = []
     lines.append("# CASK H100 Actual-Bridge Assets")
     lines.append("")
-    lines.append("This directory packages the H100 output-level evidence that complements the replay-fidelity gates in `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/`.")
+    lines.append("This directory packages the H100 output-level evidence that complements the replay-fidelity gates in `artifacts/h100_2026_04_10/cask_h100_fidelity/`.")
     lines.append("")
     lines.append("Tracked here:")
     lines.append("- actual-output bridge rows for `qasper`, `multi_news`, and `hotpotqa`")
@@ -261,3 +261,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

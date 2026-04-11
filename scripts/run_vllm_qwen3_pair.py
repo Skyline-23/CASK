@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run Qwen3 vLLM comparisons for baseline, TriAttention, or HorizonKV under Linux or WSL."""
+"""Run Qwen3 vLLM comparisons for baseline, TriAttention, or CASK under Linux or WSL."""
 from __future__ import annotations
 
 import argparse
@@ -19,12 +19,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from triattention.common.prompt_utils import build_plain_prompt, extract_question_from_record
+from cask.common.prompt_utils import build_plain_prompt, extract_question_from_record
 
 
 DEFAULT_MODEL_PATH = REPO_ROOT / "experiments" / "models" / "Qwen3-8B"
 DEFAULT_STATS_PATH = (
-    REPO_ROOT / "triattention" / "calibration" / "for_aime25_experiment" / "qwen3_8b.pt"
+    REPO_ROOT / "cask" / "calibration" / "for_aime25_experiment" / "qwen3_8b.pt"
 )
 
 
@@ -32,14 +32,14 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode",
-        choices=("pair", "baseline", "triattention", "horizonkv"),
+        choices=("pair", "baseline", "triattention", "CASK"),
         default="pair",
         help="Run both modes in subprocesses or a single concrete mode.",
     )
     parser.add_argument(
         "--candidate-mode",
-        choices=("triattention", "horizonkv"),
-        default="horizonkv",
+        choices=("triattention", "CASK"),
+        default="CASK",
         help="Candidate mode used in pair runs.",
     )
     parser.add_argument("--dataset", default="aime24", help="Dataset name under data/*.jsonl.")
@@ -132,9 +132,9 @@ def validate_stats_args(args: argparse.Namespace) -> None:
         raise FileNotFoundError(f"Stats file not found: {args.stats_path}")
 
     requires_rms2 = False
-    if args.mode == "horizonkv":
+    if args.mode == "CASK":
         requires_rms2 = True
-    elif args.mode == "pair" and args.candidate_mode == "horizonkv":
+    elif args.mode == "pair" and args.candidate_mode == "CASK":
         requires_rms2 = True
     elif args.triattention_norm_mode == "rms2":
         requires_rms2 = True
@@ -142,7 +142,7 @@ def validate_stats_args(args: argparse.Namespace) -> None:
     if requires_rms2 and not stats_supports_rms2(args.stats_path):
         raise ValueError(
             f"Stats file {args.stats_path} does not contain q_sq_abs_mean and cannot be used "
-            "with HorizonKV / norm_mode='rms2'. Regenerate v2 stats with scripts/calibrate.py "
+            "with CASK / norm_mode='rms2'. Regenerate v2 stats with scripts/calibrate.py "
             "and pass the result via --stats-path."
         )
 
@@ -274,7 +274,7 @@ def apply_mode_env(args: argparse.Namespace, mode: str, trace_path: Path, compre
     os.environ["TRIATTENTION_INTERFACE"] = "runtime"
     os.environ["TRIATTENTION_QUIET"] = "1"
     os.environ["TRIATTN_RUNTIME_TRACE_PATH"] = str(trace_path)
-    if mode in {"triattention", "horizonkv"}:
+    if mode in {"triattention", "CASK"}:
         os.environ["ENABLE_TRIATTENTION"] = "true"
         os.environ["TRIATTN_RUNTIME_KV_BUDGET"] = str(args.kv_budget)
         os.environ["TRIATTN_RUNTIME_DIVIDE_LENGTH"] = str(args.divide_length)
@@ -286,7 +286,7 @@ def apply_mode_env(args: argparse.Namespace, mode: str, trace_path: Path, compre
         os.environ["TRIATTN_RUNTIME_DEBUG_COMPRESSION_LOG_CONTEXT_TOKENS"] = "16"
         horizon_mode = args.triattention_horizon_mode
         norm_mode = args.triattention_norm_mode
-        if mode == "horizonkv":
+        if mode == "CASK":
             horizon_mode = horizon_mode or "adaptive"
             norm_mode = norm_mode or "rms2"
         if horizon_mode:
@@ -553,3 +553,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

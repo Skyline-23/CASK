@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUT = ROOT / "paper_artifacts" / "h100_2026_04_11" / "figures"
+DEFAULT_OUT = ROOT / "docs" / "assets"
 
 CASK_COLOR = "#2563EB"
 TRI_COLOR = "#DC2626"
@@ -95,7 +95,7 @@ def resolve_repo_path(raw_path: str | None) -> Path | None:
         return candidate
 
     normalized = str(raw_path).replace("/", "\\")
-    for marker in ("experiments\\", "paper_artifacts\\", "docs\\", "scripts\\"):
+    for marker in ("experiments\\", "artifacts\\", "docs\\", "scripts\\"):
         idx = normalized.lower().find(marker)
         if idx != -1:
             suffix = normalized[idx:].replace("\\", "/")
@@ -127,10 +127,10 @@ def load_reasoning_slice(path: Path) -> dict[str, dict[int, dict[str, float]]]:
 def build_reasoning_gate_figure(outdir: Path) -> str:
     budgets = [256, 384, 512]
     aime24 = load_reasoning_slice(
-        ROOT / "paper_artifacts" / "h100_2026_04_10" / "cask_h100_fidelity" / "aime24_ref6_h100_fidelity_summary.csv"
+        ROOT / "artifacts" / "h100_2026_04_10" / "cask_h100_fidelity" / "aime24_ref6_h100_fidelity_summary.csv"
     )
     aime25 = load_reasoning_slice(
-        ROOT / "paper_artifacts" / "h100_2026_04_10" / "cask_h100_fidelity" / "aime25_ref6_h100_fidelity_summary.csv"
+        ROOT / "artifacts" / "h100_2026_04_10" / "cask_h100_fidelity" / "aime25_ref6_h100_fidelity_summary.csv"
     )
 
     fig, axes = plt.subplots(2, 2, figsize=(10, 7), sharex=True)
@@ -231,7 +231,7 @@ def build_reasoning_gate_figure(outdir: Path) -> str:
 
 def load_promptheavy_rows() -> list[dict[str, Any]]:
     return load_json(
-        ROOT / "paper_artifacts" / "h100_2026_04_11" / "promptheavy_saved_ratio_audit" / "promptheavy_saved_ratio_audit.json"
+        ROOT / "artifacts" / "h100_2026_04_11" / "promptheavy_saved_ratio_audit" / "promptheavy_saved_ratio_audit.json"
     )
 
 
@@ -479,7 +479,7 @@ def read_longbench_task_metric(task: str, variant_dir: str) -> float:
 
 def build_actual_bridge_figure(outdir: Path) -> str:
     rows = load_json(
-        ROOT / "paper_artifacts" / "h100_2026_04_11" / "cask_h100_actual_bridge" / "actual_bridge_summary.json"
+        ROOT / "artifacts" / "h100_2026_04_11" / "cask_h100_actual_bridge" / "actual_bridge_summary.json"
     )
     indexed = {(row["task"], row["method"]): row for row in rows}
 
@@ -622,11 +622,11 @@ def write_figure_index(outdir: Path, captions: list[tuple[str, str]]) -> None:
             "",
             "## Source packages",
             "",
-            "- [`paper_artifacts/h100_2026_04_10/cask_h100_fidelity/`](../h100_2026_04_10/cask_h100_fidelity/)",
-            "- [`paper_artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/`](../promptheavy_saved_ratio_audit/)",
-            "- [`paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/`](../cask_h100_actual_bridge/)",
-            "- [`paper_artifacts/h100_2026_04_11/decode_active_replay_probe.md`](../decode_active_replay_probe.md)",
-            "- [`paper_artifacts/h100_2026_04_11/coverage_followup_probe.md`](../coverage_followup_probe.md)",
+            "- [`artifacts/h100_2026_04_10/cask_h100_fidelity/`](../h100_2026_04_10/cask_h100_fidelity/)",
+            "- [`artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/`](../promptheavy_saved_ratio_audit/)",
+            "- [`artifacts/h100_2026_04_11/cask_h100_actual_bridge/`](../cask_h100_actual_bridge/)",
+            "- [`artifacts/h100_2026_04_11/decode_active_replay_probe.md`](../decode_active_replay_probe.md)",
+            "- [`artifacts/h100_2026_04_11/coverage_followup_probe.md`](../coverage_followup_probe.md)",
             "",
             "## Regeneration",
             "",
@@ -658,3 +658,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

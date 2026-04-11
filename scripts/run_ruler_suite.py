@@ -17,7 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from triattention.benchmarks.ruler.constants import DEFAULT_TASKS
+from cask.benchmarks.ruler.constants import DEFAULT_TASKS
 
 
 WORKER_PATH = REPO_ROOT / "scripts" / "worker.py"
@@ -42,7 +42,7 @@ def parse_args() -> tuple[argparse.Namespace, list[str]]:
         "--stats-path",
         type=Path,
         default=None,
-        help="TriAttention/HorizonKV stats file forwarded to worker as --triattention_stats_file.",
+        help="TriAttention/CASK stats file forwarded to worker as --triattention_stats_file.",
     )
     parser.add_argument("--python", type=str, default=sys.executable)
     args, passthrough = parser.parse_known_args()
@@ -270,7 +270,7 @@ def main() -> None:
             [
                 args.python,
                 "-m",
-                "triattention.benchmarks.ruler.evaluate",
+                "cask.benchmarks.ruler.evaluate",
                 "--pred-dir",
                 str(merged_root),
                 "--output",
@@ -293,3 +293,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

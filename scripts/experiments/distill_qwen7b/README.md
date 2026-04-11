@@ -1,6 +1,6 @@
 # DeepSeek-R1-Distill-Qwen-7B Historical TriAttention Automation
 
-This directory is kept for the historical TriAttention baseline workflow. For the current paper-facing HorizonKV workflow, prefer the repo-level commands in the top-level `README.md`, `docs/reproduction.md`, and `scripts/run_horizonkv_benchmark_bundle.py`.
+This directory is kept for the historical TriAttention baseline workflow. For the current paper-facing CASK workflow, prefer the repo-level commands in the top-level `README.md`, `README.md`, and `scripts/run_kv_benchmark_bundle.py`.
 
 This folder mirrors the standard `experiments/scripts` helpers, but is pre-filtered for the `DeepSeek-R1-Distill-Qwen-7B` model so you can recycle the same workflows while staying focused on the new checkpoints. The scripts all respect two env vars:
 
@@ -26,6 +26,7 @@ Each of the `run_*.sh` scripts fans out over the dataset list, spawns up to `JOB
 
 ## Tips
 
-- Shared config is in `triattention/configs/shared/runner_defaults.yaml`.
+- Shared config is in `cask/configs/shared/runner_defaults.yaml`.
 - Use `JOB_PARALLEL=N` on any script to speed up throughput.
 - Logs for each run land in `experiments/logs/<dataset>/<model>/<mode>/<tag>/`. Check them if a batch failure is reported.
+
