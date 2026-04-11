@@ -10,7 +10,6 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -373,21 +372,13 @@ def build_witness_map_figure(outdir: Path) -> str:
                     f"experiments/frontier/Qwen3-8B/h100_decode_probe_{task}_20260411_{task}_replay/{method}_budget_{budget}.json"
                 )
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(9.5, 8.4))
-    y_positions = list(range(len(WITNESS_TASKS)))
+    top1_256: list[float] = []
+    top1_384: list[float] = []
+    nll_256: list[float] = []
+    nll_384: list[float] = []
+    labels: list[str] = []
 
-    def annotate_value(ax: plt.Axes, x_value: float, y_value: float, text: str, color: str) -> None:
-        ax.annotate(
-            text,
-            xy=(x_value, y_value),
-            xytext=(4, 0),
-            textcoords="offset points",
-            fontsize=6.4,
-            color=color,
-            va="center",
-        )
-
-    for idx, (task, role, color) in enumerate(WITNESS_TASKS):
+    for task, role, _color in WITNESS_TASKS:
         if task in {"vcsum", "qmsum", "gov_report"}:
             tri_256 = extra_rows[(task, 256, "triattention")]
             tri_384 = extra_rows[(task, 384, "triattention")]
@@ -399,71 +390,64 @@ def build_witness_map_figure(outdir: Path) -> str:
             cask_256 = indexed[(task, 256, "cask")]
             cask_384 = indexed[(task, 384, "cask")]
 
-        delta_top1_256 = 100.0 * (float(cask_256["top1"]) - float(tri_256["top1"]))
-        delta_top1_384 = 100.0 * (float(cask_384["top1"]) - float(tri_384["top1"]))
-        delta_nll_256 = float(cask_256["mean_nll"]) - float(tri_256["mean_nll"])
-        delta_nll_384 = float(cask_384["mean_nll"]) - float(tri_384["mean_nll"])
+        top1_256.append(100.0 * (float(cask_256["top1"]) - float(tri_256["top1"])))
+        top1_384.append(100.0 * (float(cask_384["top1"]) - float(tri_384["top1"])))
+        nll_256.append(float(cask_256["mean_nll"]) - float(tri_256["mean_nll"]))
+        nll_384.append(float(cask_384["mean_nll"]) - float(tri_384["mean_nll"]))
+        labels.append(f"{task} | {role.replace(chr(10), ' ')}")
 
-        ax1.scatter(delta_top1_256, idx - 0.12, marker="o", s=80, color=color, zorder=5, edgecolors="white", linewidth=0.5)
-        ax1.scatter(delta_top1_384, idx + 0.12, marker="D", s=60, color=color, zorder=5, edgecolors="white", linewidth=0.5, alpha=0.7)
-        ax2.scatter(delta_nll_256, idx - 0.12, marker="o", s=80, color=color, zorder=5, edgecolors="white", linewidth=0.5)
-        ax2.scatter(delta_nll_384, idx + 0.12, marker="D", s=60, color=color, zorder=5, edgecolors="white", linewidth=0.5, alpha=0.7)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.8, 6.4), sharey=True)
+    y_positions = list(range(len(WITNESS_TASKS)))
+    bar_height = 0.34
+    budget256_color = "#60A5FA"
+    budget384_color = "#2563EB"
 
-        annotate_value(ax1, delta_top1_256, idx - 0.12, f"{delta_top1_256:+.1f}", color)
-        annotate_value(ax1, delta_top1_384, idx + 0.12, f"{delta_top1_384:+.1f}", color)
-        annotate_value(ax2, delta_nll_256, idx - 0.12, f"{delta_nll_256:+.2f}", color)
-        annotate_value(ax2, delta_nll_384, idx + 0.12, f"{delta_nll_384:+.2f}", color)
+    bars1_256 = ax1.barh([value - bar_height / 2 for value in y_positions], top1_256, height=bar_height, color=budget256_color, label="Budget 256")
+    bars1_384 = ax1.barh([value + bar_height / 2 for value in y_positions], top1_384, height=bar_height, color=budget384_color, alpha=0.8, label="Budget 384")
+    bars2_256 = ax2.barh([value - bar_height / 2 for value in y_positions], nll_256, height=bar_height, color=budget256_color, label="Budget 256")
+    bars2_384 = ax2.barh([value + bar_height / 2 for value in y_positions], nll_384, height=bar_height, color=budget384_color, alpha=0.8, label="Budget 384")
 
-        cask_384_decode = int(cask_384.get("decode_events") or 0)
-        cask_384_prefix = int(cask_384.get("prefix_events") or 0)
-        guard_reason = cask_384.get("guard_reason")
-        if cask_384_decode > 0:
-            ax1.annotate(
-                f"p={cask_384_prefix}, d={cask_384_decode}",
-                xy=(delta_top1_384 + 0.2, idx + 0.12),
-                fontsize=6.8,
-                color="#2563EB",
-                style="italic",
+    def annotate_bar_values(ax: plt.Axes, bars: Any, decimals: int) -> None:
+        for bar in bars:
+            value = bar.get_width()
+            y_value = bar.get_y() + bar.get_height() / 2
+            offset = 4 if value >= 0 else -4
+            anchor = "left" if value >= 0 else "right"
+            ax.annotate(
+                f"{value:+.{decimals}f}",
+                xy=(value, y_value),
+                xytext=(offset, 0),
+                textcoords="offset points",
+                ha=anchor,
+                va="center",
+                fontsize=7,
+                color="#1F2937",
             )
-        elif guard_reason:
-            ax1.annotate(
-                guard_reason,
-                xy=(delta_top1_384 + 0.2, idx + 0.12),
-                fontsize=6.5,
-                color="#7F1D1D",
-                style="italic",
-            )
 
-    ax1.axvline(x=0, color="#9CA3AF", linewidth=0.8, linestyle="-")
-    ax2.axvline(x=0, color="#9CA3AF", linewidth=0.8, linestyle="-")
-    labels = [f"{task}\n({role})" for task, role, _ in WITNESS_TASKS]
-    ax1.set_yticks(y_positions)
-    ax1.set_yticklabels(labels, fontsize=8)
-    ax2.set_yticks(y_positions)
-    ax2.set_yticklabels(labels, fontsize=8)
+    annotate_bar_values(ax1, bars1_256, 1)
+    annotate_bar_values(ax1, bars1_384, 1)
+    annotate_bar_values(ax2, bars2_256, 2)
+    annotate_bar_values(ax2, bars2_384, 2)
+
+    for ax in (ax1, ax2):
+        ax.axvline(x=0, color="#9CA3AF", linewidth=0.8, linestyle="-")
+        ax.set_yticks(y_positions)
+        ax.set_yticklabels(labels, fontsize=8)
+        ax.invert_yaxis()
+
     ax1.set_xlabel("Delta Top-1 (%p)")
-    ax1.set_title("Top-1 Delta (CASK - TriAttention)", fontweight="bold")
-    ax1.legend(
-        handles=[
-            Line2D([0], [0], marker="o", color="none", markerfacecolor="#6B7280", markeredgecolor="white", markersize=8, label="Budget 256"),
-            Line2D([0], [0], marker="D", color="none", markerfacecolor="#9CA3AF", markeredgecolor="white", markersize=7, label="Budget 384"),
-        ],
-        loc="lower right",
-        framealpha=0.9,
-        fontsize=8,
-        title="Budget",
-        title_fontsize=8,
-    )
+    ax1.set_title("Top-1 Delta (positive is better)", fontweight="bold")
+    ax1.legend(loc="lower right", framealpha=0.9, fontsize=8, title="Budget", title_fontsize=8)
     ax1.set_xlim(-8.0, 18.5)
 
     ax2.set_xlabel("Delta Mean NLL")
-    ax2.set_title("Mean NLL Delta (CASK - TriAttention, lower is better)", fontweight="bold")
+    ax2.set_title("Mean NLL Delta (negative is better)", fontweight="bold")
     ax2.set_xlim(-3.5, 1.1)
 
-    fig.suptitle("Figure 3. Prompt-Heavy Witness Map: Active Wins, Prefix-Only Wins, and Boundaries", fontsize=12, fontweight="bold", y=1.02)
+    fig.suptitle("Figure 3. Prompt-Heavy Witness Summary by Task and Budget", fontsize=12, fontweight="bold", y=1.02)
     plt.tight_layout()
     save_figure(fig, outdir, "fig3_promptheavy_witness_map")
-    return "Figure 3. Prompt-heavy witness map with active, prefix-only, and boundary regimes."
+    return "Figure 3. Simplified prompt-heavy witness summary by task and budget."
 
 
 def read_longbench_task_metric(task: str, variant_dir: str) -> float:

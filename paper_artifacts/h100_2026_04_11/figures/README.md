@@ -6,7 +6,7 @@ This directory stores the current paper-facing figure pack generated from the tr
 
 - [`fig1_reasoning_gate_frontier.png`](fig1_reasoning_gate_frontier.png) / [`fig1_reasoning_gate_frontier.pdf`](fig1_reasoning_gate_frontier.pdf): Figure 1. H100 reasoning replay gate frontier.
 - [`fig2_promptheavy_aggregate.png`](fig2_promptheavy_aggregate.png) / [`fig2_promptheavy_aggregate.pdf`](fig2_promptheavy_aggregate.pdf): Figure 2. H100 prompt-heavy weighted aggregate.
-- [`fig3_promptheavy_witness_map.png`](fig3_promptheavy_witness_map.png) / [`fig3_promptheavy_witness_map.pdf`](fig3_promptheavy_witness_map.pdf): Figure 3. Prompt-heavy witness map with active, prefix-only, and boundary regimes.
+- [`fig3_promptheavy_witness_map.png`](fig3_promptheavy_witness_map.png) / [`fig3_promptheavy_witness_map.pdf`](fig3_promptheavy_witness_map.pdf): Figure 3. Simplified prompt-heavy witness summary by task and budget.
 - [`fig4_actual_output_bridge.png`](fig4_actual_output_bridge.png) / [`fig4_actual_output_bridge.pdf`](fig4_actual_output_bridge.pdf): Figure 4. Actual-output bridge across lexical, semantic, and task-level metrics.
 - [`fig5_method_overview.png`](fig5_method_overview.png) / [`fig5_method_overview.pdf`](fig5_method_overview.pdf): Figure 5. Method overview for two-stage CASK.
 
