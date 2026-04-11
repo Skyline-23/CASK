@@ -183,17 +183,6 @@ High-level read:
 - `paper_artifacts/`: tracked paper-facing summaries and frozen experiment snapshots.
 - `docs/`: historical notes and archived Phase 1 materials.
 
-## Historical Archive
-
-The repository still contains the earlier HorizonKV / adaptive-horizon direction. Those materials are retained as archive context and baseline infrastructure, not as the current paper claim.
-
-In particular:
-
-- `docs/head_adaptive_horizon_averaging_for_kv_cache_compression.md`
-- `docs/head_adaptive_horizon_implementation_spec.md`
-
-should be read as **Phase 1 archive**, while the current paper mainline is **CASK**, exposed as `cask` in the CLI.
-
 ## Provenance
 
 This codebase started from the TriAttention implementation and now serves as the active research repository for CASK. Historical file paths and namespaces are retained where changing them would break reproducibility or internal tooling.
