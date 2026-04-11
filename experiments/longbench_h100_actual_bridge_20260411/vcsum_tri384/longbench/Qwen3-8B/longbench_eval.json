@@ -1,0 +1,14 @@
+{
+  "task_set": "longbench",
+  "num_tasks": 1,
+  "task_scores": {
+    "vcsum": {
+      "overall": 17.17,
+      "num_examples": 1
+    }
+  },
+  "overall_average": 17.17,
+  "category_averages": {
+    "summarization": 17.17
+  }
+}

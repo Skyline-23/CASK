@@ -1,0 +1,64 @@
+{
+  "reference_input": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_refs\\longbench\\Qwen3-8B\\runs\\multi_news\\merged\\merged.jsonl",
+  "candidate_input": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_actual_bridge_20260411\\multi_news_cask384\\longbench\\Qwen3-8B\\runs\\multi_news\\merged\\merged.jsonl",
+  "reference_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_refs\\longbench\\Qwen3-8B\\runs\\multi_news\\merged\\merged.jsonl",
+  "candidate_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_actual_bridge_20260411\\multi_news_cask384\\longbench\\Qwen3-8B\\runs\\multi_news\\merged\\merged.jsonl",
+  "reference_eval_jsonl": null,
+  "candidate_eval_jsonl": null,
+  "shared_indices": [
+    0
+  ],
+  "fidelity": {
+    "records_compared": 1,
+    "question_match_rate": 1.0,
+    "prompt_match_rate": 1.0,
+    "final_answer_match_rate": 0.0,
+    "exact_output_match_rate": 0.0,
+    "normalized_output_match_rate": 0.0,
+    "mean_sequence_ratio": 0.1687041564792176,
+    "mean_prefix_token_ratio": 0.0810126582278481,
+    "mean_prefix_char_ratio": 0.0771770532397854,
+    "mean_output_token_ratio": 1.0,
+    "mean_output_token_delta": 0.0
+  },
+  "savings": {
+    "records_with_compression_summary": 1,
+    "records_with_positive_terminal_savings": 1,
+    "mean_compression_events": 3.0,
+    "mean_terminal_saved_tokens": 2692.0,
+    "mean_terminal_saved_ratio": 0.8407245471580262,
+    "mean_terminal_cache_ratio": 0.15927545284197375,
+    "mean_cumulative_saved_tokens": 375.0,
+    "mean_current_cache_tokens": 510.0,
+    "mean_current_total_cardinality": 3202.0
+  },
+  "rows": [
+    {
+      "idx": 0,
+      "unique_id": null,
+      "question_match": true,
+      "prompt_match": true,
+      "reference_output_tokens": 512,
+      "candidate_output_tokens": 512,
+      "reference_total_tokens": 3203,
+      "candidate_total_tokens": 3203,
+      "reference_pred": null,
+      "candidate_pred": null,
+      "final_answer_match": false,
+      "exact_output_match": false,
+      "normalized_output_match": false,
+      "sequence_ratio": 0.1687041564792176,
+      "prefix_token_ratio": 0.0810126582278481,
+      "prefix_char_ratio": 0.0771770532397854,
+      "output_token_ratio": 1.0,
+      "output_token_delta": 0,
+      "compression_events": 3,
+      "terminal_saved_tokens": 2692,
+      "terminal_saved_ratio": 0.8407245471580262,
+      "terminal_cache_ratio": 0.15927545284197375,
+      "cumulative_saved_tokens": 375,
+      "current_cache_tokens": 510,
+      "current_total_cardinality": 3202
+    }
+  ]
+}

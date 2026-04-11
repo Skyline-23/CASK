@@ -51,4 +51,6 @@ This package is useful for local bridge examples and cheap debugging, but the H1
 
 ## Raw Provenance
 
-Raw per-run replay reports were generated under `experiments/reports/` and are intentionally not tracked in git. This directory contains the tracked paper-facing extraction of those local reports.
+This package is the tracked paper-facing extraction of the local reports. To trace a packaged row further, use the referenced report paths under:
+
+- `experiments/reports/`

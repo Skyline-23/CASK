@@ -1,0 +1,80 @@
+{
+  "reference_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_refs\\longbench\\Qwen3-8B\\runs\\qmsum\\merged\\merged.jsonl",
+  "candidate_method": "cask",
+  "candidate_budget": 384,
+  "model_path": "experiments/models/Qwen3-8B",
+  "summary": {
+    "records_compared": 1,
+    "mean_target_top1_match_rate": 0.994140625,
+    "mean_target_top5_match_rate": 1.0,
+    "mean_strict_prefix_top1_ratio": 0.22265625,
+    "mean_first_top1_mismatch_step": 114.0,
+    "mean_target_logprob": -0.11130452016368508,
+    "mean_target_nll": 0.11130452016368508,
+    "mean_perplexity": 1.1177352279490822,
+    "mean_terminal_saved_tokens": 10112.0,
+    "mean_terminal_saved_ratio": 0.9610340239498194,
+    "mean_terminal_cache_ratio": 0.038965976050180574,
+    "mean_reference_terminal_saved_tokens": 10112.0,
+    "mean_reference_terminal_saved_ratio": 0.9610340239498194,
+    "mean_reference_terminal_cache_ratio": 0.038965976050180574,
+    "records_with_positive_terminal_savings": 1,
+    "records_with_positive_reference_terminal_savings": 1,
+    "records_with_guard_triggered": 1,
+    "guard_reason_counts": {
+      "prefix_budget_exhausted": 1
+    },
+    "mean_compression_events": 0.0
+  },
+  "records": [
+    {
+      "index": 0,
+      "id": "fdd371de2668a6f1e7914fe9a67aef33927ecc392fdc2606",
+      "reference_output_tokens": 512,
+      "used_combined_boundary_tokenization": true,
+      "target_top1_match_rate": 0.994140625,
+      "target_top5_match_rate": 1.0,
+      "strict_prefix_top1_ratio": 0.22265625,
+      "first_top1_mismatch_step": 114,
+      "mean_target_logprob": -0.11130452016368508,
+      "mean_target_nll": 0.11130452016368508,
+      "perplexity": 1.1177352279490822,
+      "reference_prompt_tokens": 10011,
+      "reference_total_tokens": 10523,
+      "prefix_coverage_ratio": 0.0625,
+      "core_selection_mode": "vote",
+      "merge_operator": "keepkv",
+      "prefix_stage_mode": "triattention_eviction",
+      "decode_stage_mode": "merge",
+      "prefix_compression_events": 0,
+      "total_prefix_evicted_tokens": 0,
+      "last_prefix_event": null,
+      "compression_events": 0,
+      "total_protected_core_tokens": 0,
+      "total_scratch_descriptors": 0,
+      "total_scratch_source_tokens": 0,
+      "total_scratch_merged_groups": 0,
+      "total_scratch_saved_tokens": 0,
+      "guard_triggered": true,
+      "guard_reason_counts": {
+        "prefix_budget_exhausted": 1
+      },
+      "last_guard": {
+        "reason": "prefix_budget_exhausted",
+        "seq_len": 10496,
+        "prefix_length": 10011,
+        "budget": 384
+      },
+      "last_event": null,
+      "current_cache_tokens": 410,
+      "current_prefix_tokens": 384,
+      "current_total_cardinality": 10522,
+      "terminal_saved_tokens": 10112,
+      "terminal_saved_ratio": 0.9610340239498194,
+      "terminal_cache_ratio": 0.038965976050180574,
+      "reference_terminal_saved_tokens": 10112,
+      "reference_terminal_saved_ratio": 0.9610340239498194,
+      "reference_terminal_cache_ratio": 0.038965976050180574
+    }
+  ]
+}

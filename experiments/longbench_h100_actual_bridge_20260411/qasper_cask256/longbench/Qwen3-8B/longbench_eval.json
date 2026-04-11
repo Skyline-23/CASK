@@ -1,0 +1,14 @@
+{
+  "task_set": "longbench",
+  "num_tasks": 1,
+  "task_scores": {
+    "qasper": {
+      "overall": 12.77,
+      "num_examples": 1
+    }
+  },
+  "overall_average": 12.77,
+  "category_averages": {
+    "single_doc_qa": 12.77
+  }
+}

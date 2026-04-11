@@ -1,0 +1,14 @@
+{
+  "task_set": "longbench",
+  "num_tasks": 1,
+  "task_scores": {
+    "hotpotqa": {
+      "overall": 27.27,
+      "num_examples": 1
+    }
+  },
+  "overall_average": 27.27,
+  "category_averages": {
+    "multi_doc_qa": 27.27
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "reference_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_refs\\longbench\\Qwen3-8B\\runs\\gov_report\\merged\\merged.jsonl",
+  "candidate_method": "cask",
+  "candidate_budget": 384,
+  "model_path": "experiments/models/Qwen3-8B",
+  "summary": {
+    "records_compared": 1,
+    "mean_target_top1_match_rate": 0.9609375,
+    "mean_target_top5_match_rate": 0.984375,
+    "mean_strict_prefix_top1_ratio": 0.63671875,
+    "mean_first_top1_mismatch_step": 326.0,
+    "mean_target_logprob": -0.4224320868961513,
+    "mean_target_nll": 0.4224320868961513,
+    "mean_perplexity": 1.5256676032626688,
+    "mean_terminal_saved_tokens": 11136.0,
+    "mean_terminal_saved_ratio": 0.9640723746861743,
+    "mean_terminal_cache_ratio": 0.035927625313825644,
+    "mean_reference_terminal_saved_tokens": 11136.0,
+    "mean_reference_terminal_saved_ratio": 0.9640723746861743,
+    "mean_reference_terminal_cache_ratio": 0.035927625313825644,
+    "records_with_positive_terminal_savings": 1,
+    "records_with_positive_reference_terminal_savings": 1,
+    "records_with_guard_triggered": 1,
+    "guard_reason_counts": {
+      "prefix_budget_exhausted": 1
+    },
+    "mean_compression_events": 0.0
+  },
+  "records": [
+    {
+      "index": 0,
+      "id": "4bd6930b3b65caf89aa127d679a80294f31f9cfa7cdab703",
+      "reference_output_tokens": 512,
+      "used_combined_boundary_tokenization": true,
+      "target_top1_match_rate": 0.9609375,
+      "target_top5_match_rate": 0.984375,
+      "strict_prefix_top1_ratio": 0.63671875,
+      "first_top1_mismatch_step": 326,
+      "mean_target_logprob": -0.4224320868961513,
+      "mean_target_nll": 0.4224320868961513,
+      "perplexity": 1.5256676032626688,
+      "reference_prompt_tokens": 11040,
+      "reference_total_tokens": 11552,
+      "prefix_coverage_ratio": 0.0625,
+      "core_selection_mode": "vote",
+      "merge_operator": "keepkv",
+      "prefix_stage_mode": "triattention_eviction",
+      "decode_stage_mode": "merge",
+      "prefix_compression_events": 0,
+      "total_prefix_evicted_tokens": 0,
+      "last_prefix_event": null,
+      "compression_events": 0,
+      "total_protected_core_tokens": 0,
+      "total_scratch_descriptors": 0,
+      "total_scratch_source_tokens": 0,
+      "total_scratch_merged_groups": 0,
+      "total_scratch_saved_tokens": 0,
+      "guard_triggered": true,
+      "guard_reason_counts": {
+        "prefix_budget_exhausted": 1
+      },
+      "last_guard": {
+        "reason": "prefix_budget_exhausted",
+        "seq_len": 11520,
+        "prefix_length": 11040,
+        "budget": 384
+      },
+      "last_event": null,
+      "current_cache_tokens": 415,
+      "current_prefix_tokens": 384,
+      "current_total_cardinality": 11551,
+      "terminal_saved_tokens": 11136,
+      "terminal_saved_ratio": 0.9640723746861743,
+      "terminal_cache_ratio": 0.035927625313825644,
+      "reference_terminal_saved_tokens": 11136,
+      "reference_terminal_saved_ratio": 0.9640723746861743,
+      "reference_terminal_cache_ratio": 0.035927625313825644
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "task_set": "longbench",
+  "num_tasks": 1,
+  "task_scores": {
+    "multi_news": {
+      "overall": 0.0,
+      "num_examples": 1
+    }
+  },
+  "overall_average": 0.0,
+  "category_averages": {
+    "summarization": 0.0
+  }
+}

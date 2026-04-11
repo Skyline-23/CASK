@@ -1,0 +1,64 @@
+{
+  "reference_input": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_refs\\longbench\\Qwen3-8B\\runs\\qasper\\merged\\merged.jsonl",
+  "candidate_input": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_actual_bridge_20260411\\qasper_tri512\\longbench\\Qwen3-8B\\runs\\qasper\\merged\\merged.jsonl",
+  "reference_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_refs\\longbench\\Qwen3-8B\\runs\\qasper\\merged\\merged.jsonl",
+  "candidate_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_actual_bridge_20260411\\qasper_tri512\\longbench\\Qwen3-8B\\runs\\qasper\\merged\\merged.jsonl",
+  "reference_eval_jsonl": null,
+  "candidate_eval_jsonl": null,
+  "shared_indices": [
+    0
+  ],
+  "fidelity": {
+    "records_compared": 1,
+    "question_match_rate": 1.0,
+    "prompt_match_rate": 1.0,
+    "final_answer_match_rate": 0.0,
+    "exact_output_match_rate": 0.0,
+    "normalized_output_match_rate": 0.0,
+    "mean_sequence_ratio": 0.17341040462427745,
+    "mean_prefix_token_ratio": 0.03669724770642202,
+    "mean_prefix_char_ratio": 0.030349013657056147,
+    "mean_output_token_ratio": 1.0,
+    "mean_output_token_delta": 0.0
+  },
+  "savings": {
+    "records_with_compression_summary": 0,
+    "records_with_positive_terminal_savings": 0,
+    "mean_compression_events": null,
+    "mean_terminal_saved_tokens": null,
+    "mean_terminal_saved_ratio": null,
+    "mean_terminal_cache_ratio": null,
+    "mean_cumulative_saved_tokens": null,
+    "mean_current_cache_tokens": null,
+    "mean_current_total_cardinality": null
+  },
+  "rows": [
+    {
+      "idx": 0,
+      "unique_id": null,
+      "question_match": true,
+      "prompt_match": true,
+      "reference_output_tokens": 128,
+      "candidate_output_tokens": 128,
+      "reference_total_tokens": 4200,
+      "candidate_total_tokens": 4200,
+      "reference_pred": null,
+      "candidate_pred": null,
+      "final_answer_match": false,
+      "exact_output_match": false,
+      "normalized_output_match": false,
+      "sequence_ratio": 0.17341040462427745,
+      "prefix_token_ratio": 0.03669724770642202,
+      "prefix_char_ratio": 0.030349013657056147,
+      "output_token_ratio": 1.0,
+      "output_token_delta": 0,
+      "compression_events": null,
+      "terminal_saved_tokens": null,
+      "terminal_saved_ratio": null,
+      "terminal_cache_ratio": null,
+      "cumulative_saved_tokens": null,
+      "current_cache_tokens": null,
+      "current_total_cardinality": null
+    }
+  ]
+}

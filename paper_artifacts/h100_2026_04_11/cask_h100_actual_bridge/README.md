@@ -12,9 +12,9 @@ This package contains the output-level evidence that complements the replay gate
 
 ## Read This First
 
-1. `actual_bridge_summary.md`
-2. `stage_ablation_summary.md`
-3. `actual_bridge_summary.csv` / `stage_ablation_summary.csv` if you want the table source
+1. [`actual_bridge_summary.md`](actual_bridge_summary.md)
+2. [`stage_ablation_summary.md`](stage_ablation_summary.md)
+3. [`actual_bridge_summary.csv`](actual_bridge_summary.csv) / [`stage_ablation_summary.csv`](stage_ablation_summary.csv) if you want the table source
 
 ## Headline Read
 
@@ -29,12 +29,12 @@ This package contains the output-level evidence that complements the replay gate
 
 | File | What it contains | When to open it |
 | --- | --- | --- |
-| `actual_bridge_summary.md` | paper-facing readout of the output-level bridge rows | first stop |
-| `actual_bridge_summary.csv` | compact table for the same rows | when you want copyable numbers |
-| `actual_bridge_summary.json` | same rows plus raw provenance | when tracing back to raw experiments |
-| `stage_ablation_summary.md` | output-level boundary for `multi_news` stage ablation | when discussing decode-stage caution |
-| `stage_ablation_summary.csv` | compact ablation table | when you want the raw values |
-| `stage_ablation_summary.json` | ablation rows with raw provenance | when auditing inputs |
+| [`actual_bridge_summary.md`](actual_bridge_summary.md) | paper-facing readout of the output-level bridge rows | first stop |
+| [`actual_bridge_summary.csv`](actual_bridge_summary.csv) | compact table for the same rows | when you want copyable numbers |
+| [`actual_bridge_summary.json`](actual_bridge_summary.json) | same rows plus raw provenance | when tracing back to raw experiments |
+| [`stage_ablation_summary.md`](stage_ablation_summary.md) | output-level boundary for `multi_news` stage ablation | when discussing decode-stage caution |
+| [`stage_ablation_summary.csv`](stage_ablation_summary.csv) | compact ablation table | when you want the raw values |
+| [`stage_ablation_summary.json`](stage_ablation_summary.json) | ablation rows with raw provenance | when auditing inputs |
 
 ## Scope
 
@@ -47,7 +47,9 @@ This package contains the output-level evidence that complements the replay gate
 
 ## Raw Provenance
 
-- replay metrics: `experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/`
-- generation runs: `experiments/longbench_h100_actual_bridge_20260411/`
-- stage-ablation generation run: `experiments/longbench_h100_stage_ablation/`
-- stage-ablation replay metrics: `experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/`
+Use the packaged JSON/CSV files first, then trace into these tracked raw roots:
+
+- replay metrics: [`experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/`](../../../experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/)
+- generation runs: [`experiments/longbench_h100_actual_bridge_20260411/`](../../../experiments/longbench_h100_actual_bridge_20260411/)
+- stage-ablation generation run: [`experiments/longbench_h100_stage_ablation/`](../../../experiments/longbench_h100_stage_ablation/)
+- stage-ablation replay metrics: [`experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/`](../../../experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/)

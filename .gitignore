@@ -63,3 +63,27 @@ external/
 
 # Misc
 prompt.txt
+
+# Paper-facing raw evidence exceptions
+!experiments/frontier/
+!experiments/frontier/Qwen3-8B/
+!experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/
+!experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/**
+!experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/
+!experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/**
+!experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/
+!experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/**
+!experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/
+!experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/**
+!experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411/
+!experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411/**
+!experiments/frontier/Qwen3-8B/h100_decode_probe_vcsum_20260411_vcsum_replay/
+!experiments/frontier/Qwen3-8B/h100_decode_probe_vcsum_20260411_vcsum_replay/**
+!experiments/frontier/Qwen3-8B/h100_decode_probe_qmsum_20260411_qmsum_replay/
+!experiments/frontier/Qwen3-8B/h100_decode_probe_qmsum_20260411_qmsum_replay/**
+!experiments/frontier/Qwen3-8B/h100_decode_probe_gov_report_20260411_gov_report_replay/
+!experiments/frontier/Qwen3-8B/h100_decode_probe_gov_report_20260411_gov_report_replay/**
+!experiments/longbench_h100_actual_bridge_20260411/
+!experiments/longbench_h100_actual_bridge_20260411/**
+!experiments/longbench_h100_stage_ablation/
+!experiments/longbench_h100_stage_ablation/**

@@ -6,10 +6,10 @@ This directory contains the paper-facing evidence packages for CASK. Start here 
 
 | If you want to answer this question | Open this first | Then drill into |
 | --- | --- | --- |
-| Does CASK beat TriAttention on the main reasoning replay gate? | [`h100_2026_04_10/cask_h100_fidelity/README.md`](h100_2026_04_10/cask_h100_fidelity/README.md) | `aime24_ref6_h100_fidelity_summary.csv`, `aime25_ref6_h100_fidelity_summary.csv` |
-| Does CASK preserve output quality, not just replay fidelity? | [`h100_2026_04_11/cask_h100_actual_bridge/README.md`](h100_2026_04_11/cask_h100_actual_bridge/README.md) | `actual_bridge_summary.md`, `stage_ablation_summary.md` |
-| What is the prompt-heavy story, including decode-active witnesses and failure boundaries? | [`h100_2026_04_11/README.md`](h100_2026_04_11/README.md) | `decode_active_replay_probe.md`, `coverage_followup_probe.md`, `promptheavy_saved_ratio_audit/promptheavy_replay_readout.md` |
-| What is the cheapest local evidence package for debugging and compact bridge examples? | [`rtx5070ti_2026_04_10/cask_v2_fidelity/README.md`](rtx5070ti_2026_04_10/cask_v2_fidelity/README.md) | `teacher_forced_budget_sweep_summary.csv`, `math_actual_accuracy_subset.md`, `submission_gate_checks.md` |
+| Does CASK beat TriAttention on the main reasoning replay gate? | [`h100_2026_04_10/cask_h100_fidelity/README.md`](h100_2026_04_10/cask_h100_fidelity/README.md) | [`aime24_ref6_h100_fidelity_summary.csv`](h100_2026_04_10/cask_h100_fidelity/aime24_ref6_h100_fidelity_summary.csv), [`aime25_ref6_h100_fidelity_summary.csv`](h100_2026_04_10/cask_h100_fidelity/aime25_ref6_h100_fidelity_summary.csv) |
+| Does CASK preserve output quality, not just replay fidelity? | [`h100_2026_04_11/cask_h100_actual_bridge/README.md`](h100_2026_04_11/cask_h100_actual_bridge/README.md) | [`actual_bridge_summary.md`](h100_2026_04_11/cask_h100_actual_bridge/actual_bridge_summary.md), [`stage_ablation_summary.md`](h100_2026_04_11/cask_h100_actual_bridge/stage_ablation_summary.md) |
+| What is the prompt-heavy story, including decode-active witnesses and failure boundaries? | [`h100_2026_04_11/README.md`](h100_2026_04_11/README.md) | [`decode_active_replay_probe.md`](h100_2026_04_11/decode_active_replay_probe.md), [`coverage_followup_probe.md`](h100_2026_04_11/coverage_followup_probe.md), [`promptheavy_replay_readout.md`](h100_2026_04_11/promptheavy_saved_ratio_audit/promptheavy_replay_readout.md) |
+| What is the cheapest local evidence package for debugging and compact bridge examples? | [`rtx5070ti_2026_04_10/cask_v2_fidelity/README.md`](rtx5070ti_2026_04_10/cask_v2_fidelity/README.md) | [`teacher_forced_budget_sweep_summary.csv`](rtx5070ti_2026_04_10/cask_v2_fidelity/teacher_forced_budget_sweep_summary.csv), [`math_actual_accuracy_subset.md`](rtx5070ti_2026_04_10/cask_v2_fidelity/math_actual_accuracy_subset.md), [`submission_gate_checks.md`](rtx5070ti_2026_04_10/cask_v2_fidelity/submission_gate_checks.md) |
 
 ## Package Map
 
@@ -30,4 +30,4 @@ This directory contains the paper-facing evidence packages for CASK. Start here 
 
 ## Provenance
 
-Every package README points back to the raw experiment roots under `experiments/`. The tracked files here are the paper-facing summaries, not the full raw run logs.
+Every package README points to tracked summary files that already carry raw provenance fields such as `source_json` or `source_eval_json`. For paper writing, cite the packaged summaries first, then use those provenance fields to trace each row back to its generating experiment.

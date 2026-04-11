@@ -12,9 +12,9 @@ This package is the main H100 replay-level evidence for the paper's reasoning st
 
 ## Read This First
 
-1. `aime24_ref6_h100_fidelity_summary.csv`
-2. `aime25_ref6_h100_fidelity_summary.csv`
-3. `aime24_ref6_h100_fidelity_summary.json` / `aime25_ref6_h100_fidelity_summary.json` if you need per-row provenance
+1. [`aime24_ref6_h100_fidelity_summary.csv`](aime24_ref6_h100_fidelity_summary.csv)
+2. [`aime25_ref6_h100_fidelity_summary.csv`](aime25_ref6_h100_fidelity_summary.csv)
+3. [`aime24_ref6_h100_fidelity_summary.json`](aime24_ref6_h100_fidelity_summary.json) / [`aime25_ref6_h100_fidelity_summary.json`](aime25_ref6_h100_fidelity_summary.json) if you need per-row provenance
 
 ## Headline Read
 
@@ -27,11 +27,11 @@ This package is the main H100 replay-level evidence for the paper's reasoning st
 
 | File | What it contains | When to open it |
 | --- | --- | --- |
-| `aime24_ref6_h100_fidelity_summary.csv` | compact replay summary for the 6-example `AIME24` slice | first stop for main table numbers |
-| `aime25_ref6_h100_fidelity_summary.csv` | compact replay summary for the 6-example `AIME25` slice | first stop for main table numbers |
-| `aime24_ref6_h100_fidelity_summary.json` | same data plus explicit `source_json` provenance | when you need to trace a row back to raw outputs |
-| `aime25_ref6_h100_fidelity_summary.json` | same data plus explicit `source_json` provenance | when you need raw-path traceability |
-| `MANIFEST.sha256` | integrity manifest for tracked files | only if you need a frozen artifact audit |
+| [`aime24_ref6_h100_fidelity_summary.csv`](aime24_ref6_h100_fidelity_summary.csv) | compact replay summary for the 6-example `AIME24` slice | first stop for main table numbers |
+| [`aime25_ref6_h100_fidelity_summary.csv`](aime25_ref6_h100_fidelity_summary.csv) | compact replay summary for the 6-example `AIME25` slice | first stop for main table numbers |
+| [`aime24_ref6_h100_fidelity_summary.json`](aime24_ref6_h100_fidelity_summary.json) | same data plus explicit `source_json` provenance | when you need to trace a row back to raw outputs |
+| [`aime25_ref6_h100_fidelity_summary.json`](aime25_ref6_h100_fidelity_summary.json) | same data plus explicit `source_json` provenance | when you need raw-path traceability |
+| [`MANIFEST.sha256`](MANIFEST.sha256) | integrity manifest for tracked files | only if you need a frozen artifact audit |
 
 ## Scope
 
@@ -49,5 +49,7 @@ This is a **replay-fidelity** package. It should support the full-KV similarity 
 
 ## Raw Provenance
 
-- `experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/`
-- `experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/`
+Use the `source_json` column in the packaged summaries, then trace into these tracked raw roots:
+
+- [`experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/`](../../../experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/)
+- [`experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/`](../../../experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/)
