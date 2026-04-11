@@ -360,7 +360,7 @@ def load_replay_summary_json(relpath: str) -> dict[str, Any]:
     }
 
 
-def build_witness_map_figure(outdir: Path) -> str:
+def collect_witness_delta_data() -> dict[str, Any]:
     audit_rows = load_promptheavy_rows()
     indexed = promptheavy_index(audit_rows)
 
@@ -396,58 +396,76 @@ def build_witness_map_figure(outdir: Path) -> str:
         nll_384.append(float(cask_384["mean_nll"]) - float(tri_384["mean_nll"]))
         labels.append(f"{task} | {role.replace(chr(10), ' ')}")
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.8, 6.4), sharey=True)
-    y_positions = list(range(len(WITNESS_TASKS)))
-    bar_height = 0.34
-    budget256_color = "#60A5FA"
-    budget384_color = "#2563EB"
+    return {
+        "labels": labels,
+        "top1_256": top1_256,
+        "top1_384": top1_384,
+        "nll_256": nll_256,
+        "nll_384": nll_384,
+    }
 
-    bars1_256 = ax1.barh([value - bar_height / 2 for value in y_positions], top1_256, height=bar_height, color=budget256_color, label="Budget 256")
-    bars1_384 = ax1.barh([value + bar_height / 2 for value in y_positions], top1_384, height=bar_height, color=budget384_color, alpha=0.8, label="Budget 384")
-    bars2_256 = ax2.barh([value - bar_height / 2 for value in y_positions], nll_256, height=bar_height, color=budget256_color, label="Budget 256")
-    bars2_384 = ax2.barh([value + bar_height / 2 for value in y_positions], nll_384, height=bar_height, color=budget384_color, alpha=0.8, label="Budget 384")
 
-    def annotate_bar_values(ax: plt.Axes, bars: Any, decimals: int) -> None:
-        for bar in bars:
-            value = bar.get_width()
-            y_value = bar.get_y() + bar.get_height() / 2
-            offset = 4 if value >= 0 else -4
-            anchor = "left" if value >= 0 else "right"
-            ax.annotate(
-                f"{value:+.{decimals}f}",
-                xy=(value, y_value),
-                xytext=(offset, 0),
-                textcoords="offset points",
-                ha=anchor,
-                va="center",
-                fontsize=7,
-                color="#1F2937",
-            )
+def build_witness_map_figure(outdir: Path) -> str:
+    payload = collect_witness_delta_data()
+    top1_256 = payload["top1_256"]
+    top1_384 = payload["top1_384"]
+    fig, axes = plt.subplots(2, 4, figsize=(13.5, 6.4), sharey=True)
+    axes_flat = list(axes.flat)
+    ylim = (-6.0, 18.5)
 
-    annotate_bar_values(ax1, bars1_256, 1)
-    annotate_bar_values(ax1, bars1_384, 1)
-    annotate_bar_values(ax2, bars2_256, 2)
-    annotate_bar_values(ax2, bars2_384, 2)
+    for idx, ((task, role, _color), ax) in enumerate(zip(WITNESS_TASKS, axes_flat)):
+        bars = ax.bar([0, 1], [top1_256[idx], top1_384[idx]], color=["#60A5FA", "#2563EB"], width=0.62)
+        ax.axhline(0, color="#9CA3AF", linewidth=0.8, linestyle="-")
+        ax.set_title(task, fontweight="bold", fontsize=10)
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["256", "384"])
+        ax.set_ylim(*ylim)
+        ax.grid(axis="y", alpha=0.25)
+        if idx % 4 == 0:
+            ax.set_ylabel("Delta Top-1 (%p)")
+        if role:
+            ax.text(0.02, 0.94, role.replace("\n", " "), transform=ax.transAxes, ha="left", va="top", fontsize=6.6, color="#4B5563")
+        for bar, value in zip(bars, [top1_256[idx], top1_384[idx]]):
+            offset = 0.45 if value >= 0 else -0.65
+            va = "bottom" if value >= 0 else "top"
+            ax.text(bar.get_x() + bar.get_width() / 2, value + offset, f"{value:+.1f}", ha="center", va=va, fontsize=7, color="#1F2937")
 
-    for ax in (ax1, ax2):
-        ax.axvline(x=0, color="#9CA3AF", linewidth=0.8, linestyle="-")
-        ax.set_yticks(y_positions)
-        ax.set_yticklabels(labels, fontsize=8)
-        ax.invert_yaxis()
-
-    ax1.set_xlabel("Delta Top-1 (%p)")
-    ax1.set_title("Top-1 Delta (positive is better)", fontweight="bold")
-    ax1.legend(loc="lower right", framealpha=0.9, fontsize=8, title="Budget", title_fontsize=8)
-    ax1.set_xlim(-8.0, 18.5)
-
-    ax2.set_xlabel("Delta Mean NLL")
-    ax2.set_title("Mean NLL Delta (negative is better)", fontweight="bold")
-    ax2.set_xlim(-3.5, 1.1)
-
-    fig.suptitle("Figure 3. Prompt-Heavy Witness Summary by Task and Budget", fontsize=12, fontweight="bold", y=1.02)
+    fig.suptitle("Figure 3. Prompt-Heavy Top-1 Delta by Task", fontsize=12, fontweight="bold", y=1.02)
     plt.tight_layout()
     save_figure(fig, outdir, "fig3_promptheavy_witness_map")
-    return "Figure 3. Simplified prompt-heavy witness summary by task and budget."
+    return "Figure 3. Prompt-heavy top-1 delta by task."
+
+
+def build_witness_nll_figure(outdir: Path) -> str:
+    payload = collect_witness_delta_data()
+    nll_256 = payload["nll_256"]
+    nll_384 = payload["nll_384"]
+
+    fig, axes = plt.subplots(2, 4, figsize=(13.5, 6.4), sharey=True)
+    axes_flat = list(axes.flat)
+    ylim = (-1.5, 0.65)
+
+    for idx, ((task, role, _color), ax) in enumerate(zip(WITNESS_TASKS, axes_flat)):
+        bars = ax.bar([0, 1], [nll_256[idx], nll_384[idx]], color=["#60A5FA", "#2563EB"], width=0.62)
+        ax.axhline(0, color="#9CA3AF", linewidth=0.8, linestyle="-")
+        ax.set_title(task, fontweight="bold", fontsize=10)
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["256", "384"])
+        ax.set_ylim(*ylim)
+        ax.grid(axis="y", alpha=0.25)
+        if idx % 4 == 0:
+            ax.set_ylabel("Delta Mean NLL")
+        if role:
+            ax.text(0.02, 0.94, role.replace("\n", " "), transform=ax.transAxes, ha="left", va="top", fontsize=6.6, color="#4B5563")
+        for bar, value in zip(bars, [nll_256[idx], nll_384[idx]]):
+            offset = 0.05 if value >= 0 else -0.06
+            va = "bottom" if value >= 0 else "top"
+            ax.text(bar.get_x() + bar.get_width() / 2, value + offset, f"{value:+.2f}", ha="center", va=va, fontsize=7, color="#1F2937")
+
+    fig.suptitle("Figure 3A. Prompt-Heavy Mean NLL Delta by Task", fontsize=12, fontweight="bold", y=1.02)
+    plt.tight_layout()
+    save_figure(fig, outdir, "fig3a_promptheavy_nll_by_task")
+    return "Figure 3A. Prompt-heavy mean NLL delta by task."
 
 
 def read_longbench_task_metric(task: str, variant_dir: str) -> float:
@@ -626,6 +644,7 @@ def main() -> None:
         ("fig1_reasoning_gate_frontier", build_reasoning_gate_figure(outdir)),
         ("fig2_promptheavy_aggregate", build_promptheavy_aggregate_figure(outdir)),
         ("fig3_promptheavy_witness_map", build_witness_map_figure(outdir)),
+        ("fig3a_promptheavy_nll_by_task", build_witness_nll_figure(outdir)),
         ("fig4_actual_output_bridge", build_actual_bridge_figure(outdir)),
         ("fig5_method_overview", build_method_overview_figure(outdir)),
     ]
