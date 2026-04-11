@@ -1,5 +1,7 @@
 # Prompt-Heavy Saved-Ratio Audit
 
+Paper-facing readout: [promptheavy_replay_readout.md](/C:/Users/AIUSER/Downloads/CASK/paper_artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/promptheavy_replay_readout.md)
+
 | Source Manifest | `C:\Users\AIUSER\Downloads\CASK\experiments\frontier\Qwen3-8B\h100_promptheavy_twostage_rerun_20260411\overnight_manifest.json` |
 | --- | --- |
 
