@@ -88,12 +88,26 @@ Detail:
 
 ## Artifact Index
 
-| Artifact family | Contents | Entry point |
+Start here:
+[paper_artifacts/README.md](paper_artifacts/README.md)
+
+### Which package should you open?
+
+| If you want to know... | Open this | Why this is the right package |
 | --- | --- | --- |
-| Local RTX 5070 Ti fidelity sweep | budget sweeps, prompt-heavy local witnesses, submission gate checks | [rtx5070ti_2026_04_10/cask_v2_fidelity/README.md](paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/README.md) |
-| H100 reasoning replay | AIME24/AIME25 ref6 synchronized replay summaries | [h100_2026_04_10/cask_h100_fidelity/README.md](paper_artifacts/h100_2026_04_10/cask_h100_fidelity/README.md) |
-| H100 output bridge | actual-output bridge summaries and stage ablation | [h100_2026_04_11/cask_h100_actual_bridge/README.md](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md) |
-| H100 prompt-heavy follow-up | decode-active replay probe, coverage probe, saved-ratio readout | [h100_2026_04_11/README.md](paper_artifacts/h100_2026_04_11/README.md) |
+| whether CASK wins the main reasoning replay gate | [H100 reasoning replay gate](paper_artifacts/h100_2026_04_10/cask_h100_fidelity/README.md) | contains the `AIME24` / `AIME25` synchronized replay tables and crossing read |
+| whether replay gains show up in actual generation | [H100 actual-output bridge](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md) | contains `qasper`, `multi_news`, and `hotpotqa` output-level bridge rows |
+| how to read the full prompt-heavy story | [H100 prompt-heavy follow-up](paper_artifacts/h100_2026_04_11/README.md) | separates decode-active wins from `prefix_budget_exhausted` boundaries |
+| what the cheapest local sanity package is | [Local CASK v2 fidelity package](paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/README.md) | gives the compact local sweep, `hexagon` bridge, and submission-gate checks |
+
+### Package Roles
+
+| Package | Use it for | Do not use it for |
+| --- | --- | --- |
+| H100 reasoning replay gate | main reasoning replay headline | final benchmark-accuracy headline |
+| H100 actual-output bridge | showing replay-to-output linkage | broad decode-stage generalization claims by itself |
+| H100 prompt-heavy follow-up | regime separation and prompt-heavy narrative | pretending every prompt-heavy task is decode-active |
+| Local CASK v2 fidelity package | cheap debugging and compact bridge examples | stronger headline claims than the H100 packages |
 
 ## Installation
 

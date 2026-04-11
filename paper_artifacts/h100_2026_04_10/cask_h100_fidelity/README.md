@@ -1,58 +1,53 @@
-# CASK H100 Fidelity Assets
+# H100 Reasoning Replay Gate
 
-This directory tracks the H100 paper-facing fidelity assets that are stable
-enough to cite directly in the manuscript.
+This package is the main H100 replay-level evidence for the paper's reasoning story.
 
-Tracked here:
-- compact summary tables derived from completed H100 replay runs
-- crossing summaries that are small enough to review by hand
-- provenance links back to ignored raw outputs under `experiments/frontier/`
+## What This Package Answers
 
-Not tracked here:
-- raw H100 launcher logs
-- raw merged outputs and replay JSONs under `experiments/frontier/`
-- prompt-heavy reference caches under `experiments/longbench_h100_refs/`
-- local overnight orchestration glue such as `scripts/run_h100_fidelity_overnight.py`
+| Question | Answer source |
+| --- | --- |
+| Does CASK beat TriAttention at the same budget on reasoning replay? | `aime24_ref6_h100_fidelity_summary.csv`, `aime25_ref6_h100_fidelity_summary.csv` |
+| Is there any budget crossing? | same CSV files; compare `cask@256` vs `triattention@384`, and `cask@384` vs `triattention@512` |
+| Are the gains fidelity-only or broad enough to matter for the paper? | this package establishes the replay gate, not final benchmark accuracy |
 
-Current scope:
-- model: `Qwen3-8B`
-- hardware: `H100 PCIe`
-- dataset slices:
-  - `AIME24` reference replay on `6` examples
-  - `AIME25` reference replay on `6` examples
-- methods: `triattention`, `cask`
-- budgets: `256`, `384`, `512`
+## Read This First
 
-Companion package:
-- output-level bridge evidence is packaged separately under
-  `paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/`
+1. `aime24_ref6_h100_fidelity_summary.csv`
+2. `aime25_ref6_h100_fidelity_summary.csv`
+3. `aime24_ref6_h100_fidelity_summary.json` / `aime25_ref6_h100_fidelity_summary.json` if you need per-row provenance
 
-Primary files:
-- `aime24_ref6_h100_fidelity_summary.csv`
-- `aime24_ref6_h100_fidelity_summary.json`
-- `aime25_ref6_h100_fidelity_summary.csv`
-- `aime25_ref6_h100_fidelity_summary.json`
-- `MANIFEST.sha256`
+## Headline Read
 
-Headline read from the packaged H100 gates:
-- `AIME24`: same-budget `cask` beats `triattention` on `top1`, `top5`, and
-  `mean_nll` at `256`, `384`, and `512`
-- `AIME24`: `cask @ 256` is already ahead of `triattention @ 384`
-- `AIME24`: `cask @ 384` is ahead of `triattention @ 512` while preserving
-  much higher KV savings
-- `AIME25`: same-budget `cask` again beats `triattention` on `top1`, `top5`,
-  and `mean_nll` at `256`, `384`, and `512`
-- `AIME25`: `cask @ 384` is ahead of `triattention @ 512`
-- `AIME25`: `cask @ 256` does not beat `triattention @ 384`, so the crossing
-  pattern is real but weaker than on `AIME24`
+| Slice | Main read |
+| --- | --- |
+| `AIME24 ref6` | CASK wins the same-budget replay gate at `256`, `384`, and `512`, and shows two clean crossing points: `cask@256 > triattention@384` and `cask@384 > triattention@512` |
+| `AIME25 ref6` | CASK again wins the same-budget replay gate at `256`, `384`, and `512`; the crossing is weaker than on `AIME24`, but `cask@384 > triattention@512` still holds |
 
-Important caveat:
-- these are **fidelity** assets, not final benchmark-accuracy claims
-- they are intended to support the paper's full-KV similarity story and to
-  guide which larger H100 packages are worth running next
+## File Guide
 
-Raw provenance:
-- all summary rows include `source_json`
-- current raw source roots:
-  - `experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/`
-  - `experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/`
+| File | What it contains | When to open it |
+| --- | --- | --- |
+| `aime24_ref6_h100_fidelity_summary.csv` | compact replay summary for the 6-example `AIME24` slice | first stop for main table numbers |
+| `aime25_ref6_h100_fidelity_summary.csv` | compact replay summary for the 6-example `AIME25` slice | first stop for main table numbers |
+| `aime24_ref6_h100_fidelity_summary.json` | same data plus explicit `source_json` provenance | when you need to trace a row back to raw outputs |
+| `aime25_ref6_h100_fidelity_summary.json` | same data plus explicit `source_json` provenance | when you need raw-path traceability |
+| `MANIFEST.sha256` | integrity manifest for tracked files | only if you need a frozen artifact audit |
+
+## Scope
+
+| Field | Value |
+| --- | --- |
+| Model | `Qwen3-8B` |
+| Hardware | `H100 PCIe` |
+| Methods | `triattention`, `cask` |
+| Budgets | `256`, `384`, `512` |
+| Metric family | replay `top1`, `top5`, `mean_nll`, `first_mismatch`, `saved_ratio` |
+
+## Caveat
+
+This is a **replay-fidelity** package. It should support the full-KV similarity story and the reasoning gate, but it should not be cited as if it were already the final benchmark-accuracy table.
+
+## Raw Provenance
+
+- `experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/`
+- `experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/`
