@@ -1,175 +1,81 @@
 # Submission Gate Checks
 
-This note records the extra checks added after the initial witness sweep to
-estimate whether the current CASK paper package is strong enough for
-submission.
+This note tracks the current submission-facing evidence package after the
+H100 prompt-heavy two-stage rerun.
 
-## 1. Prompt-heavy decode-active witness: `multi_news`
+## 1. H100 Prompt-Heavy Matrix
 
-Teacher-forced replay against `fullkv`:
+Authoritative source:
 
-| Method | Top-1 | Top-5 | Mean NLL | First Mismatch | Ref-Length Saved Ratio | Prefix Events | Decode Events |
+- `experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411/overnight_status.md`
+
+| Task | Budget | TriAttention Top-1 | CASK Top-1 | TriAttention Top-5 | CASK Top-5 | TriAttention NLL | CASK NLL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `triattention @ 384` | `0.5371` | `0.8125` | `2.0676` | `2` | `0.8408` | `0` | `0` |
-| `cask @ 384` | `0.6582` | `0.9043` | `1.4737` | `2` | `0.8411` | `2` | `2` |
+| `qasper` | `256` | `67.2%` | `71.1%` | `89.8%` | `93.8%` | `1.315` | `1.247` |
+| `qasper` | `384` | `66.4%` | `73.4%` | `90.6%` | `92.2%` | `1.398` | `1.297` |
+| `multi_news` | `256` | `54.7%` | `60.0%` | `82.0%` | `87.9%` | `2.060` | `1.652` |
+| `multi_news` | `384` | `53.7%` | `61.3%` | `81.6%` | `89.5%` | `2.052` | `1.540` |
+| `hotpotqa` | `256` | `81.3%` | `93.8%` | `90.6%` | `100.0%` | `1.374` | `0.151` |
+| `hotpotqa` | `384` | `81.3%` | `96.9%` | `90.6%` | `100.0%` | `1.344` | `0.110` |
+| `musique` | `256` | `59.4%` | `65.6%` | `71.9%` | `75.0%` | `2.697` | `2.713` |
+| `musique` | `384` | `53.1%` | `62.5%` | `75.0%` | `75.0%` | `2.862` | `2.650` |
+| `2wikimqa` | `256` | `59.4%` | `62.5%` | `68.8%` | `81.3%` | `3.368` | `2.375` |
+| `2wikimqa` | `384` | `59.4%` | `56.3%` | `68.8%` | `81.3%` | `3.415` | `2.397` |
 
-Interpretation:
-- This is the cleanest prompt-heavy witness where **both** CASK stages are active.
-- At the same physical budget, CASK substantially improves `top1`, `top5`, and
-  `mean_nll` over TriAttention.
-- This closes the gap left by `qasper`: the prompt-heavy story is no longer
-  limited to prefix-only evidence.
+Readout:
 
-Actual-generation sanity on the same witness:
+- `qasper`, `multi_news`, `hotpotqa`, and `musique` all show same-budget
+  fidelity advantage for CASK.
+- `hotpotqa` is the strongest prompt-heavy same-budget witness.
+- `2wikimqa` remains the boundary case.
 
-| Method | Sequence Ratio vs `fullkv` | Task Metric |
-| --- | ---: | ---: |
-| `triattention @ 384` | `0.0000` | `0.0000` |
-| `cask @ 384` | `0.1690` | `0.1394` |
-| `fullkv` | `1.0000` | `0.1785` |
+## 2. Stage Attribution
 
-This is still single-example evidence, but it shows that the same-budget
-fidelity gain on `multi_news` also translates into a meaningfully better
-generated summary.
+| Task | `cask @ 256` decode events | `cask @ 384` decode events | Interpretation |
+| --- | ---: | ---: | --- |
+| `qasper` | `0` | `0` | prefix-dominant |
+| `multi_news` | `3` | `3` | decode-active |
+| `hotpotqa` | `0` | `0` | prefix-dominant |
+| `musique` | `0` | `0` | prefix-dominant |
+| `2wikimqa` | `0` | `0` | prefix-dominant boundary case |
 
-## 2. LongBench prompt-heavy witness: `qasper` budget crossing
+Readout:
 
-Teacher-forced replay against `fullkv`:
+- `multi_news` is still the clean decode-active witness.
+- The rest of the H100 prompt-heavy package is primarily telling a
+  stage-1 prefix-aware story.
 
-| Method | Top-1 | Top-5 | Strict Prefix | Mean NLL | First Mismatch |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `cask @ 256` | `0.6953` | `0.9531` | `0.0313` | `1.2583` | `4` |
-| `cask @ 384` | `0.7656` | `0.9531` | `0.0469` | `1.0135` | `6` |
-| `triattention @ 384` | `0.6719` | `0.9063` | `0.0156` | `1.3659` | `2` |
-| `triattention @ 512` | `0.6563` | `0.9063` | `0.0156` | `1.3839` | `2` |
-| `cask @ 512` | `0.7578` | `0.9453` | `0.0469` | `1.1091` | `6` |
+## 3. Output-Level Sanity
 
-Interpretation:
-- `cask @ 384` beats `triattention @ 512` on every tracked fidelity metric while
-  using `25%` less physical budget.
-- `cask @ 256` still beats `triattention @ 512`, giving a `50%` budget-crossing
-  example on this prompt-heavy LongBench witness.
-- This witness is **prefix-stage dominated**:
-  - `prefix_compression_events = 1`
-  - `compression_events = 0`
-- It should be cited as **two-stage coverage evidence**, not as decode-merge
-  evidence.
+Local single-example output checks still support the replay story:
 
-Stage-contribution summary:
+| Task | Method | Sequence Ratio | Prefix Token Ratio | Task Metric |
+| --- | --- | ---: | ---: | ---: |
+| `multi_news` | `TriAttention @ 384` | `0.000` | `0.000` | `0.000` |
+| `multi_news` | `CASK @ 384` | `0.169` | `0.081` | `0.139` |
+| `qasper` | `TriAttention @ 512` | `0.042` | `0.018` | `0.015` |
+| `qasper` | `CASK @ 512` | `0.174` | `0.045` | `0.075` |
+| `2wikimqa` | `TriAttention @ 512` | `0.083` | `0.125` | `0.000` |
+| `2wikimqa` | `CASK @ 384` | `0.703` | `0.625` | `0.000` |
 
-| Method | Budget | Ref-Length Saved Ratio | Prefix Events | Decode Events | Stage Profile |
-| --- | ---: | ---: | ---: | ---: | --- |
-| `triattention @ 384` | `384` | `0.8786` | `0` | `0` | `eviction_only_baseline` |
-| `triattention @ 512` | `512` | `0.8481` | `0` | `0` | `eviction_only_baseline` |
-| `cask @ 384` | `384` | `0.8786` | `1` | `0` | `prefix_only_active` |
-| `cask @ 384 (coverage 0.0625)` | `384` | `0.8786` | `1` | `0` | `prefix_only_active` |
-| `cask @ 256` | `256` | `0.9090` | `1` | `0` | `prefix_only_active` |
+Readout:
 
-This is the cleanest evidence that the current prompt-heavy gain comes from the
-two-stage prefix policy rather than from decode-stage merge.
+- `multi_news` is the strongest same-budget prompt-heavy bridge from replay
+  fidelity to task-visible output quality.
+- `qasper` remains a useful prompt-heavy output-level sanity check.
+- `2wikimqa` remains boundary analysis, not headline evidence.
 
-## 3. Output-level sanity on `qasper @ 512`
+## 4. Reasoning-Side Bridge
 
-Greedy generation compared to the `fullkv` output:
-
-| Method | Final Answer Match | Sequence Ratio | Prefix Token Ratio |
-| --- | ---: | ---: | ---: |
-| `triattention @ 512` | `0.0` | `0.0420` | `0.0182` |
-| `cask @ 512` | `0.0` | `0.1735` | `0.0455` |
-
-Observed outputs:
-- `fullkv`: repeats the correct article-grounded explanation.
-- `triattention`: collapses into repeated `The ground ...`.
-- `cask`: keeps the correct semantic gist much longer, but still loops and does
-  not exactly match the `fullkv` final string.
-
-Interpretation:
-- This is **not** a clean final-answer win.
-- It is still useful as a sanity check because `cask` remains materially closer
-  to `fullkv` than `triattention` in actual greedy decoding.
-
-## 4. Boundary-case prompt-heavy witness: `2wikimqa`
-
-Teacher-forced replay against `fullkv`:
-
-| Method | Top-1 | Top-5 | Mean NLL | First Mismatch |
-| --- | ---: | ---: | ---: | ---: |
-| `triattention @ 512` | `0.5938` | `0.6875` | `3.5010` | `2` |
-| `cask @ 384` | `0.5625` | `0.8438` | `2.4323` | `2` |
-
-Greedy output comparison:
-
-| Method | Sequence Ratio vs `fullkv` | Prefix Token Ratio vs `fullkv` |
-| --- | ---: | ---: |
-| `triattention @ 512` | `0.0833` | `0.1250` |
-| `cask @ 384` | `0.7027` | `0.6250` |
-
-Observed outputs:
-- `fullkv`: `Based on Passage 2, the wife of Francis I Rákóczi, Jelena Zrinska, was born in Gyulafehérv`
-- `triattention @ 512`: collapses into repeated `Based on on on ...`
-- `cask @ 384`: keeps the answer structure and supporting relation, but still drifts to an incorrect surface form
-
-Interpretation:
-- This is a **boundary case**, not a clean win.
-- Under teacher-forced replay, `cask` improves `top5` and `mean_nll` but does
-  not beat `triattention` on `top1`.
-- Under actual greedy decoding, `cask` is dramatically closer to the `fullkv`
-  output than `triattention`.
-- This task is therefore best used to show the current limit of the prefix-only
-  prompt-heavy story: the gain is real, but not every task yields the same kind
-  of win.
-
-Coverage-reserve ablation:
-
-| Variant | Coverage Ratio | Top-1 | Top-5 | Mean NLL | First Mismatch |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `cask @ 384` | `0` | `0.5313` | `0.8438` | `2.5322` | `2` |
-| `cask @ 384` | `0.0625` | `0.5625` | `0.8438` | `2.4323` | `2` |
-| `cask @ 384` | `0.125` | `0.5625` | `0.8438` | `2.5400` | `2` |
-
-This ablation supports the current reverse-engineering story:
-- score-only prefix eviction was leaving `2wikimqa` under-covered
-- a small coverage reserve fixes part of that drift
-- pushing the reserve further does not keep helping
-
-## 5. Representative-mode ablation on `hexagon @ 104`
-
-Teacher-forced replay against `fullkv`:
-
-| Representative Mode | Top-1 | Top-5 | Mean NLL | First Mismatch |
-| --- | ---: | ---: | ---: | ---: |
-| `score_max_source` | `0.8639` | `0.9827` | `0.4976` | `160` |
-| `weighted_latest` | `0.8553` | `0.9827` | `0.5152` | `160` |
-
-Interpretation:
-- The `score_max_source` representative anchor is modestly but consistently
-  better than `weighted_latest`.
-- This is a small but useful ablation that supports the current default.
-
-## 6. Reasoning-task sanity on `hexagon @ 104`
-
-Actual generation on the tracked math witness:
+### `hexagon @ 104`
 
 | Method | Extracted Answer | Correct |
 | --- | --- | ---: |
 | `fullkv` | `42` | `1` |
 | `triattention @ 104` | repeated `7...` tail | `0` |
-| `triattention @ 192` | `42` | `1` |
 | `cask @ 104` | `42` | `1` |
 
-Interpretation:
-- This is the cleanest reasoning-side example where a low-budget fidelity gain
-  also maps to an actual answer flip.
-- At `budget = 104`, `triattention` collapses and fails, while `cask` still
-  produces the correct final answer.
-- This complements the prompt-heavy evidence by showing that CASK is not only
-  improving continuation fidelity but can also preserve answer correctness at a
-  lower budget on at least one concrete math witness.
-
-## 7. Small `math500` actual-accuracy bridge subset
-
-Actual generation on a 3-witness subset at `budget = 104`, `sample4`,
-`stop_on_final_answer=true`:
+### `math500` 3-witness subset, `budget=104`, `sample4`
 
 | Witness | TriAttention | CASK |
 | --- | ---: | ---: |
@@ -177,52 +83,38 @@ Actual generation on a 3-witness subset at `budget = 104`, `sample4`,
 | `geometry/248` | `0/4` | `0/4` |
 | `geometry/434` | `0/4` | `0/4` |
 
-Aggregate:
-
 | Metric | TriAttention | CASK |
 | --- | ---: | ---: |
 | draw-level exact match | `2/12` | `4/12` |
 | problem-level `pass@4` | `1/3` | `1/3` |
 
-Prompt-control rerun on `geometry/434`:
+Readout:
 
-| Prompt Style | TriAttention | CASK |
-| --- | ---: | ---: |
-| current answer-stabilized prompt | `0/4` | `0/4` |
+- The strongest reasoning-side bridge is still `hexagon`.
+- The subset bridge remains small, but it is not zero.
 
-Interpretation:
-- This is not a headline benchmark win; it is a bridge check from replay
-  fidelity to actual answer extraction.
-- The strongest signal is `hexagon`, where `cask @ 104` succeeds on all 4
-  draws while `triattention @ 104` succeeds on only 2.
-- At the subset level, CASK doubles draw-level exact match (`2/12 -> 4/12`)
-  but does not yet improve `pass@4` (`1/3 -> 1/3`).
-- The `geometry/434` control rerun shows that its failure is not just a stale
-  prompt-format artifact.
+## 5. Representative-Mode Ablation
 
-## Bottom line
+| Representative Mode | Top-1 | Top-5 | Mean NLL | First Mismatch |
+| --- | ---: | ---: | ---: | ---: |
+| `score_max_source` | `0.8639` | `0.9827` | `0.4976` | `160` |
+| `weighted_latest` | `0.8553` | `0.9827` | `0.5152` | `160` |
 
-The current package is enough for a **submission-facing draft**:
-- same-budget fidelity advantage exists across the tracked math witnesses,
-  plus both a decode-active prompt-heavy witness and a strong prompt-heavy
-  crossing witness
-- two-stage coverage is now supported by actual LongBench examples in both the
-  prefix-only and decode-active regimes
-- prompt-heavy stage contribution is now explicitly decomposed into prefix-only,
-  decode-active, and boundary-case behavior
-- prompt-heavy actual generation now shows at least one same-budget decode-active
-  witness where fidelity gains also map to a better task-visible output
-- reasoning-side actual generation now includes one low-budget math witness
-  where CASK preserves the correct answer while TriAttention does not
-- the smallest math-side sample-based bridge check now shows a draw-level exact
-  match gain (`2/12 -> 4/12`) even though subset-level `pass@4` is still tied
-- one implementation ablation supports the current representative default
-- one boundary-case prompt-heavy task shows `cask` can still be much closer to
-  `fullkv` under actual greedy decoding even when teacher-forced `top1` does
-  not flip
+Readout:
 
-It is still not a fully closed large-scale empirical package. The strongest
-current claim remains:
+- `score_max_source` remains the better default.
+
+## Bottom Line
+
+The current package now supports the following submission-facing claim:
 
 > CASK improves the same-budget full-KV fidelity frontier for reasoning traces,
-> and two-stage compression extends that advantage into prompt-heavy regimes.
+> and the two-stage path extends that advantage into prompt-heavy
+> regimes.
+
+The strongest prompt-heavy evidence is now:
+
+- a decode-active witness: `multi_news`
+- a very strong same-budget witness: `hotpotqa`
+- a stable prompt-heavy same-budget win: `qasper`
+- a retained boundary case: `2wikimqa`

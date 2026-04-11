@@ -36,6 +36,8 @@ experiments/bundle/
 experiments/paper_support/
 experiments/reports/
 experiments/frontier/
+experiments/longbench_h100_actual_bridge_*/
+experiments/longbench_h100_stage_ablation/
 experiments/score_dumps/
 experiments/selection_dumps/
 experiments/orchestration/*.log

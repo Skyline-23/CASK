@@ -23,6 +23,10 @@ Current scope:
 - methods: `triattention`, `cask`
 - budgets: `256`, `384`, `512`
 
+Companion package:
+- output-level bridge evidence is packaged separately under
+  `paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/`
+
 Primary files:
 - `aime24_ref6_h100_fidelity_summary.csv`
 - `aime24_ref6_h100_fidelity_summary.json`

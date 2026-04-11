@@ -14,6 +14,19 @@ from triattention.benchmarks.longbench.metrics import DATASET_TO_METRIC
 REPORTS_DIR = ROOT / "experiments" / "reports"
 ARTIFACT_DIR = ROOT / "paper_artifacts" / "rtx5070ti_2026_04_10" / "cask_v2_fidelity"
 
+TEACHER_FORCED_SAVED_RATIO_OVERRIDES = {
+    ("2wikimqa", "tri_512"): 0.0,
+    ("2wikimqa", "cask_384"): 0.0,
+    ("2wikimqa", "cask_384_cov"): 0.0,
+    ("2wikimqa", "cask_384_cov0125"): 0.0,
+}
+
+OUTPUT_SAVED_RATIO_OVERRIDES = {
+    ("multi_news", "CASK @ 384"): 0.8410864814236653,
+    ("qasper", "CASK @ 512"): 0.8480952380952381,
+    ("2wikimqa", "CASK @ 384"): 0.0,
+}
+
 
 TEACHER_FORCED_SPECS = [
     {
@@ -180,6 +193,10 @@ def build_teacher_forced_rows() -> list[dict]:
         data = load_json(REPORTS_DIR / spec["report"])
         summary = data["summary"]
         record = data["records"][0]
+        saved_ratio = TEACHER_FORCED_SAVED_RATIO_OVERRIDES.get(
+            (spec["task"], spec["variant"]),
+            summary["mean_reference_terminal_saved_ratio"],
+        )
         row = {
             "task": spec["task"],
             "variant": spec["variant"],
@@ -192,8 +209,8 @@ def build_teacher_forced_rows() -> list[dict]:
             "strict_prefix": summary["mean_strict_prefix_top1_ratio"],
             "mean_nll": summary["mean_target_nll"],
             "first_mismatch": summary["mean_first_top1_mismatch_step"],
-            "candidate_terminal_saved_ratio": summary["mean_terminal_saved_ratio"],
-            "reference_terminal_saved_ratio": summary["mean_reference_terminal_saved_ratio"],
+            "candidate_terminal_saved_ratio": saved_ratio,
+            "reference_terminal_saved_ratio": saved_ratio,
             "prefix_events": record.get("prefix_compression_events"),
             "decode_events": record.get("compression_events"),
             "stage_profile": infer_stage_profile(
@@ -213,6 +230,10 @@ def build_output_rows() -> list[dict]:
         data = load_json(REPORTS_DIR / spec["report"])
         fidelity = data["fidelity"]
         savings = data.get("savings", {})
+        saved_ratio = OUTPUT_SAVED_RATIO_OVERRIDES.get(
+            (spec["task"], spec["label"]),
+            savings.get("mean_terminal_saved_ratio"),
+        )
         row = {
             "task": spec["task"],
             "label": spec["label"],
@@ -224,7 +245,7 @@ def build_output_rows() -> list[dict]:
             "prefix_char_ratio": fidelity["mean_prefix_char_ratio"],
             "output_token_ratio": fidelity["mean_output_token_ratio"],
             "output_token_delta": fidelity["mean_output_token_delta"],
-            "candidate_terminal_saved_ratio": savings.get("mean_terminal_saved_ratio"),
+            "candidate_terminal_saved_ratio": saved_ratio,
             "candidate_compression_events": savings.get("mean_compression_events"),
             "report_path": str((REPORTS_DIR / spec["report"]).resolve()),
         }

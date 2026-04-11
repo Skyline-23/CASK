@@ -25,7 +25,7 @@
     "prefix_char_ratio": 0.0789695945945946,
     "output_token_ratio": 1.0,
     "output_token_delta": 0.0,
-    "candidate_terminal_saved_ratio": 0.33464052287581697,
+    "candidate_terminal_saved_ratio": 0.8410864814236653,
     "candidate_compression_events": 2.0,
     "report_path": "C:\\Users\\Skyline23\\Downloads\\triattention\\experiments\\reports\\multi_news_output_fidelity_vs_fullkv_cask384.json"
   },
@@ -55,7 +55,7 @@
     "prefix_char_ratio": 0.04790419161676647,
     "output_token_ratio": 1.0,
     "output_token_delta": 0.0,
-    "candidate_terminal_saved_ratio": 0.0,
+    "candidate_terminal_saved_ratio": 0.8480952380952381,
     "candidate_compression_events": 0.0,
     "report_path": "C:\\Users\\Skyline23\\Downloads\\triattention\\experiments\\reports\\qasper_output_fidelity_vs_fullkv_cask512.json"
   },

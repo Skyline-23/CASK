@@ -128,6 +128,11 @@ The tracked local summary lives here:
 - `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/aime24_ref6_h100_fidelity_summary.json`
 - `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/aime25_ref6_h100_fidelity_summary.csv`
 - `paper_artifacts/h100_2026_04_10/cask_h100_fidelity/aime25_ref6_h100_fidelity_summary.json`
+- `paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md`
+- `paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/actual_bridge_summary.csv`
+- `paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/actual_bridge_summary.json`
+- `paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/stage_ablation_summary.csv`
+- `paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/stage_ablation_summary.json`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/longbench_qasper_prompt_heavy_witness.md`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_stage_summary.csv`
 - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/prompt_heavy_output_sanity.csv`
@@ -148,16 +153,21 @@ High-level read:
 - `geometry248`: CASK beats TriAttention on `top1` and `mean_nll` at every tested budget.
 - `geometry434`: CASK wins at `104`, `128`, and `192`; `160` is essentially parity.
 - `hexagon`: CASK is clearly stronger at `104` and `192`, with near-parity at `128` and `160`.
-- `multi_news`: CASK now has a prompt-heavy **decode-active** witness. At the same `384` budget, both stages fire and CASK substantially improves `top1`, `top5`, and `mean_nll` over `triattention`.
-- `multi_news`: that same witness also shows an actual-generation gain, not just a replay gain. `sequence_ratio` rises from `0.000` to `0.169`, and the single-example task metric rises from `0.000` to `0.139` against `fullkv = 0.178`.
-- `qasper`: CASK shows a prompt-heavy budget crossing. Both `cask @ 384` and `cask @ 256` outperform `triattention @ 512` on the tracked teacher-forced fidelity metrics, although this witness is still prefix-stage-only rather than decode-merge evidence.
-- `2wikimqa`: the prompt-heavy picture is mixed under teacher-forced `top1`, but `cask` still improves `top5`/`mean_nll` and is far closer to the `fullkv` greedy output than `triattention`. A small `prefix_coverage_ratio=0.0625` reserve improves this boundary case, while `0.125` does not.
+- `multi_news`: the H100 rerun keeps this as the prompt-heavy **decode-active** witness. At both `256` and `384`, both-stage CASK improves `top1`, `top5`, and `mean_nll` over `triattention`.
+- `multi_news`: the H100 actual-output bridge also survives generation. At `384`, `TriAttention` falls to `sequence_ratio = 0.000` and task metric `0.00`, while `CASK` reaches `sequence_ratio = 0.169` and task metric `15.16`.
+- `hotpotqa`: the H100 rerun adds the strongest prompt-heavy same-budget witness. At `384`, `cask` reaches `top1 = 96.9%`, `top5 = 100.0%`, and `mean_nll = 0.110` against `triattention`'s `81.3%`, `90.6%`, and `1.344`.
+- `qasper`: the H100 actual-output package now gives the cleanest budget-crossing witness. `CASK @ 256` exceeds `TriAttention @ 512` on both `sequence_ratio` (`0.238 > 0.173`) and task metric (`12.77 > 11.94`), while ending with a `90.9%` terminal saved ratio.
+- `hotpotqa`: the H100 actual-output package should be read as non-regression parity, not as a win case. `CASK @ 256` matches `TriAttention @ 256` at `sequence_ratio = 1.000` and task metric `27.27`, while preserving a `97.6%` terminal saved ratio.
+- `musique`: the H100 rerun shows smaller but consistent same-budget fidelity gains.
+- `2wikimqa`: the later H100 saved-ratio audit reclassified this as an **inactive regime** under the current `divide_length=128` trigger semantics. Neither TriAttention nor CASK fires a compression event before the 32-token continuation ends, so this task should not be cited as prompt-heavy compression evidence or as a saved-ratio comparison.
+- `2wikimqa`: the older local coverage-reserve ablation is retained only as archived reverse-engineering context for output drift; it is not part of the current compression headline.
 - `hexagon`: on a tracked math witness, `triattention @ 104` fails while `cask @ 104` still produces the correct answer `42`, giving a compact reasoning-side answer-flip example.
 - `AIME24 H100 ref6`: `cask` now wins the same-budget full-KV replay gate at `256`, `384`, and `512`, and also shows two explicit crossing points: `cask @ 256 > triattention @ 384` and `cask @ 384 > triattention @ 512`.
 - `AIME25 H100 ref6`: `cask` again wins the same-budget full-KV replay gate at `256`, `384`, and `512`. The crossing is weaker than on `AIME24`, but `cask @ 384 > triattention @ 512` still holds on `top1`, `top5`, and `mean_nll`.
 - `math_actual_accuracy_subset.md`: small `math500` bridge check showing that `cask` doubles draw-level exact match (`2/12 -> 4/12`) on a 3-witness subset at `budget = 104`, driven by a `hexagon` robustness gain (`2/4 -> 4/4`).
-- `prompt_heavy_stage_and_output_summary.md`: consolidates the prompt-heavy stage decomposition, the `2wikimqa` coverage-reserve ablation, and the output-level sanity table.
-- `submission_gate_checks.md`: small add-on package covering one LongBench witness, one representative-mode ablation, and prompt-heavy boundary checks.
+- `prompt_heavy_stage_and_output_summary.md`: consolidates the prompt-heavy stage decomposition, the archived `2wikimqa` local ablation, and the output-level sanity table.
+- `paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/`: packages the clean H100 output-level bridge and the `multi_news` stage-ablation boundary in one place, so the paper can cite actual-output evidence without mixing it with the replay-only gate.
+- `submission_gate_checks.md`: small add-on package covering the active LongBench witnesses, one representative-mode ablation, and the inactive-regime boundary checks.
 
 `first_mismatch` is useful, but it should be plotted together with `top1` or `mean_nll`, not interpreted alone.
 
