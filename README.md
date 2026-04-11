@@ -37,39 +37,41 @@ If you are running the current paper candidate, use `--method cask`.
 
 ## Benchmark Snapshot
 
+The tables below report both fidelity and **terminal saved ratio** so the quality-memory tradeoff is visible at a glance.
+
 ### H100 Reasoning Replay Gate
 
-| Slice | Budget | Tri Top-1 | CASK Top-1 | Tri Mean NLL | CASK Mean NLL |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `AIME24 ref6` | `256` | `86.10` | `88.43` | `0.463` | `0.359` |
-| `AIME24 ref6` | `384` | `88.27` | `90.76` | `0.383` | `0.268` |
-| `AIME24 ref6` | `512` | `89.42` | `91.68` | `0.333` | `0.233` |
-| `AIME25 ref6` | `256` | `85.71` | `86.77` | `0.500` | `0.504` |
-| `AIME25 ref6` | `384` | `89.10` | `90.28` | `0.356` | `0.315` |
-| `AIME25 ref6` | `512` | `89.94` | `91.68` | `0.321` | `0.254` |
+| Slice | Budget | Tri Top-1 | CASK Top-1 | Tri Mean NLL | CASK Mean NLL | Tri Saved Ratio | CASK Saved Ratio |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `AIME24 ref6` | `256` | `86.10` | `88.43` | `0.463` | `0.359` | `65.31%` | `65.28%` |
+| `AIME24 ref6` | `384` | `88.27` | `90.76` | `0.383` | `0.268` | `61.59%` | `61.55%` |
+| `AIME24 ref6` | `512` | `89.42` | `91.68` | `0.333` | `0.233` | `43.57%` | `43.52%` |
+| `AIME25 ref6` | `256` | `85.71` | `86.77` | `0.500` | `0.504` | `63.37%` | `55.87%` |
+| `AIME25 ref6` | `384` | `89.10` | `90.28` | `0.356` | `0.315` | `59.56%` | `52.05%` |
+| `AIME25 ref6` | `512` | `89.94` | `91.68` | `0.321` | `0.254` | `44.76%` | `37.25%` |
 
 Detail:
 [H100 reasoning replay package](paper_artifacts/h100_2026_04_10/cask_h100_fidelity/README.md)
 
 ### Prompt-Heavy Replay Highlights
 
-| Dataset | Budget | Tri Top-1 | CASK Top-1 | Tri Mean NLL | CASK Mean NLL | Read |
-| --- | ---: | ---: | ---: | ---: | ---: | --- |
-| `qasper` | `256` | `67.19` | `71.09` | `1.315` | `1.247` | same-budget replay win |
-| `multi_news` | `384` | `53.71` | `61.33` | `2.052` | `1.540` | decode-active replay win |
-| `hotpotqa` | `384` | `81.25` | `96.88` | `1.344` | `0.110` | strongest same-budget witness |
-| `2wikimqa` | `384` | `59.38` | `56.25` | `3.415` | `2.397` | retained boundary |
+| Dataset | Budget | Tri Top-1 | CASK Top-1 | Tri Mean NLL | CASK Mean NLL | CASK Saved Ratio | Read |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `qasper` | `256` | `67.19` | `71.09` | `1.315` | `1.247` | `90.90%` | same-budget replay win |
+| `multi_news` | `384` | `53.71` | `61.33` | `2.052` | `1.540` | `84.07%` | decode-active replay win |
+| `hotpotqa` | `384` | `81.25` | `96.88` | `1.344` | `0.110` | `96.49%` | strongest same-budget witness |
+| `2wikimqa` | `384` | `59.38` | `56.25` | `3.415` | `2.397` | `94.41%` | retained boundary |
 
 Detail:
 [Prompt-heavy replay readout](paper_artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/promptheavy_replay_readout.md)
 
 ### Output-Level Bridge Highlights
 
-| Task | Comparison | Main signal | Read |
-| --- | --- | --- | --- |
-| `qasper` | `CASK @ 256` vs `TriAttention @ 512` | `sequence_ratio 0.238 > 0.173`, `task_metric 12.77 > 11.94` | clean budget crossing |
-| `multi_news` | `CASK @ 384` vs `TriAttention @ 384` | `sequence_ratio 0.169 > 0.000`, `task_metric 15.16 > 0.00` | strongest decode-active output bridge |
-| `hotpotqa` | `CASK @ 256` vs `TriAttention @ 256` | `sequence_ratio 1.000 = 1.000`, `task_metric 27.27 = 27.27` | non-regression parity |
+| Task | Comparison | Main signal | CASK Terminal Saved Ratio | Read |
+| --- | --- | --- | ---: | --- |
+| `qasper` | `CASK @ 256` vs `TriAttention @ 512` | `sequence_ratio 0.238 > 0.173`, `task_metric 12.77 > 11.94` | `90.90%` | clean budget crossing |
+| `multi_news` | `CASK @ 384` vs `TriAttention @ 384` | `sequence_ratio 0.169 > 0.000`, `task_metric 15.16 > 0.00` | `84.07%` | strongest decode-active output bridge |
+| `hotpotqa` | `CASK @ 256` vs `TriAttention @ 256` | `sequence_ratio 1.000 = 1.000`, `task_metric 27.27 = 27.27` | `97.57%` | non-regression parity |
 
 Detail:
 [H100 actual-output bridge package](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md)
