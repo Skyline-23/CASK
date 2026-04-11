@@ -55,6 +55,22 @@ aime25.jsonl
 # Binary artifacts
 *.jar
 
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+paper/*.pdf
+paper/*.zip
+
 # Internal verification configs (not for public release)
 scripts/configs/aime25_llama_budget512_a6000_verify.yaml
 

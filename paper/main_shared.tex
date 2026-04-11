@@ -1,0 +1,43 @@
+\documentclass{article}
+
+% \PassOptionsToPackage{numbers,compress}{natbib}
+\CASKLoadStyle
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{float}
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlist[itemize]{leftmargin=1.5em}
+\setlist[enumerate]{leftmargin=1.5em}
+\graphicspath{{../docs/assets/}}
+
+\title{CASK: Core-Aware Selective KV Compression for Reasoning Traces}
+\author{\CASKAuthorBlock}
+
+\begin{document}
+\maketitle
+
+\input{content}
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\CASKChecklistBlock
+
+\end{document}

@@ -17,6 +17,7 @@ CASK treats reasoning-time KV compression as a **behavior-preserving selective c
 | Main replay harness | `scripts/replay_reference_fidelity.py` |
 | Command provenance | `artifacts/COMMAND_MAP.md` |
 | Figure assets | `docs/assets/` |
+| Paper source | `paper/` |
 
 ## Method Summary
 
@@ -168,6 +169,7 @@ python scripts/replay_reference_fidelity.py \
 | `scripts/build_promptheavy_saved_ratio_audit.py` | package prompt-heavy replay summaries |
 | `scripts/build_actual_bridge_artifacts.py` | package actual-output bridge summaries |
 | `scripts/build_paper_figures.py` | generate the current paper-facing figure pack under `docs/assets/` |
+| `paper/` | NeurIPS paper source, bibliography, and style files |
 | `cask/methods/triattention.py` | TriAttention baseline implementation |
 | `cask/methods/cask.py` | CASK implementation |
 | `artifacts/` | tracked paper-facing summaries |
