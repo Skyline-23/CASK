@@ -108,6 +108,7 @@ Command trace:
 | whether CASK wins the main reasoning replay gate | [H100 reasoning replay gate](paper_artifacts/h100_2026_04_10/cask_h100_fidelity/README.md) | contains the `AIME24` / `AIME25` synchronized replay tables and crossing read |
 | whether replay gains show up in actual generation | [H100 actual-output bridge](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md) | contains the tracked `qasper`, `multi_news`, and `hotpotqa` output bridge rows |
 | how to read the full prompt-heavy story | [H100 prompt-heavy follow-up](paper_artifacts/h100_2026_04_11/README.md) | separates replay-level decode-active wins from output-level bridge rows and `prefix_budget_exhausted` boundaries |
+| which figures are current and ready to paste into the draft | [H100 figure pack](paper_artifacts/h100_2026_04_11/figures/README.md) | bundles the synchronized PNG/PDF versions of the reasoning gate, prompt-heavy, bridge, and method-overview figures |
 
 ### Package Roles
 
@@ -165,6 +166,7 @@ python scripts/replay_reference_fidelity.py \
 | `scripts/compare_kv_fidelity.py` | output-level comparison helper |
 | `scripts/build_promptheavy_saved_ratio_audit.py` | package prompt-heavy replay summaries |
 | `scripts/build_actual_bridge_artifacts.py` | package actual-output bridge summaries |
+| `scripts/build_paper_figures.py` | generate the current paper-facing H100 figure pack |
 | `triattention/methods/triattention.py` | TriAttention baseline implementation |
 | `triattention/methods/cask.py` | CASK implementation |
 | `paper_artifacts/` | tracked paper-facing summaries |
