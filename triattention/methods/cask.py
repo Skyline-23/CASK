@@ -31,6 +31,7 @@ class CASKConfig(TriAttentionConfig):
     """Configuration for phase-2 CASK."""
 
     prefix_coverage_ratio: float = 0.0625
+    decode_merge_enabled: bool = True
     recent_window_size: int = 128
     protected_core_ratio: float = 0.5
     min_protected_core_tokens: int = 1
@@ -69,6 +70,7 @@ class CASK(TriAttention):
         super().__init__(config)
         self.recent_window_size = int(config.recent_window_size)
         self.prefix_coverage_ratio = float(config.prefix_coverage_ratio)
+        self.decode_merge_enabled = bool(config.decode_merge_enabled)
         self.protected_core_ratio = float(config.protected_core_ratio)
         self.min_protected_core_tokens = int(config.min_protected_core_tokens)
         self.core_selection_mode = str(config.core_selection_mode).strip().lower()
@@ -141,6 +143,7 @@ class CASK(TriAttention):
             "core_selection_mode": self.core_selection_mode,
             "merge_operator": self.merge_operator,
             "prefix_stage_mode": "triattention_eviction",
+            "decode_stage_mode": "merge" if self.decode_merge_enabled else "evict_only",
             "prefix_compression_events": 0,
             "total_prefix_evicted_tokens": 0,
             "last_prefix_event": None,
@@ -349,7 +352,12 @@ class CASK(TriAttention):
         summary = dict(self.runtime_stats)
         summary["current_cache_tokens"] = int(len(self.cache_positions))
         summary["current_prefix_tokens"] = int(self.prefix_length)
-        summary["current_total_cardinality"] = int(sum(self.merge_counts)) if self.merge_counts else 0
+        # `merge_counts` preserves source cardinality through decode-time merges, but
+        # pure prefix eviction can drop evicted source counts from the retained list.
+        # `absolute_position` tracks the active replay horizon and provides a stable
+        # lower bound for the true source cardinality seen so far.
+        merge_total = int(sum(self.merge_counts)) if self.merge_counts else 0
+        summary["current_total_cardinality"] = max(merge_total, int(self.absolute_position))
         return summary
 
     def _set_phase_markers(
@@ -694,6 +702,22 @@ class CASK(TriAttention):
             proposed = max(minimum_core, available_slots - 1)
         return proposed
 
+    def _select_decode_eviction_indices(
+        self,
+        *,
+        scratch_indices: Sequence[int],
+        score_map: Dict[int, float],
+        scratch_slots: int,
+    ) -> List[int]:
+        if scratch_slots <= 0 or not scratch_indices:
+            return []
+        ordered = sorted(
+            (int(idx) for idx in scratch_indices),
+            key=lambda idx: (float(score_map.get(int(idx), 0.0)), -int(idx)),
+            reverse=True,
+        )
+        return ordered[: int(scratch_slots)]
+
     def _apply_dynamic_core_promotion(
         self,
         *,
@@ -757,6 +781,38 @@ class CASK(TriAttention):
         scratch_slots = available_slots - len(core_indices)
         if scratch_slots < 0:
             return None
+        if not self.decode_merge_enabled:
+            selected_scratch = set(
+                self._select_decode_eviction_indices(
+                    scratch_indices=scratch_indices,
+                    score_map=score_map,
+                    scratch_slots=scratch_slots,
+                )
+            )
+            descriptors = [
+                self._single_descriptor(
+                    idx,
+                    protected_core=(idx in core_set),
+                    representative_score=score_map.get(idx),
+                    score_mass=score_map.get(idx),
+                )
+                for idx in candidate_indices
+                if idx in core_set or idx in selected_scratch
+            ]
+            self._last_selection_dump_payload = {
+                "plan_strategy": "decode_eviction_only",
+                "heuristic_attempt": "strict" if (allow_promotion or allow_mass_gate) else "fallback_relaxed",
+                "core_count": int(len(core_indices)),
+                "core_indices": [int(idx) for idx in core_indices],
+                "promoted_core_indices": [int(idx) for idx in core_indices if idx not in set(base_core_indices)],
+                "scratch_slots": int(scratch_slots),
+                "selected_scratch_indices": [int(idx) for idx in selected_scratch],
+                "phase_boundary_relaxed": False,
+                "score_mass_gate_relaxed": False,
+                "merge_trace": [],
+                "candidate_descriptors": [self._descriptor_to_dump(item) for item in descriptors],
+            }
+            return descriptors
         slot_reference_mass = self._score_slot_reference_mass(candidate_scores, available_slots)
         score_mass_gate_relaxed = not allow_mass_gate
         if len(scratch_indices) <= scratch_slots:
@@ -1492,6 +1548,7 @@ def apply_cask_patch(
     disable_mlr: bool = False,
     disable_trig: bool = False,
     prefix_coverage_ratio: float = 0.0625,
+    decode_merge_enabled: bool = True,
     recent_window_size: int = 128,
     protected_core_ratio: float = 0.5,
     min_protected_core_tokens: int = 1,
@@ -1534,6 +1591,7 @@ def apply_cask_patch(
         horizon_mode="fixed",
         norm_mode="tri",
         prefix_coverage_ratio=prefix_coverage_ratio,
+        decode_merge_enabled=decode_merge_enabled,
         recent_window_size=recent_window_size,
         protected_core_ratio=protected_core_ratio,
         min_protected_core_tokens=min_protected_core_tokens,
@@ -1711,7 +1769,8 @@ def apply_cask_patch(
     model.forward = MethodType(cask_forward, model)
     print(
         f"[CASK] Applied two-stage compression (budget={kv_budget}, "
-        f"prefix_coverage_ratio={prefix_coverage_ratio}, recent_window={recent_window_size}, core_ratio={protected_core_ratio}, "
+        f"prefix_coverage_ratio={prefix_coverage_ratio}, decode_merge_enabled={decode_merge_enabled}, "
+        f"recent_window={recent_window_size}, core_ratio={protected_core_ratio}, "
         f"core_selection_mode={core_selection_mode}, "
         f"merge_operator={merge_operator}, "
         f"merge_local_window={merge_local_window}, similarity_threshold={merge_similarity_threshold}, "

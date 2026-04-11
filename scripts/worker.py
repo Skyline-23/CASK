@@ -596,6 +596,14 @@ def parse_arguments() -> argparse.Namespace:
         help="Fraction of the prefix budget reserved for evenly spaced coverage anchors during stage-1 eviction.",
     )
     parser.add_argument(
+        "--cask_decode_merge_enabled",
+        "--cask-decode-merge-enabled",
+        dest="cask_decode_merge_enabled",
+        type=str2bool,
+        default=True,
+        help="Enable decode-stage scratch merging. Set false for stage-1 plus decode-eviction ablations.",
+    )
+    parser.add_argument(
         "--cask_protected_core_ratio",
         "--cask-protected-core-ratio",
         dest="cask_protected_core_ratio",
@@ -980,6 +988,7 @@ def main(args: argparse.Namespace) -> None:
                 disable_mlr=args.disable_mlr,
                 disable_trig=args.disable_trig,
                 prefix_coverage_ratio=args.cask_prefix_coverage_ratio,
+                decode_merge_enabled=args.cask_decode_merge_enabled,
                 recent_window_size=args.window_size,
                 protected_core_ratio=args.cask_protected_core_ratio,
                 min_protected_core_tokens=args.cask_min_protected_core_tokens,

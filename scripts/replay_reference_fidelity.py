@@ -115,6 +115,7 @@ def parse_args() -> argparse.Namespace:
 
     parser.add_argument("--cask-protected-core-ratio", type=float, default=0.5)
     parser.add_argument("--cask-prefix-coverage-ratio", type=float, default=0.0625)
+    parser.add_argument("--cask-decode-merge-enabled", type=str2bool, default=True)
     parser.add_argument("--cask-min-protected-core-tokens", type=int, default=1)
     parser.add_argument(
         "--cask-core-selection-mode",
@@ -200,6 +201,7 @@ def apply_candidate_method(
             disable_mlr=args.disable_mlr,
             disable_trig=args.disable_trig,
             prefix_coverage_ratio=args.cask_prefix_coverage_ratio,
+            decode_merge_enabled=args.cask_decode_merge_enabled,
             recent_window_size=args.window_size,
             protected_core_ratio=args.cask_protected_core_ratio,
             min_protected_core_tokens=args.cask_min_protected_core_tokens,
@@ -259,13 +261,17 @@ def get_runtime_summary(
     *,
     total_reference_tokens: int,
 ) -> Dict[str, Any]:
+    # At the final teacher-forced scoring step, the KV cache contains the replay
+    # prefix plus all previously-consumed target tokens, but not the final target
+    # token itself. Use this active horizon consistently for saved-ratio accounting.
+    active_reference_tokens = max(0, int(total_reference_tokens) - 1)
     compressor = get_active_compressor(model)
     if compressor is None:
         reference_saved_tokens = 0
         return {
             "compression_events": 0,
-            "current_cache_tokens": int(total_reference_tokens),
-            "current_total_cardinality": int(total_reference_tokens),
+            "current_cache_tokens": int(active_reference_tokens),
+            "current_total_cardinality": int(active_reference_tokens),
             "terminal_saved_tokens": 0,
             "terminal_saved_ratio": 0.0,
             "terminal_cache_ratio": 1.0,
@@ -280,7 +286,7 @@ def get_runtime_summary(
         total_cardinality = int(summary.get("current_total_cardinality", total_reference_tokens))
     else:
         cache_tokens = int(len(getattr(compressor, "cache_positions", [])))
-        total_cardinality = int(total_reference_tokens)
+        total_cardinality = int(active_reference_tokens)
         summary = {
             "compression_events": None,
             "current_cache_tokens": cache_tokens,
@@ -288,18 +294,18 @@ def get_runtime_summary(
         }
 
     if total_cardinality <= 0:
-        total_cardinality = int(total_reference_tokens)
+        total_cardinality = int(active_reference_tokens)
     saved_tokens = max(0, total_cardinality - cache_tokens)
     summary["terminal_saved_tokens"] = int(saved_tokens)
     summary["terminal_saved_ratio"] = float(saved_tokens / total_cardinality) if total_cardinality > 0 else 0.0
     summary["terminal_cache_ratio"] = float(cache_tokens / total_cardinality) if total_cardinality > 0 else 1.0
-    reference_saved_tokens = max(0, int(total_reference_tokens) - cache_tokens)
+    reference_saved_tokens = max(0, int(active_reference_tokens) - cache_tokens)
     summary["reference_terminal_saved_tokens"] = int(reference_saved_tokens)
     summary["reference_terminal_saved_ratio"] = (
-        float(reference_saved_tokens / total_reference_tokens) if total_reference_tokens > 0 else 0.0
+        float(reference_saved_tokens / active_reference_tokens) if active_reference_tokens > 0 else 0.0
     )
     summary["reference_terminal_cache_ratio"] = (
-        float(cache_tokens / total_reference_tokens) if total_reference_tokens > 0 else 1.0
+        float(cache_tokens / active_reference_tokens) if active_reference_tokens > 0 else 1.0
     )
     return summary
 
