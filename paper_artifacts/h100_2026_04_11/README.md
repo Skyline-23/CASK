@@ -24,6 +24,7 @@ This directory is the prompt-heavy follow-up package. Open it when you want to u
 | --- | --- |
 | Strong same-budget replay wins | `qasper`, `multi_news`, `hotpotqa`, `musique` |
 | Replay-level decode-active witnesses | `multi_news`, `vcsum` |
+| Output-level bridge read | `multi_news` is the clean decode-active bridge; `vcsum` is a lexical-semantic split boundary |
 | Retained boundary | `2wikimqa` |
 | Prefix-budget-exhausted boundaries | `qmsum`, `gov_report` |
 

@@ -24,6 +24,12 @@ CASK treats reasoning-time KV compression as a **behavior-preserving selective c
 | Stage 1: prefix compression | TriAttention-style eviction plus a small coverage reserve | Prevent prompt-heavy runs from exhausting the budget before decode starts |
 | Stage 2: decode compression | Split decode states into `protected core` and `mergeable scratch`, then consolidate scratch only | Preserve answer-critical states while compressing redundant reasoning work |
 
+## Safety Hook
+
+CASK is built around two paper-facing diagnostics: `lost representative mass` and `kappa-dispersion`.
+If a scratch group preserves most of the horizon-weighted mass and its members stay close to the representative under the calibrated `kappa` geometry, then replacing that group with one representative changes the next-token score only by a small additive amount.
+This is the main reason the repo reports fidelity and saved ratio together rather than treating compression as a pure ranking problem.
+
 ## Mode Map
 
 | Mode | Purpose | Status |
@@ -68,11 +74,11 @@ Detail:
 
 ### Output-Level Bridge Highlights
 
-| Task | Comparison | Main signal | CASK Terminal Saved Ratio | Read |
-| --- | --- | --- | ---: | --- |
-| `qasper` | `CASK @ 256` vs `TriAttention @ 512` | `sequence_ratio 0.238 > 0.173`, `task_metric 12.77 > 11.94` | `90.90%` | clean budget crossing |
-| `multi_news` | `CASK @ 384` vs `TriAttention @ 384` | `sequence_ratio 0.169 > 0.000`, `task_metric 15.16 > 0.00` | `84.07%` | strongest decode-active output bridge |
-| `hotpotqa` | `CASK @ 256` vs `TriAttention @ 256` | `sequence_ratio 1.000 = 1.000`, `task_metric 27.27 = 27.27` | `97.57%` | non-regression parity |
+| Task | Comparison | Lexical / Sequence | Semantic Sim. | Official Metric | CASK Terminal Saved Ratio | Read |
+| --- | --- | --- | ---: | --- | ---: | --- |
+| `qasper` | `CASK @ 256` vs `TriAttention @ 512` | `0.238 > 0.173` | `0.791 > 0.678` | `12.77 > 11.94` | `90.90%` | clean budget crossing on all three axes |
+| `multi_news` | `CASK @ 384` vs `TriAttention @ 384` | `0.169 > 0.000` | `0.952 > 0.452` | `15.16 > 0.00` | `84.07%` | strongest decode-active output bridge |
+| `hotpotqa` | `CASK @ 256` vs `TriAttention @ 256` | `1.000 = 1.000` | `1.000 = 1.000` | `27.27 = 27.27` | `97.57%` | non-regression parity |
 
 Detail:
 [H100 actual-output bridge package](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md)
@@ -82,8 +88,8 @@ Detail:
 | Axis | Current read |
 | --- | --- |
 | Reasoning replay | CASK beats TriAttention at the same budget on the tracked H100 gate and shows partial crossing |
-| Prompt-heavy replay | CASK has a strong same-budget replay package, but decode-active replay evidence is still concentrated in a small set |
-| Output-level bridge | The bridge is real but still limited; `multi_news` is the strongest decode-active output witness |
+| Prompt-heavy replay | CASK has a strong same-budget replay package, with `multi_news` and `vcsum` as the current replay-level decode-active witnesses |
+| Output-level bridge | `multi_news` remains the strongest decode-active output bridge; `vcsum` is a lexical-vs-semantic boundary rather than a clean headline win |
 | Savings interpretation | The claim is **not** "always compress more"; it is "keep full-KV behavior alive at a lower usable budget" |
 | Claim boundary | Active decode regime and `prefix_budget_exhausted` regime must be separated explicitly |
 
@@ -100,8 +106,8 @@ Command trace:
 | If you want to know... | Open this | Why this is the right package |
 | --- | --- | --- |
 | whether CASK wins the main reasoning replay gate | [H100 reasoning replay gate](paper_artifacts/h100_2026_04_10/cask_h100_fidelity/README.md) | contains the `AIME24` / `AIME25` synchronized replay tables and crossing read |
-| whether replay gains show up in actual generation | [H100 actual-output bridge](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md) | contains `qasper`, `multi_news`, and `hotpotqa` output-level bridge rows |
-| how to read the full prompt-heavy story | [H100 prompt-heavy follow-up](paper_artifacts/h100_2026_04_11/README.md) | separates decode-active wins from `prefix_budget_exhausted` boundaries |
+| whether replay gains show up in actual generation | [H100 actual-output bridge](paper_artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md) | contains the tracked `qasper`, `multi_news`, and `hotpotqa` output bridge rows |
+| how to read the full prompt-heavy story | [H100 prompt-heavy follow-up](paper_artifacts/h100_2026_04_11/README.md) | separates replay-level decode-active wins from output-level bridge rows and `prefix_budget_exhausted` boundaries |
 
 ### Package Roles
 

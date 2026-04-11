@@ -5,6 +5,7 @@
   "candidate_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_actual_bridge_20260411\\vcsum_cask384\\longbench\\Qwen3-8B\\runs\\vcsum\\merged\\merged.jsonl",
   "reference_eval_jsonl": null,
   "candidate_eval_jsonl": null,
+  "semantic_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
   "shared_indices": [
     0
   ],
@@ -19,7 +20,8 @@
     "mean_prefix_token_ratio": 0.0,
     "mean_prefix_char_ratio": 0.012672811059907835,
     "mean_output_token_ratio": 1.0,
-    "mean_output_token_delta": 0.0
+    "mean_output_token_delta": 0.0,
+    "mean_semantic_similarity": 0.9408527612686157
   },
   "savings": {
     "records_with_compression_summary": 1,
@@ -52,6 +54,7 @@
       "prefix_char_ratio": 0.012672811059907835,
       "output_token_ratio": 1.0,
       "output_token_delta": 0,
+      "semantic_similarity": 0.9408527612686157,
       "compression_events": 3,
       "terminal_saved_tokens": 5260,
       "terminal_saved_ratio": 0.9116117850953206,

@@ -114,6 +114,7 @@ def build_row(spec: dict[str, Any]) -> dict[str, Any]:
         "prefix_token_ratio": fidelity.get("mean_prefix_token_ratio"),
         "prefix_char_ratio": fidelity.get("mean_prefix_char_ratio"),
         "output_token_ratio": fidelity.get("mean_output_token_ratio"),
+        "semantic_similarity": fidelity.get("mean_semantic_similarity"),
         "final_answer_match_rate": fidelity.get("final_answer_match_rate"),
         "exact_output_match_rate": fidelity.get("exact_output_match_rate"),
         "normalized_output_match_rate": fidelity.get("normalized_output_match_rate"),
@@ -152,20 +153,20 @@ def build_bridge_markdown(rows: list[dict[str, Any]]) -> str:
     lines: list[str] = []
     lines.append("# Actual-Bridge Summary")
     lines.append("")
-    lines.append("| Task | Variant | Budget | Sequence Ratio | Prefix Ratio | Output Ratio | Task Metric | Terminal Saved | Compression Events |")
-    lines.append("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
+    lines.append("| Task | Variant | Budget | Sequence Ratio | Prefix Ratio | Semantic Sim. | Output Ratio | Task Metric | Terminal Saved | Compression Events |")
+    lines.append("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
     for row in rows:
         lines.append(
             f"| `{row['task']}` | `{row['variant']}` | `{row['budget']}` | "
             f"`{fmt_pct(row['sequence_ratio'])}` | `{fmt_pct(row['prefix_token_ratio'])}` | "
-            f"`{fmt_pct(row['output_token_ratio'])}` | `{fmt_num(row['task_metric'], 2)}` | "
+            f"`{fmt_num(row['semantic_similarity'], 3)}` | `{fmt_pct(row['output_token_ratio'])}` | `{fmt_num(row['task_metric'], 2)}` | "
             f"`{fmt_pct(row['terminal_saved_ratio'])}` | `{fmt_num(row['compression_events'], 1)}` |"
         )
     lines.append("")
     lines.append("## Readout")
     lines.append("")
-    lines.append("- `qasper`: `CASK @ 256` beats `TriAttention @ 512` on both `sequence_ratio` and task metric, giving the cleanest actual-output budget crossing in the current H100 package.")
-    lines.append("- `multi_news`: `CASK @ 384` recovers a non-zero actual-output bridge where `TriAttention @ 384` collapses to zero on both `sequence_ratio` and task metric.")
+    lines.append("- `qasper`: `CASK @ 256` beats `TriAttention @ 512` on `sequence_ratio`, official task metric, and semantic similarity, giving the cleanest actual-output budget crossing in the current H100 package.")
+    lines.append("- `multi_news`: `CASK @ 384` recovers a non-zero actual-output bridge where `TriAttention @ 384` collapses on both lexical overlap and task metric; semantic similarity shows the same direction even more strongly.")
     lines.append("- `hotpotqa`: `CASK @ 256` matches `TriAttention @ 256` exactly at the output level on this witness while still ending with a `97.6%` terminal saved ratio.")
     return "\n".join(lines)
 
@@ -201,6 +202,7 @@ def build_readme(bridge_rows: list[dict[str, Any]], stage_rows: list[dict[str, A
     lines.append("- actual-output bridge rows for `qasper`, `multi_news`, and `hotpotqa`")
     lines.append("- the `multi_news` stage-ablation row needed to keep the stage-2 claim honest")
     lines.append("- clean CSV / JSON / Markdown tables with direct provenance links")
+    lines.append("- output-level evaluation reported on official task metric, lexical overlap, and semantic/reference similarity")
     lines.append("")
     lines.append("Primary files:")
     lines.append("- `actual_bridge_summary.csv`")
@@ -221,8 +223,8 @@ def build_readme(bridge_rows: list[dict[str, Any]], stage_rows: list[dict[str, A
     lines.append("- stage-ablation replay metrics: `experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/`")
     lines.append("")
     lines.append("Headline read:")
-    lines.append("- `qasper`: `CASK @ 256` crosses above `TriAttention @ 512` on actual output similarity and task metric.")
-    lines.append("- `multi_news`: `CASK @ 384` beats `TriAttention @ 384` on actual output similarity and task metric at the same budget.")
+    lines.append("- `qasper`: `CASK @ 256` crosses above `TriAttention @ 512` on lexical overlap, semantic similarity, and task metric.")
+    lines.append("- `multi_news`: `CASK @ 384` beats `TriAttention @ 384` on lexical overlap, semantic similarity, and task metric at the same budget.")
     lines.append("- `hotpotqa`: `CASK @ 256` is an output-parity non-regression witness rather than a win case.")
     lines.append("- `multi_news` stage ablation stays in the package as a claim boundary: it does not justify a large standalone stage-2 output gain.")
     lines.append("")
