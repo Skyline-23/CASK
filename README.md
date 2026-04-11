@@ -6,7 +6,7 @@ Core-Aware Selective KV Compression for Reasoning Traces
 
 This repository now treats **CASK** as the main paper direction. The central claim is no longer that a better RoPE scorer alone wins; it is that reasoning traces contain a **protected core** plus **mergeable scratch**, and that preserving the core while selectively consolidating scratch can preserve full-KV behavior better than pure eviction at the same budget.
 
-The repository name and the Python namespace still reflect the historical `HorizonKV` / `triattention` lineage. Paper-facing method naming, however, is now **CASK**.
+The repository name and the Python namespace still reflect the historical `triattention` lineage. Paper-facing method naming is **CASK**.
 
 ## Main Idea
 
@@ -27,7 +27,7 @@ The main internal validation axis is **teacher-forced reference fidelity**, not 
 - `triattention`: original TriAttention eviction baseline.
 - `cask`: **CASK mainline implementation**.
 - `expectedattention`: closest prior-style baseline kept for comparison.
-- `horizonkv`: archived Phase 1 scorer-engineering direction.
+- `horizonkv`: legacy internal alias for the archived Phase 1 scorer path.
 
 If you are running the current paper candidate, use `--method cask`.
 
@@ -38,7 +38,7 @@ If you are running the current paper candidate, use `--method cask`.
 - Invalid prompt-heavy regimes are explicitly marked with runtime guards instead of being silently treated as successful merge runs.
 - The local RTX 5070 Ti teacher-forced fidelity sweep is tracked under:
   - `paper_artifacts/rtx5070ti_2026_04_10/cask_v2_fidelity/`
-- Historical HorizonKV / adaptive-horizon work is retained in-tree as Phase 1 archive material, not as the current paper mainline.
+- Archived Phase 1 scorer-engineering work remains only as legacy code context, not as the current paper mainline.
 
 ## Installation
 
@@ -181,7 +181,7 @@ High-level read:
 - `triattention/methods/triattention.py`: TriAttention baseline.
 - `triattention/methods/cask.py`: CASK mainline implementation.
 - `paper_artifacts/`: tracked paper-facing summaries and frozen experiment snapshots.
-- `docs/`: historical notes and archived Phase 1 materials.
+- `docs/`: supporting notes for the current repo.
 
 ## Provenance
 
