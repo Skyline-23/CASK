@@ -1,0 +1,53 @@
+{
+  "reference_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_refs\\longbench\\Qwen3-8B\\runs\\hotpotqa\\merged\\merged.jsonl",
+  "candidate_method": "triattention",
+  "candidate_budget": 256,
+  "model_path": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\models\\Qwen3-8B",
+  "summary": {
+    "records_compared": 1,
+    "mean_target_top1_match_rate": 0.8125,
+    "mean_target_top5_match_rate": 0.90625,
+    "mean_strict_prefix_top1_ratio": 0.0625,
+    "mean_first_top1_mismatch_step": 2.0,
+    "mean_target_logprob": -1.374340482056141,
+    "mean_target_nll": 1.374340482056141,
+    "mean_perplexity": 3.9524691388212405,
+    "mean_terminal_saved_tokens": 11503.0,
+    "mean_terminal_saved_ratio": 0.9757400967003138,
+    "mean_terminal_cache_ratio": 0.024259903299686147,
+    "mean_reference_terminal_saved_tokens": 11503.0,
+    "mean_reference_terminal_saved_ratio": 0.9757400967003138,
+    "mean_reference_terminal_cache_ratio": 0.024259903299686147,
+    "records_with_positive_terminal_savings": 1,
+    "records_with_positive_reference_terminal_savings": 1,
+    "records_with_guard_triggered": 0,
+    "guard_reason_counts": {},
+    "mean_compression_events": null
+  },
+  "records": [
+    {
+      "index": 0,
+      "id": "fc6267db9ba02bbb251960231bc87251c581110e4e2b5f3f",
+      "reference_output_tokens": 32,
+      "used_combined_boundary_tokenization": true,
+      "target_top1_match_rate": 0.8125,
+      "target_top5_match_rate": 0.90625,
+      "strict_prefix_top1_ratio": 0.0625,
+      "first_top1_mismatch_step": 2,
+      "mean_target_logprob": -1.374340482056141,
+      "mean_target_nll": 1.374340482056141,
+      "perplexity": 3.9524691388212405,
+      "reference_prompt_tokens": 11758,
+      "reference_total_tokens": 11790,
+      "compression_events": null,
+      "current_cache_tokens": 286,
+      "current_total_cardinality": 11789,
+      "terminal_saved_tokens": 11503,
+      "terminal_saved_ratio": 0.9757400967003138,
+      "terminal_cache_ratio": 0.024259903299686147,
+      "reference_terminal_saved_tokens": 11503,
+      "reference_terminal_saved_ratio": 0.9757400967003138,
+      "reference_terminal_cache_ratio": 0.024259903299686147
+    }
+  ]
+}

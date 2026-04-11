@@ -1,0 +1,44 @@
+{
+  "task_set": "longbench",
+  "num_tasks": 8,
+  "task_scores": {
+    "qasper": {
+      "overall": 11.65,
+      "num_examples": 1
+    },
+    "hotpotqa": {
+      "overall": 27.27,
+      "num_examples": 1
+    },
+    "2wikimqa": {
+      "overall": 0.0,
+      "num_examples": 1
+    },
+    "musique": {
+      "overall": 0.0,
+      "num_examples": 1
+    },
+    "gov_report": {
+      "overall": 32.7,
+      "num_examples": 1
+    },
+    "qmsum": {
+      "overall": 21.16,
+      "num_examples": 1
+    },
+    "multi_news": {
+      "overall": 15.29,
+      "num_examples": 1
+    },
+    "vcsum": {
+      "overall": 13.92,
+      "num_examples": 1
+    }
+  },
+  "overall_average": 15.25,
+  "category_averages": {
+    "single_doc_qa": 11.65,
+    "multi_doc_qa": 9.09,
+    "summarization": 20.77
+  }
+}

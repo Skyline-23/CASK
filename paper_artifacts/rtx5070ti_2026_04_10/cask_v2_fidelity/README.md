@@ -45,12 +45,13 @@ This is the cheapest paper-facing evidence package in the repo. Open it when you
 | Main local budgets | `104`, `128`, `160`, `192` |
 | Main witnesses | `hexagon`, `geometry248`, `geometry434` |
 
+## Command Provenance
+
+| Item | File |
+| --- | --- |
+| Package command map | [`paper_artifacts/COMMAND_MAP.md`](../../COMMAND_MAP.md) |
+| Local replay summary with original `report_path` fields | [`teacher_forced_budget_sweep_summary.json`](teacher_forced_budget_sweep_summary.json) |
+
 ## Caveat
 
 This package is useful for local bridge examples and cheap debugging, but the H100 packages are the stronger sources for headline paper claims.
-
-## Raw Provenance
-
-This package is the tracked paper-facing extraction of the local reports. To trace a packaged row further, use the referenced report paths under:
-
-- `experiments/reports/`

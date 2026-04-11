@@ -15,6 +15,7 @@ CASK treats reasoning-time KV compression as a **behavior-preserving selective c
 | Prompt-heavy policy | Stage 1 prefix eviction, then Stage 2 decode consolidation |
 | Primary runner | `python scripts/cli.py run-one ... --method cask` |
 | Main replay harness | `scripts/replay_reference_fidelity.py` |
+| Command provenance | `paper_artifacts/COMMAND_MAP.md` |
 
 ## Method Summary
 
@@ -91,6 +92,9 @@ Detail:
 Start here:
 [paper_artifacts/README.md](paper_artifacts/README.md)
 
+Command trace:
+[paper_artifacts/COMMAND_MAP.md](paper_artifacts/COMMAND_MAP.md)
+
 ### Which package should you open?
 
 | If you want to know... | Open this | Why this is the right package |
@@ -152,8 +156,11 @@ python scripts/replay_reference_fidelity.py \
 | `scripts/cli.py` | high-level experiment wrapper |
 | `scripts/worker.py` | HuggingFace execution path |
 | `scripts/replay_reference_fidelity.py` | teacher-forced replay harness |
+| `scripts/run_replay_fidelity_frontier.py` | batch replay frontier launcher |
+| `scripts/run_longbench_suite.py` | LongBench generation harness |
 | `scripts/compare_kv_fidelity.py` | output-level comparison helper |
-| `scripts/build_prompt_heavy_artifacts.py` | promote replay outputs into paper-facing summaries |
+| `scripts/build_promptheavy_saved_ratio_audit.py` | package prompt-heavy replay summaries |
+| `scripts/build_actual_bridge_artifacts.py` | package actual-output bridge summaries |
 | `triattention/methods/triattention.py` | TriAttention baseline implementation |
 | `triattention/methods/cask.py` | CASK implementation |
 | `paper_artifacts/` | tracked paper-facing summaries |

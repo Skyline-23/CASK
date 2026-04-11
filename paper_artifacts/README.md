@@ -2,6 +2,9 @@
 
 This directory contains the paper-facing evidence packages for CASK. Start here if you want to understand which files matter, what each package proves, and what to cite in the paper.
 
+Command trace:
+[`COMMAND_MAP.md`](COMMAND_MAP.md)
+
 ## Read Order
 
 | If you want to answer this question | Open this first | Then drill into |
@@ -30,4 +33,4 @@ This directory contains the paper-facing evidence packages for CASK. Start here 
 
 ## Provenance
 
-Every package README points to tracked summary files that already carry raw provenance fields such as `source_json` or `source_eval_json`. For paper writing, cite the packaged summaries first, then use those provenance fields to trace each row back to its generating experiment.
+Every package README points to tracked summary files that already carry raw provenance fields such as `source_json` or `source_eval_json`. For paper writing, cite the packaged summaries first, then use [`COMMAND_MAP.md`](COMMAND_MAP.md) plus those provenance fields to trace each row back to its generating experiment.

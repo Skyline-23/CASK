@@ -1,0 +1,53 @@
+{
+  "reference_merged_jsonl": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\longbench_h100_refs\\longbench\\Qwen3-8B\\runs\\multi_news\\merged\\merged.jsonl",
+  "candidate_method": "triattention",
+  "candidate_budget": 384,
+  "model_path": "C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\models\\Qwen3-8B",
+  "summary": {
+    "records_compared": 1,
+    "mean_target_top1_match_rate": 0.537109375,
+    "mean_target_top5_match_rate": 0.81640625,
+    "mean_strict_prefix_top1_ratio": 0.00390625,
+    "mean_first_top1_mismatch_step": 2.0,
+    "mean_target_logprob": -2.051642253762111,
+    "mean_target_nll": 2.051642253762111,
+    "mean_perplexity": 7.780668451863489,
+    "mean_terminal_saved_tokens": 2692.0,
+    "mean_terminal_saved_ratio": 0.8407245471580262,
+    "mean_terminal_cache_ratio": 0.15927545284197375,
+    "mean_reference_terminal_saved_tokens": 2692.0,
+    "mean_reference_terminal_saved_ratio": 0.8407245471580262,
+    "mean_reference_terminal_cache_ratio": 0.15927545284197375,
+    "records_with_positive_terminal_savings": 1,
+    "records_with_positive_reference_terminal_savings": 1,
+    "records_with_guard_triggered": 0,
+    "guard_reason_counts": {},
+    "mean_compression_events": null
+  },
+  "records": [
+    {
+      "index": 0,
+      "id": "e45abfcb82a3c862c0f772e6f461866839955c11ea2f46a8",
+      "reference_output_tokens": 512,
+      "used_combined_boundary_tokenization": true,
+      "target_top1_match_rate": 0.537109375,
+      "target_top5_match_rate": 0.81640625,
+      "strict_prefix_top1_ratio": 0.00390625,
+      "first_top1_mismatch_step": 2,
+      "mean_target_logprob": -2.051642253762111,
+      "mean_target_nll": 2.051642253762111,
+      "perplexity": 7.780668451863489,
+      "reference_prompt_tokens": 2691,
+      "reference_total_tokens": 3203,
+      "compression_events": null,
+      "current_cache_tokens": 510,
+      "current_total_cardinality": 3202,
+      "terminal_saved_tokens": 2692,
+      "terminal_saved_ratio": 0.8407245471580262,
+      "terminal_cache_ratio": 0.15927545284197375,
+      "reference_terminal_saved_tokens": 2692,
+      "reference_terminal_saved_ratio": 0.8407245471580262,
+      "reference_terminal_cache_ratio": 0.15927545284197375
+    }
+  ]
+}

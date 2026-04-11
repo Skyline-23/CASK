@@ -43,6 +43,14 @@ This package is the main H100 replay-level evidence for the paper's reasoning st
 | Budgets | `256`, `384`, `512` |
 | Metric family | replay `top1`, `top5`, `mean_nll`, `first_mismatch`, `saved_ratio` |
 
+## Command Provenance
+
+| Item | File |
+| --- | --- |
+| Batch command manifest | [`experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/fidelity_manifest.json`](../../../experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/fidelity_manifest.json) |
+| Batch command manifest | [`experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/fidelity_manifest.json`](../../../experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/fidelity_manifest.json) |
+| Command map | [`paper_artifacts/COMMAND_MAP.md`](../../COMMAND_MAP.md) |
+
 ## Caveat
 
 This is a **replay-fidelity** package. It should support the full-KV similarity story and the reasoning gate, but it should not be cited as if it were already the final benchmark-accuracy table.
@@ -51,5 +59,7 @@ This is a **replay-fidelity** package. It should support the full-KV similarity 
 
 Use the `source_json` column in the packaged summaries, then trace into these tracked raw roots:
 
+- [`experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_h100_aime24_ref6_fidelity_20260410/`](../../../experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_h100_aime24_ref6_fidelity_20260410/)
+- [`experiments/outputs/aime25/Qwen3-8B/sample1/fullkv/full_h100_aime25_ref6_fidelity_20260410/`](../../../experiments/outputs/aime25/Qwen3-8B/sample1/fullkv/full_h100_aime25_ref6_fidelity_20260410/)
 - [`experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/`](../../../experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/)
 - [`experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/`](../../../experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/)

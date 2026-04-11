@@ -45,6 +45,14 @@ This package contains the output-level evidence that complements the replay gate
 | Main tasks | `qasper`, `multi_news`, `hotpotqa` |
 | Metric family | `sequence_ratio`, `task_metric`, `terminal_saved_ratio` |
 
+## Command Provenance
+
+| Item | File |
+| --- | --- |
+| Package command map | [`paper_artifacts/COMMAND_MAP.md`](../../COMMAND_MAP.md) |
+| Bridge rows with raw back-pointers | [`actual_bridge_summary.json`](actual_bridge_summary.json) |
+| Stage-ablation rows with raw back-pointers | [`stage_ablation_summary.json`](stage_ablation_summary.json) |
+
 ## Raw Provenance
 
 Use the packaged JSON/CSV files first, then trace into these tracked raw roots:

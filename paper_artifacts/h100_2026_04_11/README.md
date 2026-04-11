@@ -36,15 +36,28 @@ This directory is the prompt-heavy follow-up package. Open it when you want to u
 | "Prompt-heavy evidence must be split into active and inactive regimes" | [`coverage_followup_probe.md`](coverage_followup_probe.md) |
 | "The strongest decode-active output bridge is `multi_news`" | [`cask_h100_actual_bridge/README.md`](cask_h100_actual_bridge/README.md) |
 
+## Command Provenance
+
+| Item | File |
+| --- | --- |
+| Prompt-heavy batch manifest | [`experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411/overnight_manifest.json`](../../experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411/overnight_manifest.json) |
+| Package command map | [`paper_artifacts/COMMAND_MAP.md`](../COMMAND_MAP.md) |
+
 ## Raw Provenance
 
 Use the tracked summaries first, then trace into these tracked raw roots:
 
+- [`experiments/longbench_h100_refs/`](../../experiments/longbench_h100_refs/)
 - [`experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/`](../../experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/)
 - [`experiments/longbench_h100_actual_bridge_20260411/`](../../experiments/longbench_h100_actual_bridge_20260411/)
 - [`experiments/longbench_h100_stage_ablation/`](../../experiments/longbench_h100_stage_ablation/)
 - [`experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/`](../../experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/)
 - [`experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411/`](../../experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411/)
+- [`experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_qasper_replay/`](../../experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_qasper_replay/)
+- [`experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_multi_news_replay/`](../../experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_multi_news_replay/)
+- [`experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_hotpotqa_replay/`](../../experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_hotpotqa_replay/)
+- [`experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_musique_replay/`](../../experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_musique_replay/)
+- [`experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_2wikimqa_replay/`](../../experiments/frontier/Qwen3-8B/h100_promptheavy_twostage_rerun_20260411_2wikimqa_replay/)
 - [`experiments/frontier/Qwen3-8B/h100_decode_probe_vcsum_20260411_vcsum_replay/`](../../experiments/frontier/Qwen3-8B/h100_decode_probe_vcsum_20260411_vcsum_replay/)
 - [`experiments/frontier/Qwen3-8B/h100_decode_probe_qmsum_20260411_qmsum_replay/`](../../experiments/frontier/Qwen3-8B/h100_decode_probe_qmsum_20260411_qmsum_replay/)
 - [`experiments/frontier/Qwen3-8B/h100_decode_probe_gov_report_20260411_gov_report_replay/`](../../experiments/frontier/Qwen3-8B/h100_decode_probe_gov_report_20260411_gov_report_replay/)
