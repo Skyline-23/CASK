@@ -8,7 +8,7 @@ This directory is the prompt-heavy follow-up package. Open it when you want to u
 2. [`decode_active_replay_probe.md`](decode_active_replay_probe.md)
 3. [`coverage_followup_probe.md`](coverage_followup_probe.md)
 4. [`cask_h100_actual_bridge/README.md`](cask_h100_actual_bridge/README.md) if you need the output-level bridge layer
-5. [`figures/README.md`](figures/README.md) when you need the synchronized paper figures rather than the raw tables
+5. [`../../docs/assets/README.md`](../../docs/assets/README.md) when you need the synchronized paper figures rather than the raw tables
 
 ## What Each File Is For
 
@@ -18,7 +18,7 @@ This directory is the prompt-heavy follow-up package. Open it when you want to u
 | [`decode_active_replay_probe.md`](decode_active_replay_probe.md) | Do we have another decode-active replay witness besides `multi_news`? | Use this to cite `vcsum` as the second replay-level decode-active witness |
 | [`coverage_followup_probe.md`](coverage_followup_probe.md) | What happens when we broaden the prompt-heavy coverage set? | Use this to discuss `qmsum` / `gov_report` as `prefix_budget_exhausted` boundaries |
 | [`cask_h100_actual_bridge/README.md`](cask_h100_actual_bridge/README.md) | Does replay advantage show up in actual generation? | Use this when you need output-level bridge evidence |
-| [`figures/README.md`](figures/README.md) | Which figures are current and paper-ready? | Use this for the synchronized PNG/PDF figure pack built from the H100 summaries |
+| [`../../docs/assets/README.md`](../../docs/assets/README.md) | Which figures are current and paper-ready? | Use this for the synchronized PNG/PDF figure pack built from the H100 summaries |
 
 ## Main Read
 

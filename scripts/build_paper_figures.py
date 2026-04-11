@@ -606,6 +606,201 @@ def build_method_overview_figure(outdir: Path) -> str:
     return "Figure 5. Method overview for two-stage CASK."
 
 
+def load_mass_report(name: str) -> dict[str, Any]:
+    return load_json(ROOT / "experiments" / "reports" / name)
+
+
+def build_mass_recovery_figure(outdir: Path) -> str:
+    boundary = load_mass_report("scratch_hexagon_b104_mass_compare.json")
+    healthy = load_mass_report("scratch_hexagon_b288_mass_compare.json")
+    guarded = load_mass_report("scratch_hexagon_b104_phase2a_mass_compare.json")
+
+    cases = [
+        ("Boundary\nb104", boundary["means"]),
+        ("Healthy\nb288", healthy["means"]),
+        ("Guarded\nb104+guard", guarded["means"]),
+    ]
+
+    labels = [label for label, _ in cases]
+    rho_core = [float(item["mean_scratch_core_score_mass_ratio"]) for _, item in cases]
+    rho_rep = [float(item["mean_scratch_final_rep_score_mass_ratio"]) for _, item in cases]
+    rho_overlap = [float(item["mean_scratch_final_rep_topk_overlap_ratio"]) for _, item in cases]
+
+    fig, ax = plt.subplots(figsize=(8.8, 4.8))
+    x = list(range(len(labels)))
+    width = 0.28
+
+    core_bars = ax.bar(
+        [value - width / 2 for value in x],
+        rho_core,
+        width=width,
+        color="#F59E0B",
+        edgecolor="#92400E",
+        linewidth=0.9,
+        label=r"$\rho_{core}$",
+    )
+    rep_bars = ax.bar(
+        [value + width / 2 for value in x],
+        rho_rep,
+        width=width,
+        color=CASK_COLOR,
+        edgecolor="#1D4ED8",
+        linewidth=0.9,
+        label=r"$\rho_{rep}$",
+    )
+    ax.plot(
+        x,
+        rho_overlap,
+        color="#6B7280",
+        marker="D",
+        markersize=5.5,
+        linewidth=1.4,
+        linestyle="--",
+        label="Top-k overlap",
+    )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0.0, 1.08)
+    ax.set_ylabel("Normalized Oracle-Relevant Mass Ratio")
+    ax.set_title("Mass Recovery on the Hexagon Witness", fontweight="bold")
+    ax.legend(loc="upper left", framealpha=0.92, ncol=3)
+    ax.grid(axis="y", alpha=0.25)
+
+    for bars in (core_bars, rep_bars):
+        for bar in bars:
+            value = bar.get_height()
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                value + 0.03,
+                f"{value:.2f}",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+                color="#1F2937",
+            )
+    for idx, (xpos, value) in enumerate(zip(x, rho_overlap)):
+        if idx == len(rho_overlap) - 1:
+            continue
+        ax.text(
+            xpos,
+            value + 0.045,
+            f"overlap {value:.2f}",
+            ha="center",
+            va="bottom",
+            fontsize=7.2,
+            color="#4B5563",
+            style="italic",
+        )
+
+    fig.suptitle("Figure 6. Mass Recovery: Core Preservation Alone Is Not Enough", fontsize=12, fontweight="bold", y=1.02)
+    plt.tight_layout()
+    save_figure(fig, outdir, "fig6_mass_recovery_hexagon")
+    return "Figure 6. Hexagon mass recovery: core-preserved mass versus final representative mass."
+
+
+def _mass_decomposition(report: dict[str, Any]) -> dict[str, list[float]]:
+    rows = report["rows"]
+    core = [float(row["scratch_core_score_mass_ratio"]) for row in rows]
+    final_rep = [float(row["scratch_final_rep_score_mass_ratio"]) for row in rows]
+    recovered = [max(rep - direct, 0.0) for direct, rep in zip(core, final_rep)]
+    lost = [max(1.0 - rep, 0.0) for rep in final_rep]
+    displacement = [maybe_float(row.get("mean_absorbed_token_displacement")) for row in rows]
+    return {
+        "positions": [int(row["absolute_position"]) for row in rows],
+        "core": core,
+        "recovered": recovered,
+        "lost": lost,
+        "displacement": displacement,
+    }
+
+
+def build_cluster_collapse_figure(outdir: Path) -> str:
+    healthy = _mass_decomposition(load_mass_report("scratch_hexagon_b288_mass_compare.json"))
+    boundary = _mass_decomposition(load_mass_report("scratch_hexagon_b104_mass_compare.json"))
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.8), sharey=True)
+    panels = [
+        (
+            axes[0],
+            healthy,
+            "Healthy merge regime (b288)",
+            "available slots ≈ 61",
+        ),
+        (
+            axes[1],
+            boundary,
+            "Boundary collapse regime (b104)",
+            "available slots = 1",
+        ),
+    ]
+
+    legend_handles = None
+    legend_labels = None
+    for ax, payload, title, subtitle in panels:
+        x = list(range(len(payload["positions"])))
+        core_bars = ax.bar(
+            x,
+            payload["core"],
+            color="#F59E0B",
+            edgecolor="#92400E",
+            linewidth=0.85,
+            label="Direct core preserve",
+        )
+        recovered_bars = ax.bar(
+            x,
+            payload["recovered"],
+            bottom=payload["core"],
+            color=CASK_COLOR,
+            edgecolor="#1D4ED8",
+            linewidth=0.85,
+            label="Recovered via representative",
+        )
+        lost_bottom = [core + recovered for core, recovered in zip(payload["core"], payload["recovered"])]
+        lost_bars = ax.bar(
+            x,
+            payload["lost"],
+            bottom=lost_bottom,
+            color="#E5E7EB",
+            edgecolor="#6B7280",
+            linewidth=0.85,
+            label="Unrecovered loss",
+        )
+
+        ax.set_xticks(x)
+        ax.set_xticklabels([str(value) for value in payload["positions"]])
+        ax.set_xlabel("Compression event position")
+        ax.set_title(f"{title}\n{subtitle}", fontweight="bold", fontsize=10.5)
+        ax.set_ylim(0.0, 1.06)
+        ax.grid(axis="y", alpha=0.25)
+
+        for xpos, displacement in zip(x, payload["displacement"]):
+            if displacement is None:
+                continue
+            ax.text(
+                xpos,
+                1.015,
+                f"d={displacement:.1f}",
+                ha="center",
+                va="bottom",
+                fontsize=7.1,
+                color="#7C2D12",
+            )
+
+        if legend_handles is None:
+            legend_handles, legend_labels = ax.get_legend_handles_labels()
+
+    axes[0].set_ylabel("Oracle-Relevant Mass Ratio")
+    if legend_handles is not None and legend_labels is not None:
+        fig.legend(legend_handles, legend_labels, loc="upper center", bbox_to_anchor=(0.5, 0.02), ncol=3, framealpha=0.92)
+
+    fig.suptitle("Figure 7. Cluster Collapse Versus Representative Preservation", fontsize=12, fontweight="bold", y=1.04)
+    plt.tight_layout()
+    fig.subplots_adjust(bottom=0.22)
+    save_figure(fig, outdir, "fig7_cluster_collapse_hexagon")
+    return "Figure 7. Event-level mass decomposition showing healthy representative preservation versus boundary collapse."
+
+
 def write_figure_index(outdir: Path, captions: list[tuple[str, str]]) -> None:
     lines = [
         "# H100 Figure Pack",
@@ -622,11 +817,14 @@ def write_figure_index(outdir: Path, captions: list[tuple[str, str]]) -> None:
             "",
             "## Source packages",
             "",
-            "- [`artifacts/h100_2026_04_10/cask_h100_fidelity/`](../h100_2026_04_10/cask_h100_fidelity/)",
-            "- [`artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/`](../promptheavy_saved_ratio_audit/)",
-            "- [`artifacts/h100_2026_04_11/cask_h100_actual_bridge/`](../cask_h100_actual_bridge/)",
-            "- [`artifacts/h100_2026_04_11/decode_active_replay_probe.md`](../decode_active_replay_probe.md)",
-            "- [`artifacts/h100_2026_04_11/coverage_followup_probe.md`](../coverage_followup_probe.md)",
+            "- [`artifacts/h100_2026_04_10/cask_h100_fidelity/`](../../artifacts/h100_2026_04_10/cask_h100_fidelity/)",
+            "- [`artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/`](../../artifacts/h100_2026_04_11/promptheavy_saved_ratio_audit/)",
+            "- [`artifacts/h100_2026_04_11/cask_h100_actual_bridge/`](../../artifacts/h100_2026_04_11/cask_h100_actual_bridge/)",
+            "- [`artifacts/h100_2026_04_11/decode_active_replay_probe.md`](../../artifacts/h100_2026_04_11/decode_active_replay_probe.md)",
+            "- [`artifacts/h100_2026_04_11/coverage_followup_probe.md`](../../artifacts/h100_2026_04_11/coverage_followup_probe.md)",
+            "- [`experiments/reports/scratch_hexagon_b288_mass_compare.json`](../../experiments/reports/scratch_hexagon_b288_mass_compare.json)",
+            "- [`experiments/reports/scratch_hexagon_b104_mass_compare.json`](../../experiments/reports/scratch_hexagon_b104_mass_compare.json)",
+            "- [`experiments/reports/scratch_hexagon_b104_phase2a_mass_compare.json`](../../experiments/reports/scratch_hexagon_b104_phase2a_mass_compare.json)",
             "",
             "## Regeneration",
             "",
@@ -650,6 +848,8 @@ def main() -> None:
         ("fig3a_promptheavy_nll_by_task", build_witness_nll_figure(outdir)),
         ("fig4_actual_output_bridge", build_actual_bridge_figure(outdir)),
         ("fig5_method_overview", build_method_overview_figure(outdir)),
+        ("fig6_mass_recovery_hexagon", build_mass_recovery_figure(outdir)),
+        ("fig7_cluster_collapse_hexagon", build_cluster_collapse_figure(outdir)),
     ]
     write_figure_index(outdir, captions)
 
