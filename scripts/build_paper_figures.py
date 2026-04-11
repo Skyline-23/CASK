@@ -407,26 +407,28 @@ def collect_witness_delta_data() -> dict[str, Any]:
 
 def build_witness_map_figure(outdir: Path) -> str:
     payload = collect_witness_delta_data()
+    labels = [label.split(" | ", 1)[0] for label in payload["labels"]]
     top1_256 = payload["top1_256"]
     top1_384 = payload["top1_384"]
-    fig, axes = plt.subplots(2, 4, figsize=(13.5, 6.4), sharey=True)
-    axes_flat = list(axes.flat)
-    ylim = (-6.0, 18.5)
 
-    for idx, ((task, role, _color), ax) in enumerate(zip(WITNESS_TASKS, axes_flat)):
-        bars = ax.bar([0, 1], [top1_256[idx], top1_384[idx]], color=["#60A5FA", "#2563EB"], width=0.62)
-        ax.axhline(0, color="#9CA3AF", linewidth=0.8, linestyle="-")
-        ax.set_title(task, fontweight="bold", fontsize=10)
-        ax.set_xticks([0, 1])
-        ax.set_xticklabels(["256", "384"])
-        ax.set_ylim(*ylim)
-        ax.grid(axis="y", alpha=0.25)
-        if idx % 4 == 0:
-            ax.set_ylabel("Delta Top-1 (%p)")
-        if role:
-            ax.text(0.02, 0.94, role.replace("\n", " "), transform=ax.transAxes, ha="left", va="top", fontsize=6.6, color="#4B5563")
-        for bar, value in zip(bars, [top1_256[idx], top1_384[idx]]):
-            offset = 0.45 if value >= 0 else -0.65
+    fig, ax = plt.subplots(figsize=(12.5, 4.8))
+    x = list(range(len(labels)))
+    width = 0.36
+    bars_256 = ax.bar([value - width / 2 for value in x], top1_256, width=width, color="#60A5FA", label="Budget 256")
+    bars_384 = ax.bar([value + width / 2 for value in x], top1_384, width=width, color="#2563EB", label="Budget 384")
+    ax.axhline(0, color="#9CA3AF", linewidth=0.8, linestyle="-")
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylabel("Delta Top-1 (%p)")
+    ax.set_title("Prompt-Heavy Top-1 Delta by Task", fontweight="bold")
+    ax.legend(framealpha=0.9)
+    ax.set_ylim(-6.0, 18.5)
+    ax.grid(axis="y", alpha=0.25)
+
+    for bars in (bars_256, bars_384):
+        for bar in bars:
+            value = bar.get_height()
+            offset = 0.45 if value >= 0 else -0.55
             va = "bottom" if value >= 0 else "top"
             ax.text(bar.get_x() + bar.get_width() / 2, value + offset, f"{value:+.1f}", ha="center", va=va, fontsize=7, color="#1F2937")
 
@@ -438,27 +440,28 @@ def build_witness_map_figure(outdir: Path) -> str:
 
 def build_witness_nll_figure(outdir: Path) -> str:
     payload = collect_witness_delta_data()
+    labels = [label.split(" | ", 1)[0] for label in payload["labels"]]
     nll_256 = payload["nll_256"]
     nll_384 = payload["nll_384"]
 
-    fig, axes = plt.subplots(2, 4, figsize=(13.5, 6.4), sharey=True)
-    axes_flat = list(axes.flat)
-    ylim = (-1.5, 0.65)
+    fig, ax = plt.subplots(figsize=(12.5, 4.8))
+    x = list(range(len(labels)))
+    width = 0.36
+    bars_256 = ax.bar([value - width / 2 for value in x], nll_256, width=width, color="#60A5FA", label="Budget 256")
+    bars_384 = ax.bar([value + width / 2 for value in x], nll_384, width=width, color="#2563EB", label="Budget 384")
+    ax.axhline(0, color="#9CA3AF", linewidth=0.8, linestyle="-")
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylabel("Delta Mean NLL")
+    ax.set_title("Prompt-Heavy Mean NLL Delta by Task", fontweight="bold")
+    ax.legend(framealpha=0.9)
+    ax.set_ylim(-1.5, 0.65)
+    ax.grid(axis="y", alpha=0.25)
 
-    for idx, ((task, role, _color), ax) in enumerate(zip(WITNESS_TASKS, axes_flat)):
-        bars = ax.bar([0, 1], [nll_256[idx], nll_384[idx]], color=["#60A5FA", "#2563EB"], width=0.62)
-        ax.axhline(0, color="#9CA3AF", linewidth=0.8, linestyle="-")
-        ax.set_title(task, fontweight="bold", fontsize=10)
-        ax.set_xticks([0, 1])
-        ax.set_xticklabels(["256", "384"])
-        ax.set_ylim(*ylim)
-        ax.grid(axis="y", alpha=0.25)
-        if idx % 4 == 0:
-            ax.set_ylabel("Delta Mean NLL")
-        if role:
-            ax.text(0.02, 0.94, role.replace("\n", " "), transform=ax.transAxes, ha="left", va="top", fontsize=6.6, color="#4B5563")
-        for bar, value in zip(bars, [nll_256[idx], nll_384[idx]]):
-            offset = 0.05 if value >= 0 else -0.06
+    for bars in (bars_256, bars_384):
+        for bar in bars:
+            value = bar.get_height()
+            offset = 0.04 if value >= 0 else -0.05
             va = "bottom" if value >= 0 else "top"
             ax.text(bar.get_x() + bar.get_width() / 2, value + offset, f"{value:+.2f}", ha="center", va=va, fontsize=7, color="#1F2937")
 
