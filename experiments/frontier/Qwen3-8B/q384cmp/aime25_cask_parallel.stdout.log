@@ -1,0 +1,10 @@
+Merged 10 records into C:\Users\AIUSER\Downloads\CASK\experiments\outputs\aime25\Qwen3-8B\sample1\cask\budget_384_q384cmp\merged\merged.jsonl
+{'num_samples': 10, 'num_scores': 10, 'timeout_samples': 0, 'empty_samples': 0, 'acc': 10.0}
+Saved to C:\Users\AIUSER\Downloads\CASK\experiments\outputs\aime25\Qwen3-8B\sample1\cask\budget_384_q384cmp\eval\aime25_Qwen3-8B_cask_budget_384_q384cmp\aime25\default-default_math_multi_eval.jsonl
+{'num_samples_total': 10, 'num_questions': 10, 'num_preds_per_question_expected': 1, 'num_preds_per_question_min': 1, 'num_preds_per_question_max': 1, 'num_samples': 10, 'num_scores': 10, 'timeout_samples': 0, 'empty_samples': 0, 'acc': 10.0}
+[warn] conda not found; falling back to current python: C:\Users\AIUSER\Downloads\CASK\.venv313\Scripts\python.exe
+[dispatch] shard-over-draws mode: 1 draws across 1 shards
+[launch] shard 0 -> GPU 0, log C:\Users\AIUSER\Downloads\CASK\experiments\logs\aime25\Qwen3-8B\sample1\cask\budget_384_q384cmp\shard00_20260412_221226.log
+[done] shard 0 completed.
+[merge] C:\Users\AIUSER\Downloads\CASK\.venv313\Scripts\python.exe C:\Users\AIUSER\Downloads\CASK\scripts\merge_shards.py --method-output-dir C:\Users\AIUSER\Downloads\CASK\experiments\outputs\aime25\Qwen3-8B\sample1\cask\budget_384_q384cmp\shards --merged-dir-name merged
+[eval] C:\Users\AIUSER\Downloads\CASK\.venv313\Scripts\python.exe -m triattention.evaluation.eval_math_multi --base_dir C:\Users\AIUSER\Downloads\CASK\experiments\outputs\aime25\Qwen3-8B\sample1\cask\budget_384_q384cmp\merged --dataset aime25 --exp_name aime25_Qwen3-8B_cask_budget_384_q384cmp --output_dir C:\Users\AIUSER\Downloads\CASK\experiments\outputs\aime25\Qwen3-8B\sample1\cask\budget_384_q384cmp\eval --num_samples 1

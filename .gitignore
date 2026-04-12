@@ -14,6 +14,7 @@ build/
 *.swo
 *~
 .DS_Store
+*.tmp
 
 # Environment and tooling
 .venv/
@@ -88,6 +89,10 @@ experiments/frontier/Qwen3-8B/*
 !experiments/frontier/Qwen3-8B/h100_aime24_fidelity_gate_20260410/**
 !experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/
 !experiments/frontier/Qwen3-8B/h100_aime25_fidelity_gate_20260410/**
+!experiments/frontier/Qwen3-8B/q384cmp/
+!experiments/frontier/Qwen3-8B/q384cmp/**
+!experiments/frontier/DeepSeek-R1-Distill-Llama-8B/
+!experiments/frontier/DeepSeek-R1-Distill-Llama-8B/**
 !experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/
 !experiments/frontier/Qwen3-8B/h100_actual_bridge_metrics_20260411/**
 !experiments/frontier/Qwen3-8B/h100_promptheavy_stage_ablation_20260411/
@@ -120,6 +125,10 @@ experiments/outputs/aime24/Qwen3-8B/sample1/*
 experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/*
 !experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_h100_aime24_ref6_fidelity_20260410/
 !experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_h100_aime24_ref6_fidelity_20260410/**
+!experiments/outputs/aime24/Qwen3-8B/sample1/cask/
+!experiments/outputs/aime24/Qwen3-8B/sample1/cask/**
+!experiments/outputs/aime24/DeepSeek-R1-Distill-Llama-8B/
+!experiments/outputs/aime24/DeepSeek-R1-Distill-Llama-8B/**
 !experiments/outputs/aime25/
 !experiments/outputs/aime25/Qwen3-8B/
 experiments/outputs/aime25/Qwen3-8B/*
@@ -129,6 +138,8 @@ experiments/outputs/aime25/Qwen3-8B/sample1/*
 experiments/outputs/aime25/Qwen3-8B/sample1/fullkv/*
 !experiments/outputs/aime25/Qwen3-8B/sample1/fullkv/full_h100_aime25_ref6_fidelity_20260410/
 !experiments/outputs/aime25/Qwen3-8B/sample1/fullkv/full_h100_aime25_ref6_fidelity_20260410/**
+!experiments/outputs/aime25/Qwen3-8B/sample1/cask/
+!experiments/outputs/aime25/Qwen3-8B/sample1/cask/**
 !experiments/longbench_h100_refs/
 !experiments/longbench_h100_refs/**
 !experiments/longbench_h100_actual_bridge_20260411/

@@ -1,0 +1,51 @@
+[info] triattention stats dataset: eval=aime24 stats=aime25
+[info] triattention stats fallback: using packaged stats C:\Users\AIUSER\Downloads\CASK\triattention\calibration\for_aime25_experiment\ds_llama8b.pt
+Evaluate:   0%|          | 0/10 [00:00<?, ?it/s]Evaluate: 100%|##########| 10/10 [00:00<00:00, 18094.50it/s]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\AIUSER\Downloads\CASK\triattention\evaluation\eval_math_multi.py", line 162, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AIUSER\Downloads\CASK\triattention\evaluation\eval_math_multi.py", line 138, in main
+    os.makedirs(out_dir, exist_ok=True)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 228, in makedirs
+FileNotFoundError: [WinError 206] 파일 이름이나 확장명이 너무 깁니다: 'C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\outputs\\aime24\\DeepSeek-R1-Distill-Llama-8B\\sample1\\triattention\\budget_384_h100_gate_dsllama8b_20260412\\eval\\aime24_DeepSeek-R1-Distill-Llama-8B_triattention_budget_384_h100_gate_dsllama8b_20260412\\aime24'
+Traceback (most recent call last):
+  File "C:\Users\AIUSER\Downloads\CASK\scripts\dispatch.py", line 716, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AIUSER\Downloads\CASK\scripts\dispatch.py", line 712, in main
+    run_evaluation(merged_dir, args.dataset, exp_name, eval_output_dir, python_cmd, args.dry_run, num_samples)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AIUSER\Downloads\CASK\scripts\dispatch.py", line 625, in run_evaluation
+    subprocess.check_call(cmd, cwd=str(REPO_ROOT))
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 419, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['C:\\Users\\AIUSER\\Downloads\\CASK\\.venv313\\Scripts\\python.exe', '-m', 'triattention.evaluation.eval_math_multi', '--base_dir', 'C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\outputs\\aime24\\DeepSeek-R1-Distill-Llama-8B\\sample1\\triattention\\budget_384_h100_gate_dsllama8b_20260412\\merged', '--dataset', 'aime24', '--exp_name', 'aime24_DeepSeek-R1-Distill-Llama-8B_triattention_budget_384_h100_gate_dsllama8b_20260412', '--output_dir', 'C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\outputs\\aime24\\DeepSeek-R1-Distill-Llama-8B\\sample1\\triattention\\budget_384_h100_gate_dsllama8b_20260412\\eval', '--num_samples', '1']' returned non-zero exit status 1.
+Traceback (most recent call last):
+  File "C:\Users\AIUSER\Downloads\CASK\scripts\cli.py", line 1264, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\AIUSER\Downloads\CASK\scripts\cli.py", line 1247, in main
+    run_one(
+    ~~~~~~~^
+        args.dataset,
+        ^^^^^^^^^^^^^
+    ...<8 lines>...
+        dry_run=args.dry_run,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\AIUSER\Downloads\CASK\scripts\cli.py", line 628, in run_one
+    dispatch_run(config_path, dataset, log_dir, dry_run)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\AIUSER\Downloads\CASK\scripts\cli.py", line 552, in dispatch_run
+    subprocess.check_call(cmd, cwd=str(REPO_ROOT), env=env)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 419, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['C:\\Users\\AIUSER\\Downloads\\CASK\\.venv313\\Scripts\\python.exe', 'C:\\Users\\AIUSER\\Downloads\\CASK\\scripts\\dispatch.py', '--config', 'C:\\Users\\AIUSER\\Downloads\\CASK\\experiments\\configs\\generated\\aime24\\deepseek-r1-distill-llama-8b\\triattention_budget_384_h100_gate_dsllama8b_20260412.yaml', '--dataset', 'aime24']' returned non-zero exit status 1.
+[error] Frontier job failed: dataset=aime24 method=triattention budget=384 status=1

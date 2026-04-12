@@ -1,0 +1,3 @@
+[info] triattention stats dataset: eval=aime24 stats=aime25
+[info] triattention stats fallback: using packaged stats C:\Users\AIUSER\Downloads\CASK\triattention\calibration\for_aime25_experiment\qwen3_8b.pt
+Evaluate:   0%|          | 0/10 [00:00<?, ?it/s]Evaluate: 100%|##########| 10/10 [00:00<00:00, 36695.57it/s]
