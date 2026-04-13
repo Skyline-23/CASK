@@ -164,11 +164,15 @@ python scripts/replay_reference_fidelity.py \
 | `scripts/worker.py` | HuggingFace execution path |
 | `scripts/replay_reference_fidelity.py` | teacher-forced replay harness |
 | `scripts/run_replay_fidelity_frontier.py` | batch replay frontier launcher |
+| `scripts/run_promptheavy_pack.py` | generic prompt-heavy fullkv + replay package planner/launcher |
+| `scripts/run_replay_queue.ps1` | PowerShell queue wrapper for replay configs |
 | `scripts/run_longbench_suite.py` | LongBench generation harness |
 | `scripts/compare_kv_fidelity.py` | output-level comparison helper |
 | `scripts/build_promptheavy_saved_ratio_audit.py` | package prompt-heavy replay summaries |
 | `scripts/build_actual_bridge_artifacts.py` | package actual-output bridge summaries |
+| `scripts/sync_reasoning_gate.py` | sync replay reports into the tracked reasoning-gate summaries |
 | `scripts/build_paper_figures.py` | generate the current paper-facing figure pack under `docs/assets/` |
+| `scripts/refresh_paper_figures.ps1` | optional sync + figure refresh wrapper |
 | `paper/` | NeurIPS paper source, bibliography, and style files |
 | `cask/methods/triattention.py` | TriAttention baseline implementation |
 | `cask/methods/cask.py` | CASK implementation |

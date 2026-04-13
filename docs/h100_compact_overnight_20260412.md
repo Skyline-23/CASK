@@ -100,11 +100,11 @@ The first stop checkpoint is reached when these three runs have usable merged ou
 At that point, do not keep the frontier alive just because more runs are queued.
 Read the outputs first, then decide the next minimal comparison batch.
 
-This cutover is now automated by:
+This historical cutover was previously automated by a host-specific watcher.
+For active runs, use the generic queue path instead:
 
-- `scripts/h100_cutover_watch.ps1`
-
-The watcher waits for the three required `merged.jsonl` files, kills the long frontier queues, and relaunches the reduced comparison block automatically.
+- `scripts/run_replay_queue.ps1`
+- `scripts/run_promptheavy_pack.py`
 
 ## Next Minimal Relaunch
 

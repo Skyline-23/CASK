@@ -19,13 +19,13 @@ def frontier_source_path(dataset_key: str, method: str, budget: int) -> Path:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Sync updated background replay runs into reasoning-gate artifact summaries."
+        description="Sync replay runs into reasoning-gate artifact summaries."
     )
     parser.add_argument(
         "--report-dir",
         type=Path,
-        default=ROOT / "experiments" / "reports" / "bg_replay_20260413",
-        help="Directory containing aime24/aime25 tri/cask replay JSONs.",
+        default=resolve_default_report_dir(),
+        help="Directory containing aime24/aime25 tri/cask replay JSONs to sync.",
     )
     parser.add_argument(
         "--artifact-dir",
@@ -37,16 +37,27 @@ def parse_args() -> argparse.Namespace:
         "--budget",
         type=int,
         default=384,
-        help="Budget row to overwrite from the background reports.",
+        help="Budget row to overwrite from the replay reports.",
     )
     parser.add_argument(
         "--datasets",
         nargs="+",
         choices=["aime24_ref6", "aime25_ref6"],
         default=["aime24_ref6", "aime25_ref6"],
-        help="Dataset slices to sync from background reports.",
+        help="Dataset slices to sync from replay reports.",
     )
     return parser.parse_args()
+
+
+def resolve_default_report_dir() -> Path:
+    reports_root = ROOT / "experiments" / "reports"
+    candidates = sorted((path for path in reports_root.iterdir() if path.is_dir()), key=lambda path: path.stat().st_mtime, reverse=True)
+    for candidate in candidates:
+        has_aime24 = any(candidate.glob("aime24_*.json"))
+        has_aime25 = any(candidate.glob("aime25_*.json"))
+        if has_aime24 and has_aime25:
+            return candidate
+    return reports_root / "reasoning_gate_sync"
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -98,14 +109,14 @@ def build_row(dataset_key: str, budget: int, method: str, payload: dict[str, Any
     }
 
 
-def load_bg_rows(report_dir: Path, budget: int, datasets: list[str]) -> dict[str, dict[str, Any]]:
+def load_report_rows(report_dir: Path, budget: int, datasets: list[str]) -> dict[str, dict[str, Any]]:
     rows: dict[str, dict[str, Any]] = {}
     for dataset_key in datasets:
         for method in ("triattention", "cask"):
             stem = f"{dataset_key[:6]}_{'tri' if method == 'triattention' else 'cask'}{budget}"
             path = report_dir / f"{stem}.json"
             if not path.exists():
-                raise FileNotFoundError(f"Missing background replay file: {path}")
+                raise FileNotFoundError(f"Missing replay file: {path}")
             payload = load_json(path)
             rows[f"{dataset_key}:{method}:{budget}"] = build_row(
                 dataset_key=dataset_key,
@@ -303,7 +314,7 @@ def write_update_note(path: Path, replacement_rows: dict[str, dict[str, Any]], b
 
 def main() -> None:
     args = parse_args()
-    replacement_rows = load_bg_rows(args.report_dir, args.budget, args.datasets)
+    replacement_rows = load_report_rows(args.report_dir, args.budget, args.datasets)
 
     if "aime24_ref6" in args.datasets:
         update_csv(args.artifact_dir / "aime24_ref6_h100_fidelity_summary.csv", replacement_rows)

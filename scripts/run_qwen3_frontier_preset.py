@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""5070 Ti friendly CASK frontier preset for Qwen3-8B."""
+"""Qwen3-8B CASK frontier preset with conservative single-device defaults."""
 from __future__ import annotations
 
 import argparse
@@ -17,7 +17,7 @@ def parse_args() -> tuple[argparse.Namespace, list[str]]:
     parser.add_argument("--datasets", nargs="+", default=["aime24", "aime25", "math500"])
     parser.add_argument("--budgets", nargs="+", type=int, default=[384, 512, 768, 1024])
     parser.add_argument("--methods", nargs="+", default=["triattention", "cask"])
-    parser.add_argument("--frontier-tag", default="qwen3_5070ti")
+    parser.add_argument("--frontier-tag", default="qwen3_frontier")
     parser.add_argument("--stats-path", type=Path, default=None)
     parser.add_argument("--max-examples", type=int, default=8)
     parser.add_argument("--num-samples", type=int, default=1)
