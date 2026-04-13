@@ -33,3 +33,21 @@ Command trace:
 ## Provenance
 
 Every package README points to tracked summary files that already carry raw provenance fields such as `source_json` or `source_eval_json`. For paper writing, cite the packaged summaries first, then use [`COMMAND_MAP.md`](COMMAND_MAP.md) plus those provenance fields to trace each row back to its generating experiment.
+
+## Raw Data Policy
+
+The repository keeps raw experiment data in-tree, but not every raw file belongs in the PDF itself.
+
+Use this split:
+
+| Layer | What belongs there | Where it lives |
+| --- | --- | --- |
+| Main paper | headline tables, compact figures, claim-supporting summaries | `paper/`, `docs/assets/` |
+| Appendix / audit | measured counts, witness-level audit matrices, boundary-case readout | `paper/` Appendix C-D, package README files |
+| Raw provenance | JSON/CSV reports, manifests, merged references, eval roots, generation roots | `experiments/frontier/`, `experiments/outputs/`, `experiments/longbench_h100_*` |
+
+If a reviewer asks where a row came from, the intended path is:
+
+1. Open the packaged summary in `artifacts/...`
+2. Follow its `source_json` or `source_eval_json`
+3. Use [`COMMAND_MAP.md`](COMMAND_MAP.md) to recover the exact script, manifest, and raw directory

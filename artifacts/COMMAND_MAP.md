@@ -96,3 +96,14 @@ python scripts/compare_kv_fidelity.py \
 
 Tracked evidence should keep `manifest`, `json`, `csv`, `md`, and raw eval/reference trees. Temporary launcher logs, smoke-run directories, and ad-hoc status notes do not belong in the paper-facing artifact set.
 
+## How To Cite A Raw Result
+
+When a paper table cites a result, the intended provenance path is:
+
+1. Start from the packaged summary row under `artifacts/...`
+2. Read its `source_json` or `source_eval_json` back-pointer
+3. Open the matching manifest listed above
+4. Trace from the manifest into the raw root under `experiments/frontier/...`, `experiments/outputs/...`, or `experiments/longbench_h100_*`
+
+This is the repository's raw-data contract: the PDF carries compact summaries, Appendix C preserves measured counts and audit matrices, and the full JSON/CSV/eval/reference trail remains available in the tracked raw roots.
+

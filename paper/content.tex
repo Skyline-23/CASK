@@ -403,14 +403,14 @@ Slice & Method & Budget & Top-1 & Top-5 & Mean NLL & First Mismatch & Saved Rati
 \midrule
 AIME24 ref6 & TriAttention & 256 & 86.1\% & 98.0\% & 0.463 & 8.7 & 65.3\% \\
 AIME24 ref6 & \textbf{CASK} & 256 & \textbf{88.4\%} & \textbf{99.2\%} & \textbf{0.359} & 8.7 & 65.3\% \\
-AIME24 ref6 & TriAttention & 384 & 88.3\% & 98.9\% & 0.383 & 8.7 & 61.6\% \\
-AIME24 ref6 & \textbf{CASK} & 384 & \textbf{90.8\%} & \textbf{99.7\%} & \textbf{0.268} & 8.7 & 61.6\% \\
+AIME24 ref6 & TriAttention & 384 & 88.2\% & 98.9\% & 0.383 & 8.7 & 61.6\% \\
+AIME24 ref6 & \textbf{CASK} & 384 & \textbf{90.7\%} & \textbf{99.7\%} & \textbf{0.268} & 8.7 & 61.6\% \\
 AIME24 ref6 & TriAttention & 512 & 89.4\% & 99.1\% & 0.333 & 8.7 & 43.6\% \\
 AIME24 ref6 & \textbf{CASK} & 512 & \textbf{91.7\%} & \textbf{99.9\%} & \textbf{0.233} & 8.7 & 43.5\% \\
 AIME25 ref6 & TriAttention & 256 & 85.7\% & 97.8\% & \textbf{0.500} & 17.5 & 63.4\% \\
 AIME25 ref6 & \textbf{CASK} & 256 & \textbf{86.8\%} & \textbf{97.9\%} & 0.504 & 17.5 & 55.9\% \\
-AIME25 ref6 & TriAttention & 384 & 89.1\% & 98.7\% & 0.356 & 17.5 & 59.6\% \\
-AIME25 ref6 & \textbf{CASK} & 384 & \textbf{90.3\%} & \textbf{99.1\%} & \textbf{0.315} & 17.5 & 52.1\% \\
+AIME25 ref6 & TriAttention & 384 & 89.1\% & 98.8\% & 0.357 & 18.2 & 59.5\% \\
+AIME25 ref6 & \textbf{CASK} & 384 & \textbf{90.3\%} & \textbf{99.1\%} & \textbf{0.313} & 18.2 & 63.3\% \\
 AIME25 ref6 & TriAttention & 512 & 89.9\% & 99.0\% & 0.321 & 17.5 & 44.8\% \\
 AIME25 ref6 & \textbf{CASK} & 512 & \textbf{91.7\%} & \textbf{99.6\%} & \textbf{0.254} & 17.5 & 37.2\% \\
 \bottomrule
@@ -822,6 +822,25 @@ The first term reads as within-group $\kappa$-dispersion, and the second as lost
 
 
 This appendix is a space for preserving raw replay audits removed from the main text. The tables below are not tables constituting the main text claim's headline but are needed for appendix-level transparency and audit trail.
+
+
+Raw experiment data are intentionally preserved outside the main PDF tables. For each headline package, the repository keeps three layers in sync: (1) compact paper-facing summaries under \texttt{artifacts/}, (2) command provenance in \texttt{artifacts/COMMAND\_MAP.md} and package manifests, and (3) raw JSON/CSV/eval/reference roots under \texttt{experiments/frontier/}, \texttt{experiments/outputs/}, and \texttt{experiments/longbench\_h100\_*}. The role of Appendix C is therefore not to duplicate every raw file inside the PDF, but to preserve the measured counts and audit matrices needed to read the claim honestly while keeping the full raw trail accessible and citable from the repository.
+
+
+\subsection{Raw provenance map}
+
+
+The main paper-facing packages and their raw back-pointers are:
+
+
+\begin{itemize}
+\item \textbf{Reasoning replay gate}: packaged summaries in \texttt{artifacts/h100\_2026\_04\_10/cask\_h100\_fidelity/}, command manifests in \texttt{experiments/frontier/Qwen3-8B/h100\_aime24\_fidelity\_gate\_20260410/} and \texttt{.../h100\_aime25\_fidelity\_gate\_20260410/}, and raw full-KV references in \texttt{experiments/outputs/aime24/...} and \texttt{experiments/outputs/aime25/...}.
+\item \textbf{Prompt-heavy replay package}: packaged readouts in \texttt{artifacts/h100\_2026\_04\_11/}, per-task replay manifests in \texttt{experiments/frontier/Qwen3-8B/h100\_promptheavy\_twostage\_rerun\_20260411\_*}, and raw reference/output trees in \texttt{experiments/longbench\_h100\_refs/}.
+\item \textbf{Actual-output bridge}: packaged summaries in \texttt{artifacts/h100\_2026\_04\_11/cask\_h100\_actual\_bridge/}, bridge metrics in \texttt{experiments/frontier/Qwen3-8B/h100\_actual\_bridge\_metrics\_20260411/}, and raw generation/eval trees in \texttt{experiments/longbench\_h100\_actual\_bridge\_20260411/}.
+\end{itemize}
+
+
+In practice, a reader should start from the packaged summary row, follow its \texttt{source\_json} or \texttt{source\_eval\_json} field, and then use \texttt{artifacts/COMMAND\_MAP.md} to recover the exact script, manifest, and raw directory that generated it.
 
 
 \begin{figure}[t]
