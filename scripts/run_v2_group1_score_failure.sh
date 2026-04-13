@@ -16,6 +16,7 @@ NUM_SAMPLES="${NUM_SAMPLES:-1}"
 BUDGET="${BUDGET:-384}"
 TAG_PREFIX="${TAG_PREFIX:-v2_group1}"
 DUMP_ROOT="${DUMP_ROOT:-experiments/analysis/v2/group1}"
+MAX_PARALLEL="${MAX_PARALLEL:-1}"
 
 REF_TAG="${TAG_PREFIX}_ref_${DATASET}"
 TRI_TAG="${TAG_PREFIX}_tri${BUDGET}_${DATASET}"
@@ -28,6 +29,40 @@ CASK_DUMP_DIR="${DUMP_ROOT}/${DATASET}_cask"
 
 mkdir -p "$TRI_DUMP_DIR" "$HORIZON_DUMP_DIR" "$CASK_DUMP_DIR"
 
+PIDS=()
+
+refresh_pids() {
+  local live=()
+  for pid in "${PIDS[@]:-}"; do
+    if kill -0 "$pid" 2>/dev/null; then
+      live+=("$pid")
+    fi
+  done
+  PIDS=("${live[@]:-}")
+}
+
+run_with_limit() {
+  "$@" &
+  PIDS+=("$!")
+  while ((${#PIDS[@]} >= MAX_PARALLEL)); do
+    wait -n
+    refresh_pids
+  done
+}
+
+wait_all() {
+  local failed=0
+  for pid in "${PIDS[@]:-}"; do
+    if ! wait "$pid"; then
+      failed=1
+    fi
+  done
+  PIDS=()
+  if ((failed != 0)); then
+    return 1
+  fi
+}
+
 "$PYTHON_BIN" scripts/cli.py run-one \
   --model "$MODEL_ALIAS" \
   --dataset "$DATASET" \
@@ -38,7 +73,7 @@ mkdir -p "$TRI_DUMP_DIR" "$HORIZON_DUMP_DIR" "$CASK_DUMP_DIR"
   --attn-implementation "$ATTN_IMPL" \
   --load-dtype "$DTYPE"
 
-"$PYTHON_BIN" scripts/cli.py run-one \
+run_with_limit "$PYTHON_BIN" scripts/cli.py run-one \
   --model "$MODEL_ALIAS" \
   --dataset "$DATASET" \
   --method triattention \
@@ -52,7 +87,7 @@ mkdir -p "$TRI_DUMP_DIR" "$HORIZON_DUMP_DIR" "$CASK_DUMP_DIR"
   --score-dump-dir "$TRI_DUMP_DIR" \
   --score-dump-max-events 16
 
-"$PYTHON_BIN" scripts/cli.py run-one \
+run_with_limit "$PYTHON_BIN" scripts/cli.py run-one \
   --model "$MODEL_ALIAS" \
   --dataset "$DATASET" \
   --method horizonkv \
@@ -68,7 +103,7 @@ mkdir -p "$TRI_DUMP_DIR" "$HORIZON_DUMP_DIR" "$CASK_DUMP_DIR"
   --score-dump-dir "$HORIZON_DUMP_DIR" \
   --score-dump-max-events 16
 
-"$PYTHON_BIN" scripts/cli.py run-one \
+run_with_limit "$PYTHON_BIN" scripts/cli.py run-one \
   --model "$MODEL_ALIAS" \
   --dataset "$DATASET" \
   --method cask \
@@ -81,6 +116,8 @@ mkdir -p "$TRI_DUMP_DIR" "$HORIZON_DUMP_DIR" "$CASK_DUMP_DIR"
   --load-dtype "$DTYPE" \
   --score-dump-dir "$CASK_DUMP_DIR" \
   --score-dump-max-events 16
+
+wait_all
 
 "$PYTHON_BIN" scripts/diff_score_dumps.py \
   --baseline-dir "$TRI_DUMP_DIR" \

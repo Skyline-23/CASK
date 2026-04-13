@@ -17,11 +17,47 @@ MAX_RECORDS="${MAX_RECORDS:-6}"
 BUDGET="${BUDGET:-384}"
 TAG_PREFIX="${TAG_PREFIX:-v2_group2}"
 ANALYSIS_ROOT="${ANALYSIS_ROOT:-experiments/analysis/v2/group2}"
+MAX_PARALLEL="${MAX_PARALLEL:-1}"
+SAMPLE_TAG="sample${NUM_SAMPLES}"
 
 REF_TAG="${TAG_PREFIX}_ref_${DATASET}"
-REF_MERGED="experiments/outputs/${DATASET}/${MODEL_ALIAS}/sample1/fullkv/full_${REF_TAG}/merged/merged.jsonl"
+REF_MERGED="experiments/outputs/${DATASET}/${MODEL_ALIAS}/${SAMPLE_TAG}/fullkv/full_${REF_TAG}/merged/merged.jsonl"
 
 mkdir -p "$ANALYSIS_ROOT"
+
+PIDS=()
+
+refresh_pids() {
+  local live=()
+  for pid in "${PIDS[@]:-}"; do
+    if kill -0 "$pid" 2>/dev/null; then
+      live+=("$pid")
+    fi
+  done
+  PIDS=("${live[@]:-}")
+}
+
+run_with_limit() {
+  "$@" &
+  PIDS+=("$!")
+  while ((${#PIDS[@]} >= MAX_PARALLEL)); do
+    wait -n
+    refresh_pids
+  done
+}
+
+wait_all() {
+  local failed=0
+  for pid in "${PIDS[@]:-}"; do
+    if ! wait "$pid"; then
+      failed=1
+    fi
+  done
+  PIDS=()
+  if ((failed != 0)); then
+    return 1
+  fi
+}
 
 "$PYTHON_BIN" scripts/cli.py run-one \
   --model "$MODEL_ALIAS" \
@@ -33,7 +69,7 @@ mkdir -p "$ANALYSIS_ROOT"
   --attn-implementation "$ATTN_IMPL" \
   --load-dtype "$DTYPE"
 
-"$PYTHON_BIN" scripts/replay_reference_fidelity.py \
+run_with_limit "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
   --reference "$REF_MERGED" \
   --model-path "$MODEL_PATH" \
   --method triattention \
@@ -45,7 +81,7 @@ mkdir -p "$ANALYSIS_ROOT"
   --json-output "${ANALYSIS_ROOT}/${DATASET}_triattention${BUDGET}.json" \
   --csv-output "${ANALYSIS_ROOT}/${DATASET}_triattention${BUDGET}.csv"
 
-"$PYTHON_BIN" scripts/replay_reference_fidelity.py \
+run_with_limit "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
   --reference "$REF_MERGED" \
   --model-path "$MODEL_PATH" \
   --method snapkv \
@@ -57,7 +93,7 @@ mkdir -p "$ANALYSIS_ROOT"
   --json-output "${ANALYSIS_ROOT}/${DATASET}_snapkv${BUDGET}.json" \
   --csv-output "${ANALYSIS_ROOT}/${DATASET}_snapkv${BUDGET}.csv"
 
-"$PYTHON_BIN" scripts/replay_reference_fidelity.py \
+run_with_limit "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
   --reference "$REF_MERGED" \
   --model-path "$MODEL_PATH" \
   --method cask \
@@ -70,7 +106,7 @@ mkdir -p "$ANALYSIS_ROOT"
   --json-output "${ANALYSIS_ROOT}/${DATASET}_cask_preserve_only${BUDGET}.json" \
   --csv-output "${ANALYSIS_ROOT}/${DATASET}_cask_preserve_only${BUDGET}.csv"
 
-"$PYTHON_BIN" scripts/replay_reference_fidelity.py \
+run_with_limit "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
   --reference "$REF_MERGED" \
   --model-path "$MODEL_PATH" \
   --method cask \
@@ -85,7 +121,7 @@ mkdir -p "$ANALYSIS_ROOT"
   --json-output "${ANALYSIS_ROOT}/${DATASET}_cask_fold_weakened${BUDGET}.json" \
   --csv-output "${ANALYSIS_ROOT}/${DATASET}_cask_fold_weakened${BUDGET}.csv"
 
-"$PYTHON_BIN" scripts/replay_reference_fidelity.py \
+run_with_limit "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
   --reference "$REF_MERGED" \
   --model-path "$MODEL_PATH" \
   --method cask \
@@ -96,3 +132,5 @@ mkdir -p "$ANALYSIS_ROOT"
   --load-dtype "$DTYPE" \
   --json-output "${ANALYSIS_ROOT}/${DATASET}_cask_full${BUDGET}.json" \
   --csv-output "${ANALYSIS_ROOT}/${DATASET}_cask_full${BUDGET}.csv"
+
+wait_all

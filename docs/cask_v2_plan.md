@@ -462,6 +462,13 @@ Primary entry points:
 This matters because v2 should be reproducible as a package, not as a sequence
 of one-off terminal sessions.
 
+The v2 helper scripts are Linux/Bash oriented and intended for the B200
+handoff. They share one pattern:
+
+1. run any shared reference step first
+2. fan out independent method or sweep jobs with `MAX_PARALLEL`
+3. join before summary or downstream packaging
+
 ### 12.1 Shared Environment For The Scale-Up Run
 
 All command templates below assume one shared environment block:
@@ -472,10 +479,15 @@ export MODEL_PATH=experiments/models/Qwen3-8B
 export STATS_PATH=cask/calibration/for_aime25_experiment/qwen3_8b.pt
 export DTYPE=bfloat16
 export ATTN_IMPL=sdpa
+export MAX_PARALLEL=4
 ```
 
 If the run is launched from another environment, the values should change, but
 the command structure should not.
+
+`MAX_PARALLEL` is intentionally explicit. The `run_v2_group*.sh` helpers use
+it to overlap independent replay jobs after the shared reference step. Raise it
+only to the point where the target machine still has stable memory headroom.
 
 ### 12.2 Group 1 Command Template: Scorer Failure Package
 

@@ -21,6 +21,7 @@ ANALYSIS_ROOT="${ANALYSIS_ROOT:-experiments/analysis/v2/group3}"
 CORE_RATIOS_STR="${CORE_RATIOS_STR:-0.35 0.50 0.65}"
 PREFIX_COVERAGES_STR="${PREFIX_COVERAGES_STR:-0.0 0.0625 0.125}"
 SIM_THRESHOLDS_STR="${SIM_THRESHOLDS_STR:-0.975 0.985 0.992}"
+MAX_PARALLEL="${MAX_PARALLEL:-1}"
 
 read -r -a CORE_RATIOS <<< "$CORE_RATIOS_STR"
 read -r -a PREFIX_COVERAGES <<< "$PREFIX_COVERAGES_STR"
@@ -28,9 +29,43 @@ read -r -a SIM_THRESHOLDS <<< "$SIM_THRESHOLDS_STR"
 
 mkdir -p "$ANALYSIS_ROOT"
 
+PIDS=()
+
+refresh_pids() {
+  local live=()
+  for pid in "${PIDS[@]:-}"; do
+    if kill -0 "$pid" 2>/dev/null; then
+      live+=("$pid")
+    fi
+  done
+  PIDS=("${live[@]:-}")
+}
+
+run_with_limit() {
+  "$@" &
+  PIDS+=("$!")
+  while ((${#PIDS[@]} >= MAX_PARALLEL)); do
+    wait -n
+    refresh_pids
+  done
+}
+
+wait_all() {
+  local failed=0
+  for pid in "${PIDS[@]:-}"; do
+    if ! wait "$pid"; then
+      failed=1
+    fi
+  done
+  PIDS=()
+  if ((failed != 0)); then
+    return 1
+  fi
+}
+
 for core_ratio in "${CORE_RATIOS[@]}"; do
   core_tag="$(printf '%s' "$core_ratio" | tr '.' '_')"
-  "$PYTHON_BIN" scripts/run_cask_frontier.py \
+  run_with_limit "$PYTHON_BIN" scripts/run_cask_frontier.py \
     --model "$MODEL_ALIAS" \
     --datasets "$REASONING_DATASET" \
     --methods cask \
@@ -45,6 +80,8 @@ for core_ratio in "${CORE_RATIOS[@]}"; do
     --cask-protected-core-ratio "$core_ratio"
 done
 
+wait_all
+
 "$PYTHON_BIN" scripts/run_promptheavy_pack.py \
   --tag "${TAG_PREFIX}_${PROMPT_TASK}" \
   --stage refs \
@@ -57,11 +94,11 @@ done
   --replay-inner-parallel 1 \
   --skip-existing
 
-PROMPT_REF="experiments/${TAG_PREFIX}_${PROMPT_TASK}_refs/longbench/Qwen3-8B/runs/${PROMPT_TASK}/merged/merged.jsonl"
+PROMPT_REF="experiments/${TAG_PREFIX}_${PROMPT_TASK}_refs/longbench/${MODEL_ALIAS}/runs/${PROMPT_TASK}/merged/merged.jsonl"
 
 for coverage in "${PREFIX_COVERAGES[@]}"; do
   coverage_tag="$(printf '%s' "$coverage" | tr '.' '_')"
-  "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
+  run_with_limit "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
     --reference "$PROMPT_REF" \
     --model-path "$MODEL_PATH" \
     --method cask \
@@ -78,9 +115,11 @@ for coverage in "${PREFIX_COVERAGES[@]}"; do
     --csv-output "${ANALYSIS_ROOT}/${PROMPT_TASK}_coverage_${coverage_tag}.csv"
 done
 
+wait_all
+
 for threshold in "${SIM_THRESHOLDS[@]}"; do
   threshold_tag="$(printf '%s' "$threshold" | tr '.' '_')"
-  "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
+  run_with_limit "$PYTHON_BIN" scripts/replay_reference_fidelity.py \
     --reference "$PROMPT_REF" \
     --model-path "$MODEL_PATH" \
     --method cask \
@@ -96,3 +135,5 @@ for threshold in "${SIM_THRESHOLDS[@]}"; do
     --json-output "${ANALYSIS_ROOT}/${PROMPT_TASK}_similarity_${threshold_tag}.json" \
     --csv-output "${ANALYSIS_ROOT}/${PROMPT_TASK}_similarity_${threshold_tag}.csv"
 done
+
+wait_all
