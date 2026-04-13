@@ -201,15 +201,61 @@ The current `multi_news`, `qasper`, and one reasoning task are acceptable as a
 base, but v2 should present them as a deliberate bridge set, not scattered
 supporting evidence.
 
-## 7. H100 Priority Order
+## 7. V2 Evidence Requirements
 
-The H100 queue should not be spent uniformly. The order matters.
+V2 should not be justified by "more scale" in the abstract. Every new run
+must strengthen one concrete evidence requirement that a stronger submission is
+expected to satisfy.
+
+| Evidence requirement | Why it matters | What must be added in v2 |
+| --- | --- | --- |
+| principled folding story | the paper must explain why folding is the main behavior-preserving primitive, not just a useful implementation choice | representative-mass recovery, representative-error diagnostics, and collapse-boundary analysis |
+| clear method separation | the paper must show that CASK is more than a small merge-policy variant | discard vs preserve-only vs preserve+fold ablation, plus one external merge-style baseline |
+| faithful evaluation bridge | replay fidelity must be connected to actual model behavior rather than left as an isolated proxy | explicit replay-to-actual bridge set with one reasoning bridge, one same-budget prompt-heavy bridge, and one budget-crossing bridge |
+| breadth beyond selected witnesses | the package must read as a structured study rather than a handful of favorable cases | block-structured sweeps across reasoning and prompt-heavy regimes, plus one second-model stress point |
+| interpretable policy controls | core/scratch decomposition and folding knobs must look stable and understandable rather than arbitrary | sensitivity map for core ratio, merge strength, and prefix reserve with narrow interpretable sweeps |
+
+If a new experiment does not strengthen one of these rows, it is not v2-critical.
+
+### 7.1 Translation Rule
+
+This plan should encode defense requirements, not anticipated criticism in
+reviewer language. The document should answer questions like:
+
+1. what evidence makes folding look principled?
+2. what evidence makes CASK look structurally distinct?
+3. what evidence makes replay metrics defensible?
+4. what evidence makes the package look broad rather than witness-picked?
+5. what evidence makes the policy controls interpretable?
+
+That is the right tone for a working paper plan. It keeps the document
+submission-oriented without turning it into a list of negative talking points.
+
+## 8. B200 Scale-Up Priority Order
+
+The B200 budget should be spent to close review risks in order, not to inflate
+row count uniformly.
+
+### Tier 0: Protocol Lock Before Any Large Run
+
+Before launching the scaled package, lock the following:
+
+1. primary reasoning metric: teacher-forced replay fidelity vs full-KV
+2. bridge metrics: official task metric, lexical overlap, semantic similarity
+3. main baselines: `triattention`, `cask`, `snapkv`
+4. main model: `Qwen3-8B`
+5. supplementary model: one DeepSeek distilled model as a stress-point, not a
+   full second matrix
+
+If these are not frozen first, the B200 run will create more ambiguity than
+evidence.
 
 ### Tier 1: Must-run
 
-1. scorer failure study
-2. discard vs fold ablation
-3. structure sensitivity on one reasoning slice and one prompt-heavy slice
+1. Block A: scorer failure study
+2. Block B: discard vs fold ablation
+3. Block C: structure sensitivity on one reasoning slice and one prompt-heavy
+   slice
 
 Without these, v2 is still just a broader v1.
 
@@ -229,59 +275,547 @@ These improve defense, but they are not the conceptual core.
 
 These help least relative to cost.
 
-## 8. What Not To Do
+## 9. B200 Execution Package
 
-To avoid burning H100 time, do not spend the next round on the following:
+The scaled package should be split into five run groups. The goal is not to run
+everything at once. The goal is to finish the highest-value block first and
+freeze it before moving on.
 
-1. More scorer variants without keep-set churn analysis
-2. More witness rows that do not isolate a new regime
-3. Pure sample-count expansion without structure ablations
-4. Cosmetic figure work before the v2 core blocks land
+### Group 1. Scorer Failure Package
+
+Purpose:
+convert Phase 1 into an explicit negative result.
+
+Required comparison:
+
+- `triattention`
+- `horizonkv`
+- any retained scorer-side variant already in-tree
+
+Required outputs:
+
+1. keep-set overlap / churn
+2. critical-token movement
+3. score delta vs set delta
+
+This group closes the "why not just improve the scorer?" objection.
+
+### Group 2. Discard vs Fold Package
+
+Purpose:
+make folding the central mechanism rather than a hidden implementation detail.
+
+Required rows:
+
+- `triattention`
+- preserve-only degraded variant
+- fold-only or weakened-fold variant
+- `cask`
+- `snapkv`
+
+Required outputs:
+
+1. replay fidelity
+2. representative mass recovery
+3. saved ratio
+4. collapse diagnostics on at least one failure-boundary task
+
+This group is the centerpiece of v2.
+
+### Group 3. Structure Sensitivity Package
+
+Purpose:
+show that the method is understandable and not arbitrary.
+
+Minimum sweeps:
+
+- core ratio
+- merge threshold or merge strength
+- stage-1 prefix reserve
+
+Required tasks:
+
+- one reasoning slice
+- one prompt-heavy slice
+
+Do not spread this over many tasks. The point is interpretability, not breadth.
+
+### Group 4. Breadth Package
+
+Purpose:
+remove the "selected witness" criticism.
+
+Minimum matrix:
+
+- reasoning: `aime24`, `aime25`, `math500`
+- prompt-heavy: `qasper`, `hotpotqa`, `multi_news`, `musique`, `2wikimqa`
+- probes: `vcsum`, `qmsum`, `gov_report`
+- model: `Qwen3-8B`
+- baselines: `triattention`, `cask`, `snapkv`
+
+This group should be read as breadth support, not as the main conceptual block.
+
+### Group 5. Bridge Package
+
+Purpose:
+show that replay gains are not disconnected from actual generation.
+
+Required bridges:
+
+1. one reasoning-side bridge
+2. one same-budget prompt-heavy bridge
+3. one budget-crossing bridge
+
+Current candidates:
+
+- reasoning-side: strongest stable AIME witness from the scaled replay gate
+- same-budget prompt-heavy: `multi_news`
+- budget crossing: `qasper`
+
+This group is necessary to defend replay, but it should remain smaller than the
+replay package itself.
+
+## 10. Minimum Matrix Needed To Upgrade The Submission
+
+The submission should not be upgraded from the current v1 package to v2 unless
+all of the following are true.
+
+### 10.1 Ranking Critique Is Explicitly Closed
+
+Required:
+
+1. a scorer-failure block exists
+2. the paper can show that score changes are larger than keep-set changes
+3. this result is placed in the main paper, not buried in appendix history
+
+### 10.2 Folding Is Shown To Be The Main Lever
+
+Required:
+
+1. discard vs preserve-only vs preserve+fold appears in one central table or
+   figure
+2. representative-mass recovery is reported alongside fidelity
+3. `snapkv` is included in at least one central comparison block
+
+### 10.3 Breadth Is No Longer Witness-Only
+
+Required:
+
+1. full reasoning replay block on `aime24`, `aime25`, `math500`
+2. full prompt-heavy replay block on the current main witness set
+3. one second-model stress point
+
+### 10.4 Replay Is Defended By Bridge Evidence
+
+Required:
+
+1. one reasoning actual-generation bridge
+2. one same-budget prompt-heavy bridge
+3. one budget-crossing bridge
+
+If any of these are missing, the paper is still closer to strengthened v1 than
+to true v2.
+
+## 11. Stop Rules For The B200 Queue
+
+The queue should not be allowed to grow without decision checkpoints.
+
+### Stop Rule A
+
+If Group 1 fails to show a meaningful scorer-failure story, do not keep adding
+scorer variants. Pivot all remaining time to Group 2 and Group 4.
+
+### Stop Rule B
+
+If Group 2 does not show a clear discard-vs-fold separation, v2 loses its
+center and should not be pitched as a primitive shift.
+
+### Stop Rule C
+
+If Group 4 only reproduces current witness behavior without broadening the same
+trend, the venue target should be reduced rather than hidden behind more plots.
+
+### Stop Rule D
+
+If Group 5 fails to produce at least one clean reasoning bridge and one clean
+prompt-heavy bridge, replay must remain a defended internal metric rather than
+a headline claim.
+
+## 12. Script-Level Execution Path
+
+The scaled package should use the current generic runners instead of ad hoc
+host-specific queues.
+
+Primary entry points:
+
+1. `scripts/run_replay_fidelity_frontier.py` for replay blocks
+2. `scripts/run_promptheavy_pack.py` for prompt-heavy reference + replay packs
+3. `scripts/run_kv_benchmark_bundle.py` for broader benchmark bundles
+4. `scripts/run_qwen3_frontier_preset.py` for conservative single-device
+   frontier presets
+5. `scripts/run_replay_queue.ps1` when a replay block needs queued JSON-driven
+   execution on Windows
+6. `scripts/run_v2_group1_score_failure.sh` for the scorer-failure package
+7. `scripts/run_v2_group2_fold_ablation.sh` for the discard-vs-fold package
+8. `scripts/run_v2_group3_sensitivity.sh` for the narrow sensitivity package
+
+This matters because v2 should be reproducible as a package, not as a sequence
+of one-off terminal sessions.
+
+### 12.1 Shared Environment For The Scale-Up Run
+
+All command templates below assume one shared environment block:
+
+```bash
+export MODEL_ALIAS=Qwen3-8B
+export MODEL_PATH=experiments/models/Qwen3-8B
+export STATS_PATH=cask/calibration/for_aime25_experiment/qwen3_8b.pt
+export DTYPE=bfloat16
+export ATTN_IMPL=sdpa
+```
+
+If the run is launched from another environment, the values should change, but
+the command structure should not.
+
+### 12.2 Group 1 Command Template: Scorer Failure Package
+
+The goal of Group 1 is not to chase accuracy directly. It is to measure how
+much scorer changes actually move the selected set.
+
+Step 1: generate or reuse a compact full-KV reference slice.
+
+```bash
+python scripts/cli.py run-one \
+  --model "$MODEL_ALIAS" \
+  --dataset aime24 \
+  --method fullkv \
+  --run-tag v2_group1_ref_aime24 \
+  --max-examples 6 \
+  --num-samples 1 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE"
+```
+
+Step 2: run score-dump variants on the same slice.
+
+```bash
+python scripts/cli.py run-one \
+  --model "$MODEL_ALIAS" \
+  --dataset aime24 \
+  --method triattention \
+  --budget 384 \
+  --stats-path "$STATS_PATH" \
+  --run-tag v2_group1_tri384 \
+  --max-examples 6 \
+  --num-samples 1 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --score-dump-dir experiments/analysis/v2/group1/aime24_triattention \
+  --score-dump-max-events 16
+
+python scripts/cli.py run-one \
+  --model "$MODEL_ALIAS" \
+  --dataset aime24 \
+  --method horizonkv \
+  --budget 384 \
+  --stats-path "$STATS_PATH" \
+  --run-tag v2_group1_horizon384 \
+  --max-examples 6 \
+  --num-samples 1 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --triattention-horizon-mode adaptive \
+  --triattention-norm-mode rms2 \
+  --score-dump-dir experiments/analysis/v2/group1/aime24_horizonkv \
+  --score-dump-max-events 16
+
+python scripts/cli.py run-one \
+  --model "$MODEL_ALIAS" \
+  --dataset aime24 \
+  --method cask \
+  --budget 384 \
+  --stats-path "$STATS_PATH" \
+  --run-tag v2_group1_cask384 \
+  --max-examples 6 \
+  --num-samples 1 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --score-dump-dir experiments/analysis/v2/group1/aime24_cask \
+  --score-dump-max-events 16
+```
+
+Step 3: summarize the resulting dumps.
+
+```bash
+python scripts/diff_score_dumps.py \
+  --baseline-dir experiments/analysis/v2/group1/aime24_triattention \
+  --candidate-dir experiments/analysis/v2/group1/aime24_horizonkv \
+  --json-output experiments/analysis/v2/group1/aime24_tri_vs_horizonkv.json
+
+python scripts/summarize_selection_dumps.py \
+  --dump-dir experiments/analysis/v2/group1/aime24_cask \
+  --json-output experiments/analysis/v2/group1/aime24_cask_selection_summary.json
+```
+
+The output of this block should be interpreted as:
+
+1. score-family deltas
+2. set-level overlap or churn
+3. whether CASK selection changes are larger than scorer-only changes
+
+### 12.3 Group 2 Command Template: Discard vs Fold Package
+
+The goal of Group 2 is to show that folding, not just protected selection, is
+the main behavior-preserving lever.
+
+The current codebase already supports an executable approximation of the
+required rows:
+
+| Row name in the paper | Current implementation mapping |
+| --- | --- |
+| discard-only baseline | `--method triattention` |
+| external merge baseline | `--method snapkv` |
+| preserve-only degraded CASK | `--method cask --cask-decode-merge-enabled false` |
+| fold-weakened CASK | `--method cask --cask-merge-operator mean --cask-representative-mode weighted_latest --cask-use-phase-markers false` |
+| full CASK | `--method cask` with current defaults |
+
+Important note:
+the preserve-only row is an executable degraded in-code variant, not an oracle
+policy. That is acceptable for v2 as long as the paper describes it honestly.
+
+Reference generation:
+
+```bash
+python scripts/cli.py run-one \
+  --model "$MODEL_ALIAS" \
+  --dataset aime24 \
+  --method fullkv \
+  --run-tag v2_group2_ref_aime24 \
+  --max-examples 6 \
+  --num-samples 1 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE"
+```
+
+Replay fidelity rows:
+
+```bash
+python scripts/replay_reference_fidelity.py \
+  --reference experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_v2_group2_ref_aime24/merged/merged.jsonl \
+  --model-path "$MODEL_PATH" \
+  --method triattention \
+  --budget 384 \
+  --triattention-stats-file "$STATS_PATH" \
+  --max-records 6 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --json-output experiments/analysis/v2/group2/aime24_triattention384.json \
+  --csv-output experiments/analysis/v2/group2/aime24_triattention384.csv
+
+python scripts/replay_reference_fidelity.py \
+  --reference experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_v2_group2_ref_aime24/merged/merged.jsonl \
+  --model-path "$MODEL_PATH" \
+  --method snapkv \
+  --budget 384 \
+  --triattention-stats-file "$STATS_PATH" \
+  --max-records 6 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --json-output experiments/analysis/v2/group2/aime24_snapkv384.json \
+  --csv-output experiments/analysis/v2/group2/aime24_snapkv384.csv
+
+python scripts/replay_reference_fidelity.py \
+  --reference experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_v2_group2_ref_aime24/merged/merged.jsonl \
+  --model-path "$MODEL_PATH" \
+  --method cask \
+  --budget 384 \
+  --triattention-stats-file "$STATS_PATH" \
+  --max-records 6 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --cask-decode-merge-enabled false \
+  --json-output experiments/analysis/v2/group2/aime24_cask_preserve_only384.json \
+  --csv-output experiments/analysis/v2/group2/aime24_cask_preserve_only384.csv
+
+python scripts/replay_reference_fidelity.py \
+  --reference experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_v2_group2_ref_aime24/merged/merged.jsonl \
+  --model-path "$MODEL_PATH" \
+  --method cask \
+  --budget 384 \
+  --triattention-stats-file "$STATS_PATH" \
+  --max-records 6 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --cask-merge-operator mean \
+  --cask-representative-mode weighted_latest \
+  --cask-use-phase-markers false \
+  --json-output experiments/analysis/v2/group2/aime24_cask_fold_weakened384.json \
+  --csv-output experiments/analysis/v2/group2/aime24_cask_fold_weakened384.csv
+
+python scripts/replay_reference_fidelity.py \
+  --reference experiments/outputs/aime24/Qwen3-8B/sample1/fullkv/full_v2_group2_ref_aime24/merged/merged.jsonl \
+  --model-path "$MODEL_PATH" \
+  --method cask \
+  --budget 384 \
+  --triattention-stats-file "$STATS_PATH" \
+  --max-records 6 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --json-output experiments/analysis/v2/group2/aime24_cask_full384.json \
+  --csv-output experiments/analysis/v2/group2/aime24_cask_full384.csv
+```
+
+This block should be read together with:
+
+1. replay fidelity
+2. terminal saved ratio
+3. representative-mass diagnostics from selection dumps
+
+### 12.4 Group 3 Command Template: Structure Sensitivity Package
+
+The goal of Group 3 is not to maximize performance. The goal is to show that
+the policy knobs behave in understandable ways.
+
+Recommended reasoning slice:
+
+- `aime24`
+
+Recommended prompt-heavy slice:
+
+- `multi_news`
+
+Current executable sweep axes:
+
+| Axis | CLI flag | Recommended values |
+| --- | --- | --- |
+| core ratio | `--cask-protected-core-ratio` | `0.35`, `0.50`, `0.65` |
+| prefix reserve | `--cask-prefix-coverage-ratio` | `0.0`, `0.0625`, `0.125` |
+| merge strictness | `--cask-similarity-threshold` | `0.975`, `0.985`, `0.992` |
+
+Reasoning-side template:
+
+```bash
+python scripts/run_cask_frontier.py \
+  --model "$MODEL_ALIAS" \
+  --datasets aime24 \
+  --methods cask \
+  --budgets 384 \
+  --frontier-tag v2_group3_aime24_core035 \
+  --stats-path "$STATS_PATH" \
+  --num-samples 1 \
+  --max-examples 6 \
+  --job-parallel 1 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --cask-protected-core-ratio 0.35
+```
+
+Prompt-heavy template:
+
+```bash
+python scripts/run_promptheavy_pack.py \
+  --tag v2_group3_multi_news_cov0125 \
+  --stage all \
+  --main-tasks multi_news \
+  --methods triattention cask snapkv \
+  --budgets 384 \
+  --max-examples 1 \
+  --max-records 1 \
+  --ref-parallel 1 \
+  --replay-parallel 1 \
+  --replay-inner-parallel 1
+```
+
+When the prompt-heavy axis is the object of study, use direct replay commands
+after the reference step to inject the exact CASK knob being swept, for example:
+
+```bash
+python scripts/replay_reference_fidelity.py \
+  --reference experiments/v2_group3_multi_news_cov0125_refs/longbench/Qwen3-8B/runs/multi_news/merged/merged.jsonl \
+  --model-path "$MODEL_PATH" \
+  --method cask \
+  --budget 384 \
+  --triattention-stats-file "$STATS_PATH" \
+  --max-records 1 \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE" \
+  --count-prompt-tokens true \
+  --slack-budget-trigger true \
+  --allow-prefill-compression false \
+  --cask-prefix-coverage-ratio 0.125 \
+  --json-output experiments/analysis/v2/group3/multi_news_cask_cov0125.json \
+  --csv-output experiments/analysis/v2/group3/multi_news_cask_cov0125.csv
+```
+
+The same pattern should be repeated for the selected values of each axis rather
+than hidden inside one giant mixed sweep.
+
+### 12.5 Packaging Rule
+
+For B200 execution, every completed group should emit:
+
+1. a manifest or command log
+2. compact CSV/JSON summaries
+3. one short readout note stating whether the group closed its intended
+   evidence requirement
+
+If a block finishes without that packaging step, it is not ready to inform the
+paper.
+
+## 13. What Not To Do
+
+To avoid burning B200 time, do not spend the next round on the following:
+
+1. more scorer variants without keep-set churn analysis
+2. more witness rows that do not isolate a new regime
+3. pure sample-count expansion without structure ablations
+4. cosmetic figure work before the v2 core blocks land
+5. full second-model duplication before the `Qwen3-8B` v2 center closes
 
 The current bottleneck is not presentation polish. It is causal closure.
 
-## 9. Proposed V2 Paper Outline
+## 14. Proposed V2 Paper Outline
 
 The paper structure should shift accordingly.
 
-### 9.1 Introduction
+### 14.1 Introduction
 
 - Current methods over-emphasize ranking/eviction.
 - Phase 1 showed scorer refinement has limited leverage.
 - We instead treat reasoning KV compression as structured consolidation.
 
-### 9.2 Failure of Ranking-Centric Compression
+### 14.2 Failure of Ranking-Centric Compression
 
 - scorer invariance
 - limited keep-set churn
 - why better scoring is not enough
 
-### 9.3 CASK as Structured Consolidation
+### 14.3 CASK as Structured Consolidation
 
 - core vs scratch
 - folding / representative states
 - two-stage handling for prompt-heavy regimes
 
-### 9.4 Diagnostics and Behavior Preservation
+### 14.4 Diagnostics and Behavior Preservation
 
 - representative mass
 - kappa-dispersion
 - collapse conditions
 
-### 9.5 Experiments
+### 14.5 Experiments
 
 - Block A: scorer failure
 - Block B: discard vs fold
 - Block C: sensitivity / regime decomposition
 - Block D: replay -> actual bridge
 
-### 9.6 Discussion
+### 14.6 Discussion
 
 - what CASK does solve
 - what remains boundary-limited
 - where discard-only methods still remain competitive
 
-## 10. V2 Success Criteria
+## 15. V2 Success Criteria
 
 V2 should be considered ready only if the paper can defend all four questions:
 
@@ -292,17 +826,20 @@ V2 should be considered ready only if the paper can defend all four questions:
 
 If any of these remain answered only by intuition, v2 is not finished.
 
-## 11. Immediate Action Items
+## 16. Immediate Action Items
 
 The next concrete actions should be:
 
-1. Define exact H100 commands for Block A, Block B, and Block C.
-2. Decide one reasoning slice and one prompt-heavy slice for sensitivity runs.
-3. Promote Phase 1 keep-set churn analysis from background note to main
-   artifact.
-4. Draft the new v2 outline in the paper source before launching all runs.
+1. Define exact B200 commands for Group 1, Group 2, and Group 3.
+2. Freeze one reasoning slice and one prompt-heavy slice for the sensitivity
+   package.
+3. Promote Phase 1 keep-set churn analysis from background note to a tracked
+   main artifact.
+4. Define the discard-only / preserve-only / fold-enabled ablation rows before
+   launching the scale-up run.
+5. Draft the new v2 outline in the paper source before launching all runs.
 
-## 12. Final Read
+## 17. Final Read
 
 V1 is already submit-able as a credible paper package.
 V2 should not be interpreted as "the same paper with more data."
