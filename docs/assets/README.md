@@ -1,6 +1,6 @@
-# H100 Figure Pack
+# CASK Paper Figure Pack
 
-This directory stores the current paper-facing figure pack generated from the tracked H100 artifact summaries.
+This directory stores the current paper-facing figure pack generated from the tracked CASK artifact summaries.
 
 ## Files
 

@@ -1,6 +1,6 @@
 # DeepSeek-R1-Distill-Llama-8B Historical TriAttention Automation
 
-This directory is kept for the historical TriAttention baseline workflow. For the current paper-facing CASK workflow, prefer the repo-level commands in the top-level `README.md`, `README.md`, and `scripts/run_kv_benchmark_bundle.py`.
+This directory is kept for the historical TriAttention baseline workflow. For the current paper-facing CASK workflow, prefer the repo-level guides in the top-level `README.md`, `docs/promptheavy_pack.md`, and `scripts/run_kv_benchmark_bundle.py`.
 
 This folder mirrors the standard `experiments/scripts` helpers, but is pre-filtered for the `DeepSeek-R1-Distill-Llama-8B` model so you can recycle the same workflows while staying focused on the new checkpoints. The scripts all respect two env vars:
 
