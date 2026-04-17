@@ -28,6 +28,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from compare_experiment_runs import load_jsonl, resolve_merged_jsonl_path
+from cask.integration.monkeypatch import replace_llama, replace_qwen2, replace_qwen3
 from worker import (
     build_cask_phase_marker_token_ids,
     configure_tokenizer,
@@ -52,7 +53,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--method",
         required=True,
-        choices=["fullkv", "triattention", "horizonkv", "cask"],
+        choices=["fullkv", "triattention", "horizonkv", "cask", "r1kv", "snapkv", "expectedattention"],
         help="Candidate method to replay under.",
     )
     parser.add_argument("--budget", type=int, default=None, help="KV budget for candidate method.")
@@ -81,6 +82,17 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument("--window-size", type=int, default=8)
+    parser.add_argument("--first-tokens", type=int, default=4)
+    parser.add_argument("--mix-lambda", type=float, default=0.1)
+    parser.add_argument("--retain-ratio", type=float, default=0.2)
+    parser.add_argument("--update-kv", type=str2bool, default=True)
+    parser.add_argument("--fp32-topk", type=str2bool, default=False)
+    parser.add_argument("--protect-prefill", type=str2bool, default=False)
+    parser.add_argument(
+        "--retain-direction",
+        choices=["last", "first"],
+        default="last",
+    )
     parser.add_argument("--divide-length", type=int, default=128)
     parser.add_argument("--slack-budget-trigger", type=str2bool, default=False)
     parser.add_argument("--count-prompt-tokens", type=str2bool, default=False)
@@ -162,12 +174,6 @@ def apply_candidate_method(
 
     if args.budget is None:
         raise ValueError(f"--budget is required for {method}.")
-    if args.triattention_stats_file is None:
-        raise ValueError(f"--triattention-stats-file is required for {method}.")
-
-    stats_path = resolve_under_rkv(args.triattention_stats_file)
-    if not stats_path.exists():
-        raise FileNotFoundError(f"TriAttention stats file not found: {stats_path}")
 
     local_model_path = Path(args.model_path)
     model_path_value: str | Path
@@ -175,6 +181,15 @@ def apply_candidate_method(
         model_path_value = local_model_path
     else:
         model_path_value = args.model_path.replace("\\", "/")
+
+    if method in {"triattention", "horizonkv", "cask"}:
+        if args.triattention_stats_file is None:
+            raise ValueError(f"--triattention-stats-file is required for {method}.")
+        stats_path = resolve_under_rkv(args.triattention_stats_file)
+        if not stats_path.exists():
+            raise FileNotFoundError(f"TriAttention stats file not found: {stats_path}")
+    else:
+        stats_path = None
 
     if method == "cask":
         from cask.methods.cask import apply_cask_patch
@@ -220,33 +235,75 @@ def apply_candidate_method(
         )
         return
 
-    from cask.methods.triattention import apply_triattention_patch
+    if method in {"triattention", "horizonkv"}:
+        from cask.methods.triattention import apply_triattention_patch
 
-    apply_triattention_patch(
-        model,
-        stats_path=stats_path,
-        model_path=model_path_value,
-        kv_budget=int(args.budget),
-        offset_max_length=args.triattention_frequency_window,
-        score_aggregation=args.triattention_score_aggregation,
-        pruning_seed=args.seed,
-        metadata_expectations={},
-        normalize_scores=args.triattention_normalize_scores,
-        count_prompt_tokens=args.count_prompt_tokens,
-        allow_prefill_compression=args.allow_prefill_compression,
-        divide_length=args.divide_length,
-        use_slack_trigger=args.slack_budget_trigger,
-        disable_mlr=args.disable_mlr,
-        disable_trig=args.disable_trig,
-        horizon_mode=args.triattention_horizon_mode,
-        norm_mode=args.triattention_norm_mode,
-        kernel_c_lambda=args.triattention_kernel_c_lambda,
-        kernel_s0=args.triattention_kernel_s0,
-        kernel_s1=args.triattention_kernel_s1,
-        norm_lambda=args.triattention_norm_lambda,
-        score_dump_dir=None,
-        score_dump_max_events=None,
-    )
+        apply_triattention_patch(
+            model,
+            stats_path=stats_path,
+            model_path=model_path_value,
+            kv_budget=int(args.budget),
+            offset_max_length=args.triattention_frequency_window,
+            score_aggregation=args.triattention_score_aggregation,
+            pruning_seed=args.seed,
+            metadata_expectations={},
+            normalize_scores=args.triattention_normalize_scores,
+            count_prompt_tokens=args.count_prompt_tokens,
+            allow_prefill_compression=args.allow_prefill_compression,
+            divide_length=args.divide_length,
+            use_slack_trigger=args.slack_budget_trigger,
+            disable_mlr=args.disable_mlr,
+            disable_trig=args.disable_trig,
+            horizon_mode=args.triattention_horizon_mode,
+            norm_mode=args.triattention_norm_mode,
+            kernel_c_lambda=args.triattention_kernel_c_lambda,
+            kernel_s0=args.triattention_kernel_s0,
+            kernel_s1=args.triattention_kernel_s1,
+            norm_lambda=args.triattention_norm_lambda,
+            score_dump_dir=None,
+            score_dump_max_events=None,
+        )
+        return
+
+    if method == "expectedattention":
+        method_config: Dict[str, Any] = {
+            "budget": int(args.budget),
+            "window_size": args.window_size,
+            "n_future_positions": args.expectedattention_n_future_positions,
+            "n_sink": args.expectedattention_n_sink,
+            "use_covariance": args.expectedattention_use_covariance,
+            "use_vnorm": args.expectedattention_use_vnorm,
+            "epsilon": args.expectedattention_epsilon,
+            "protect_prefill": args.protect_prefill,
+            "model_path": model_path_value,
+        }
+    else:
+        method_config = {
+            "budget": int(args.budget),
+            "window_size": args.window_size,
+            "mix_lambda": args.mix_lambda,
+            "retain_ratio": args.retain_ratio,
+            "retain_direction": args.retain_direction,
+            "first_tokens": args.first_tokens,
+            "fp32_topk": args.fp32_topk,
+            "protect_prefill": args.protect_prefill,
+        }
+
+    compression_config = {
+        "method": method,
+        "method_config": method_config,
+        "compression": None,
+        "update_kv": args.update_kv,
+    }
+    model_path_lower = str(args.model_path).lower()
+    if "llama" in model_path_lower:
+        replace_llama(compression_config)
+    elif "qwen3" in model_path_lower:
+        replace_qwen3(compression_config)
+    elif "qwen" in model_path_lower:
+        replace_qwen2(compression_config)
+    else:
+        raise ValueError(f"Unsupported model family for {method}: {args.model_path}")
 
 
 def get_active_compressor(model):
@@ -260,6 +317,7 @@ def get_runtime_summary(
     model,
     *,
     total_reference_tokens: int,
+    past_key_values=None,
 ) -> Dict[str, Any]:
     # At the final teacher-forced scoring step, the KV cache contains the replay
     # prefix plus all previously-consumed target tokens, but not the final target
@@ -267,17 +325,46 @@ def get_runtime_summary(
     active_reference_tokens = max(0, int(total_reference_tokens) - 1)
     compressor = get_active_compressor(model)
     if compressor is None:
+        cache_tokens = None
+        if past_key_values is not None:
+            for cache_attr in ("key_cache",):
+                cache_obj = getattr(past_key_values, cache_attr, None)
+                if isinstance(cache_obj, list) and cache_obj:
+                    layer_cache = cache_obj[0]
+                    if layer_cache is not None:
+                        cache_tokens = int(layer_cache.shape[-2])
+                        break
+            if cache_tokens is None and isinstance(past_key_values, (tuple, list)) and past_key_values:
+                first_layer = past_key_values[0]
+                if isinstance(first_layer, (tuple, list)) and first_layer:
+                    first_key = first_layer[0]
+                    if first_key is not None:
+                        cache_tokens = int(first_key.shape[-2])
+        if cache_tokens is None:
+            cache_tokens = int(active_reference_tokens)
         reference_saved_tokens = 0
         return {
-            "compression_events": 0,
-            "current_cache_tokens": int(active_reference_tokens),
+            "compression_events": None,
+            "current_cache_tokens": int(cache_tokens),
             "current_total_cardinality": int(active_reference_tokens),
-            "terminal_saved_tokens": 0,
-            "terminal_saved_ratio": 0.0,
-            "terminal_cache_ratio": 1.0,
-            "reference_terminal_saved_tokens": int(reference_saved_tokens),
-            "reference_terminal_saved_ratio": 0.0,
-            "reference_terminal_cache_ratio": 1.0,
+            "terminal_saved_tokens": max(0, int(active_reference_tokens) - int(cache_tokens)),
+            "terminal_saved_ratio": (
+                float(max(0, int(active_reference_tokens) - int(cache_tokens)) / active_reference_tokens)
+                if active_reference_tokens > 0
+                else 0.0
+            ),
+            "terminal_cache_ratio": (
+                float(int(cache_tokens) / active_reference_tokens) if active_reference_tokens > 0 else 1.0
+            ),
+            "reference_terminal_saved_tokens": max(0, int(active_reference_tokens) - int(cache_tokens)),
+            "reference_terminal_saved_ratio": (
+                float(max(0, int(active_reference_tokens) - int(cache_tokens)) / active_reference_tokens)
+                if active_reference_tokens > 0
+                else 0.0
+            ),
+            "reference_terminal_cache_ratio": (
+                float(int(cache_tokens) / active_reference_tokens) if active_reference_tokens > 0 else 1.0
+            ),
         }
 
     if hasattr(compressor, "get_runtime_summary"):

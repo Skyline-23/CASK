@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Tuple
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REPLAY_SCRIPT = REPO_ROOT / "scripts" / "replay_reference_fidelity.py"
 FRONTIER_ROOT = REPO_ROOT / "experiments" / "frontier"
-METHODS = ("fullkv", "triattention", "horizonkv", "cask", "snapkv")
+METHODS = ("fullkv", "triattention", "horizonkv", "cask", "snapkv", "r1kv", "expectedattention")
 
 
 def sanitize_tag(value: str) -> str:

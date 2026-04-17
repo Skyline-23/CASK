@@ -22,6 +22,24 @@ This immediately implies three consequences:
 3. Evaluation must explain when structured consolidation works, when it fails,
    and why.
 
+## 1.1 V2 Evidence Axes
+
+The v2 package should be organized around five evidence axes:
+
+1. `structure advantage`
+2. `model generalization`
+3. `regime map`
+4. `output bridge`
+5. `system package`
+
+The practical goal is to lock one sentence:
+
+> CASK gains are structural, not accidental to one scorer, one witness, or one
+> runtime slice.
+
+If a proposed run does not strengthen one of these five axes, it is not
+v2-critical.
+
 ## 2. What V1 Already Established
 
 The current package is not useless and should not be discarded. It already
@@ -252,18 +270,20 @@ evidence.
 
 ### Tier 1: Must-run
 
-1. Block A: scorer failure study
-2. Block B: discard vs fold ablation
-3. Block C: structure sensitivity on one reasoning slice and one prompt-heavy
-   slice
+1. structure advantage:
+   scorer failure study + discard vs fold ablation
+2. model generalization:
+   one different-family open model and one distilled stress-point
+3. regime map:
+   one reasoning slice and one prompt-heavy slice with active/boundary mapping
 
 Without these, v2 is still just a broader v1.
 
 ### Tier 2: Strongly recommended
 
-1. broader reasoning replay sweep
+1. output bridge thickening
 2. broader prompt-heavy regime sweep
-3. one extra non-TriAttention baseline if implementation cost is reasonable
+3. system readout on the bridge rows
 
 These improve defense, but they are not the conceptual core.
 
@@ -277,7 +297,7 @@ These help least relative to cost.
 
 ## 9. B200 Execution Package
 
-The scaled package should be split into five run groups. The goal is not to run
+The scaled package should be split into six run groups. The goal is not to run
 everything at once. The goal is to finish the highest-value block first and
 freeze it before moving on.
 
@@ -340,25 +360,48 @@ Required tasks:
 
 Do not spread this over many tasks. The point is interpretability, not breadth.
 
-### Group 4. Breadth Package
+### Group 4. Model Generalization Package
 
 Purpose:
-remove the "selected witness" criticism.
+remove the "one-model policy engineering" criticism.
 
 Minimum matrix:
 
+- models: `Qwen3-8B` + one different-family open model + one distilled
+  stress-point
 - reasoning: `aime24`, `aime25`, `math500`
-- prompt-heavy: `qasper`, `hotpotqa`, `multi_news`, `musique`, `2wikimqa`
-- probes: `vcsum`, `qmsum`, `gov_report`
-- model: `Qwen3-8B`
-- baselines: `triattention`, `cask`, `snapkv`
+- baselines: `triattention`, `cask`, `snapkv`, optionally `expectedattention`
+- prompt-heavy spot-check: `qasper`, `hotpotqa`, `multi_news`
 
-This group should be read as breadth support, not as the main conceptual block.
+This group should be read as model-family support, not as the main conceptual
+block.
 
-### Group 5. Bridge Package
+### Group 5. Regime Map Package
 
 Purpose:
-show that replay gains are not disconnected from actual generation.
+turn prompt-heavy witness language into an explicit active / inactive /
+collapse map.
+
+Required outputs:
+
+1. active decode-stage tasks
+2. `prefix_budget_exhausted` probes
+3. parameter sweeps over prefix reserve and merge strictness
+4. compression-events and saved-ratio readouts by task
+
+Recommended tasks:
+
+- active/main: `qasper`, `hotpotqa`, `multi_news`, `musique`, `2wikimqa`
+- probes: `vcsum`, `qmsum`, `gov_report`
+
+This group closes the "selected witnesses" objection by explaining which regime
+each task belongs to.
+
+### Group 6. Replay -> Output -> System Bridge Package
+
+Purpose:
+show that replay gains are not disconnected from actual generation or runtime
+cost.
 
 Required bridges:
 
@@ -366,14 +409,17 @@ Required bridges:
 2. one same-budget prompt-heavy bridge
 3. one budget-crossing bridge
 
+Required outputs:
+
+1. lexical / semantic / task-level output comparison
+2. saved-ratio and compression-events readout
+3. throughput or generation-speed comparison on the same rows
+
 Current candidates:
 
 - reasoning-side: strongest stable AIME witness from the scaled replay gate
 - same-budget prompt-heavy: `multi_news`
 - budget crossing: `qasper`
-
-This group is necessary to defend replay, but it should remain smaller than the
-replay package itself.
 
 ## 10. Minimum Matrix Needed To Upgrade The Submission
 
@@ -458,6 +504,10 @@ Primary entry points:
 6. `scripts/run_v2_group1_score_failure.sh` for the scorer-failure package
 7. `scripts/run_v2_group2_fold_ablation.sh` for the discard-vs-fold package
 8. `scripts/run_v2_group3_sensitivity.sh` for the narrow sensitivity package
+9. `scripts/run_v2_group4_generalization.sh` for the multi-model package
+10. `scripts/run_v2_group5_regime_map.sh` for the prompt-heavy regime map
+11. `scripts/run_v2_group6_bridge_system.sh` for the replay/output/system
+    bridge
 
 This matters because v2 should be reproducible as a package, not as a sequence
 of one-off terminal sessions.
@@ -762,7 +812,70 @@ python scripts/replay_reference_fidelity.py \
 The same pattern should be repeated for the selected values of each axis rather
 than hidden inside one giant mixed sweep.
 
-### 12.5 Packaging Rule
+### 12.5 Group 4 Command Template: Model Generalization Package
+
+The goal of Group 4 is not to multiply witnesses on one model. The goal is to
+show that the structure advantage persists across model families.
+
+Primary entry point:
+
+```bash
+bash scripts/run_v2_group4_generalization.sh
+```
+
+Important environment knobs:
+
+- `MODEL_SPECS`
+- `REASONING_DATASETS_STR`
+- `REASONING_METHODS_STR`
+- `REASONING_BUDGETS_STR`
+- `ENABLE_PROMPTHEAVY`
+
+Default behavior:
+
+1. reasoning replay frontier on `aime24`, `aime25`, `math500`
+2. methods `triattention`, `cask`, `snapkv`, `expectedattention`
+3. prompt-heavy spot-check on `qasper`, `hotpotqa`, `multi_news`
+
+### 12.6 Group 5 Command Template: Regime Map Package
+
+The goal of Group 5 is to turn prompt-heavy evidence into an explicit regime
+diagram.
+
+Primary entry point:
+
+```bash
+bash scripts/run_v2_group5_regime_map.sh
+```
+
+Default behavior:
+
+1. builds a prompt-heavy pack over active tasks and boundary probes
+2. sweeps `--cask-prefix-coverage-ratio`
+3. sweeps `--cask-similarity-threshold`
+4. stores per-task replay summaries under `experiments/analysis/v2/group5/`
+
+### 12.7 Group 6 Command Template: Replay -> Output -> System Bridge Package
+
+The goal of Group 6 is to keep replay as the main diagnostic while proving it
+is not disconnected from actual generation and runtime cost.
+
+Primary entry point:
+
+```bash
+bash scripts/run_v2_group6_bridge_system.sh
+```
+
+Default behavior:
+
+1. generates full-KV references for the bridge tasks
+2. runs candidate actual-output rows for the configured method/budget pairs
+3. computes lexical/semantic output fidelity
+4. computes throughput summaries
+5. writes a compact bridge table through
+   `scripts/build_v2_bridge_system_summary.py`
+
+### 12.8 Packaging Rule
 
 For B200 execution, every completed group should emit:
 
