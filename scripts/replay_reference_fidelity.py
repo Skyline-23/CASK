@@ -150,6 +150,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cask-promotion-score-ratio", type=float, default=None)
     parser.add_argument("--cask-merge-score-mass-ratio-threshold", type=float, default=None)
     parser.add_argument("--cask-use-phase-markers", type=str2bool, default=True)
+    parser.add_argument("--expectedattention-n-future-positions", type=int, default=512)
+    parser.add_argument("--expectedattention-n-sink", type=int, default=4)
+    parser.add_argument("--expectedattention-use-covariance", type=str2bool, default=True)
+    parser.add_argument("--expectedattention-use-vnorm", type=str2bool, default=True)
+    parser.add_argument("--expectedattention-epsilon", type=float, default=0.0)
     return parser.parse_args()
 
 
