@@ -17,7 +17,7 @@ CASK treats reasoning-time KV compression as a **behavior-preserving selective c
 | Main replay harness | `scripts/replay_reference_fidelity.py` |
 | Command provenance | `artifacts/COMMAND_MAP.md` |
 | Figure assets | `docs/assets/` |
-| Paper source | `paper/` |
+| Paper source | `paper/` with the vendored `cask_arxiv.sty` preprint style |
 
 ## Method Summary
 

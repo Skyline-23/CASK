@@ -1,6 +1,9 @@
 \newcommand{\CASKLoadStyle}{%
-  \usepackage[margin=1in]{geometry}%
+  \usepackage{cask_arxiv}%
   \usepackage[numbers,compress]{natbib}%
+  \renewcommand{\headeright}{CASK Preprint}%
+  \renewcommand{\undertitle}{Preprint}%
+  \renewcommand{\shorttitle}{CASK}%
 }
 \newcommand{\CASKAuthorEntry}[3]{%
   {\bfseries #1}\\
@@ -15,7 +18,7 @@
 }
 \newcommand{\CASKAuthorBlock}{%
   \CASKAuthorOne
-  \and
+  \And
   \CASKAuthorTwo
 }
 \newcommand{\CASKChecklistBlock}{}
