@@ -21,6 +21,7 @@ Command trace:
 | [`h100_2026_04_10/cask_h100_fidelity/`](h100_2026_04_10/cask_h100_fidelity/) | H100 reasoning replay gate | same-budget replay advantage and partial budget crossing on `AIME24` / `AIME25` |
 | [`h100_2026_04_11/cask_h100_actual_bridge/`](h100_2026_04_11/cask_h100_actual_bridge/) | H100 output-level bridge | `qasper` budget crossing, `multi_news` same-budget output bridge, `hotpotqa` parity |
 | [`h100_2026_04_11/`](h100_2026_04_11/) | H100 prompt-heavy follow-up package | decode-active replay witnesses plus `prefix_budget_exhausted` boundaries |
+| [`raw_outputs_2026_05_21/`](raw_outputs_2026_05_21/) | compact raw output snapshot | raw LongBench actual-output and math witness logs used as audit trail |
 | [`../docs/assets/`](../docs/assets/) | paper-ready figure bundle | current PNG/PDF figures synchronized to the tracked H100 artifact summaries |
 
 ## What Not To Cite As A Headline
@@ -44,10 +45,16 @@ Use this split:
 | --- | --- | --- |
 | Main paper | headline tables, compact figures, claim-supporting summaries | `paper/`, `docs/assets/` |
 | Appendix / audit | measured counts, witness-level audit matrices, boundary-case readout | `paper/` Appendix C-D, package README files |
-| Raw provenance | JSON/CSV reports, manifests, merged references, eval roots, generation roots | `experiments/frontier/`, `experiments/outputs/`, `experiments/longbench_h100_*` |
+| Raw provenance | JSON/CSV reports, manifests, merged references, eval roots, generation roots | tracked snapshots under `artifacts/`, plus ignored local `experiments/outputs/` trees |
 
 If a reviewer asks where a row came from, the intended path is:
 
 1. Open the packaged summary in `artifacts/...`
 2. Follow its `source_json` or `source_eval_json`
 3. Use [`COMMAND_MAP.md`](COMMAND_MAP.md) to recover the exact script, manifest, and raw directory
+
+The tracked raw snapshot in [`raw_outputs_2026_05_21/`](raw_outputs_2026_05_21/)
+keeps compact evidence that would otherwise remain only in ignored local output
+directories. It intentionally excludes the legacy exploratory `math500` tree
+because that directory contains obsolete `scratchmergekv` runs that are not part
+of the current CASK paper package.

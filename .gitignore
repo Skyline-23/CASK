@@ -147,3 +147,10 @@ experiments/outputs/aime25/Qwen3-8B/sample1/fullkv/*
 !experiments/longbench_h100_actual_bridge_20260411/**
 !experiments/longbench_h100_stage_ablation/
 !experiments/longbench_h100_stage_ablation/**
+
+# Local raw-output snapshots copied into artifacts/raw_outputs_* when needed.
+experiments/outputs/longbench_2wikimqa/
+experiments/outputs/longbench_multi_news/
+experiments/outputs/longbench_qasper/
+experiments/outputs/math500/
+experiments/outputs/math500_actual_witnesses/

@@ -110,6 +110,7 @@ Command trace:
 | whether CASK wins the main reasoning replay gate | [H100 reasoning replay gate](artifacts/h100_2026_04_10/cask_h100_fidelity/README.md) | contains the `AIME24` / `AIME25` synchronized replay tables and crossing read |
 | whether replay gains show up in actual generation | [H100 actual-output bridge](artifacts/h100_2026_04_11/cask_h100_actual_bridge/README.md) | contains the tracked `qasper`, `multi_news`, and `hotpotqa` output bridge rows |
 | how to read the full prompt-heavy story | [H100 prompt-heavy follow-up](artifacts/h100_2026_04_11/README.md) | separates replay-level decode-active wins from output-level bridge rows and `prefix_budget_exhausted` boundaries |
+| where compact raw output provenance lives | [Raw output snapshot](artifacts/raw_outputs_2026_05_21/README.md) | preserves LongBench actual-output and math witness logs without committing obsolete exploratory output trees |
 | which figures are current and ready to paste into the draft | [Figure asset pack](docs/assets/README.md) | bundles the synchronized PNG/PDF versions of the reasoning gate, prompt-heavy, bridge, and method-overview figures |
 
 ### Package Roles
@@ -119,6 +120,7 @@ Command trace:
 | H100 reasoning replay gate | main reasoning replay headline | final benchmark-accuracy headline |
 | H100 actual-output bridge | showing replay-to-output linkage | broad decode-stage generalization claims by itself |
 | H100 prompt-heavy follow-up | regime separation and prompt-heavy narrative | pretending every prompt-heavy task is decode-active |
+| Raw output snapshot | audit trail for compact generation logs | paper headline interpretation without the packaged summaries |
 
 ## Installation
 
