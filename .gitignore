@@ -71,6 +71,7 @@ aime25.jsonl
 *.toc
 paper/*.pdf
 paper/*.zip
+paper/arxiv_submit/
 
 # Internal verification configs (not for public release)
 scripts/configs/aime25_llama_budget512_a6000_verify.yaml

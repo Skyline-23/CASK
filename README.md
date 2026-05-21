@@ -174,10 +174,34 @@ python scripts/replay_reference_fidelity.py \
 | `scripts/build_paper_figures.py` | generate the current paper-facing figure pack under `docs/assets/` |
 | `scripts/refresh_paper_figures.ps1` | optional sync + figure refresh wrapper |
 | `paper/` | venue-neutral paper source, bibliography, and build entrypoints |
+| `paper/make_arxiv_package.ps1` | generate and optionally verify the arXiv source zip from the canonical paper source |
 | `cask/methods/triattention.py` | TriAttention baseline implementation |
 | `cask/methods/cask.py` | CASK implementation |
 | `artifacts/` | tracked paper-facing summaries |
 | `docs/assets/` | paper-facing rendered figures |
+
+## Paper Packaging
+
+`paper/content.tex` is the canonical manuscript body. There is no tracked
+`arxiv_submit` source copy; submission sources are generated from the canonical
+files. To build the local PDFs:
+
+```powershell
+Push-Location paper
+latexmk -g -pdf -interaction=nonstopmode -halt-on-error main_author.tex
+latexmk -g -pdf -interaction=nonstopmode -halt-on-error main_anonymous.tex
+Pop-Location
+```
+
+To create the arXiv source package from the canonical source:
+
+```powershell
+paper\make_arxiv_package.ps1 -Verify
+```
+
+The script stages a clean temporary submission tree, rewrites the figure path for
+local `figures/`, copies the current PDFs from `docs/assets/`, creates
+`paper/cask_arxiv_source.zip`, and verifies that the zip compiles independently.
 
 ## Provenance
 
