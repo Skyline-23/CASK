@@ -51,20 +51,21 @@ This immediately implies three consequences:
 
 ## 1.1 V2 Evidence Axes
 
-The v2 package should be organized around five evidence axes:
+The v2 package should be organized around six evidence axes:
 
 1. `structure advantage`
 2. `model generalization`
 3. `regime map`
 4. `output bridge`
 5. `system package`
+6. `downstream trace bridge`
 
 The practical goal is to lock one sentence:
 
 > CASK gains are structural, not accidental to one scorer, one witness, or one
 > runtime slice.
 
-If a proposed run does not strengthen one of these five axes, it is not
+If a proposed run does not strengthen one of these six axes, it is not
 v2-critical.
 
 ## 1.2 Boundary With Action-Level Trace Fidelity
@@ -86,11 +87,32 @@ Action-level trace fidelity studies:
 - downstream action-level regressions, improvements, and artifacts;
 - scenario-order sensitivity under fixed runtime builds.
 
-The bridge is conceptual, not a shared contribution. Both layers reject the idea
-that final-task accuracy alone is sufficient to measure behavior preservation,
-but CASK should not claim action-trace fidelity as a main contribution. In v2,
-action-level trace fidelity should be cited or discussed only as a downstream
-evaluation layer that can consume CASK-style token-level replay evidence.
+The bridge is conceptual and empirical, but not a shared contribution. Both
+layers reject the idea that final-task accuracy alone is sufficient to measure
+behavior preservation, but CASK should not claim action-trace fidelity as a main
+contribution. In v2, action-level trace fidelity should be treated as a
+downstream evaluation layer that can consume CASK-style token-level replay
+evidence.
+
+The safe causal chain is:
+
+```text
+KV representation change
+  -> token-distribution drift
+  -> full-KV continuation fidelity change
+  -> closed-loop reasoning / tool-trace drift
+  -> task-level behavior change
+```
+
+CASK owns the first three links. A KVFidelity-style action-trace harness owns
+the fourth link. A v2 bridge experiment may connect the two, but the paper must
+not collapse them into one metric.
+
+The most useful external signal is that independent KV/V-cache trace-fidelity
+work already treats CASK as the closest token-level replay neighbor. That does
+not validate CASK's method. It validates the evaluation concern: cache-level
+runtime changes can be behaviorally visible, so replay fidelity is a meaningful
+intermediate diagnostic rather than a cosmetic proxy.
 
 ## 2. What V1 Already Established
 
@@ -208,7 +230,9 @@ The minimum test package should be run in this order:
    regimes.
 5. `replay -> output bridge`: show that token-level replay fidelity is not an
    isolated diagnostic artifact.
-6. `system package`: measure latency, memory, throughput, and merge overhead
+6. `replay -> action-trace bridge`: show that replay fidelity can be used as
+   an intermediate layer before downstream tool/action trace evaluation.
+7. `system package`: measure latency, memory, throughput, and merge overhead
    after the behavioral claim is locked.
 
 Do not spend large compute on model scaling before Blocks A--D produce clean
@@ -289,7 +313,7 @@ The current `multi_news`, `qasper`, and one reasoning task are acceptable as a
 base, but v2 should present them as a deliberate bridge set, not scattered
 supporting evidence.
 
-### Block F. Evaluation-Layer Boundary
+### Block F. Replay -> Action-Trace Bridge
 
 Purpose:
 make clear that CASK's primary evaluation layer is token-level full-KV
@@ -300,8 +324,24 @@ Minimum output:
 1. A short taxonomy separating token-level replay, output-level bridge, and
    action-level trace fidelity.
 2. A statement that CASK does not claim to solve action-trace fidelity.
-3. A follow-up experiment hook showing how CASK traces could be passed to an
-   action-level harness, without making that harness part of the core method.
+3. One small paired trace experiment if the tooling is available:
+   - `fullkv`
+   - `triattention`
+   - `cask`
+   - same model, prompt scaffold, seed, temperature, tool scenario order, and
+     maximum turn count
+4. Joint reporting of:
+   - token-level replay fidelity against the full-KV reference;
+   - action-trace equivalence / drift category;
+   - whether replay improvements predict fewer or softer downstream trace
+     changes.
+
+The intended conclusion is narrow:
+
+> Token-level full-KV replay is an intermediate diagnostic layer for cache-level
+> behavioral stability. It does not by itself certify action-trace equivalence,
+> but it is a useful place to detect perturbations before closed-loop behavior
+> amplifies them.
 
 This block prevents the v2 paper from sprawling into a second paper while still
 acknowledging the adjacent evaluation direction.
@@ -319,6 +359,7 @@ expected to satisfy.
 | faithful evaluation bridge | replay fidelity must be connected to actual model behavior rather than left as an isolated proxy | explicit replay-to-actual bridge set with one reasoning bridge, one same-budget prompt-heavy bridge, and one budget-crossing bridge |
 | breadth beyond selected witnesses | the package must read as a structured study rather than a handful of favorable cases | block-structured sweeps across reasoning and prompt-heavy regimes, plus one second-model stress point |
 | interpretable policy controls | core/scratch decomposition and folding knobs must look stable and understandable rather than arbitrary | sensitivity map for core ratio, merge strength, and prefix reserve with narrow interpretable sweeps |
+| downstream behavioral relevance | replay metrics must not look like a closed diagnostic game disconnected from agentic or tool-use behavior | one KVFidelity-style bridge experiment or a clearly scoped discussion tying replay drift to action-trace drift as a downstream layer |
 
 If a new experiment does not strengthen one of these rows, it is not v2-critical.
 
@@ -336,10 +377,13 @@ reviewer language. The document should answer questions like:
 That is the right tone for a working paper plan. It keeps the document
 submission-oriented without turning it into a list of negative talking points.
 
-## 8. B200 Scale-Up Priority Order
+## 8. Large-GPU Scale-Up Priority Order
 
-The B200 budget should be spent to close review risks in order, not to inflate
-row count uniformly.
+Large-GPU time should be spent to close review risks in order, not to inflate
+row count uniformly. The plan should run on any CUDA Linux machine with enough
+memory for the selected model. A 5090-class machine can cover development and
+small-to-medium v2 blocks; H100-class access should be reserved for final
+reproducibility, long-context, and throughput-sensitive rows.
 
 ### Tier 0: Protocol Lock Before Any Large Run
 
@@ -352,7 +396,7 @@ Before launching the scaled package, lock the following:
 5. supplementary model: one DeepSeek distilled model as a stress-point, not a
    full second matrix
 
-If these are not frozen first, the B200 run will create more ambiguity than
+If these are not frozen first, the scale-up run will create more ambiguity than
 evidence.
 
 ### Tier 1: Must-run
@@ -371,6 +415,8 @@ Without these, v2 is still just a broader v1.
 1. output bridge thickening
 2. broader prompt-heavy regime sweep
 3. system readout on the bridge rows
+4. one small action-trace bridge if the external harness can be integrated
+   without destabilizing the main CASK code path
 
 These improve defense, but they are not the conceptual core.
 
@@ -382,9 +428,9 @@ These improve defense, but they are not the conceptual core.
 
 These help least relative to cost.
 
-## 9. B200 Execution Package
+## 9. Large-GPU Execution Package
 
-The scaled package should be split into six run groups. The goal is not to run
+The scaled package should be split into seven run groups. The goal is not to run
 everything at once. The goal is to finish the highest-value block first and
 freeze it before moving on.
 
@@ -508,6 +554,44 @@ Current candidates:
 - same-budget prompt-heavy: `multi_news`
 - budget crossing: `qasper`
 
+### Group 7. Replay -> Action-Trace Bridge Package
+
+Purpose:
+connect CASK's token-level replay layer to a downstream action/tool-trace layer
+without claiming that CASK directly solves agentic trace fidelity.
+
+Required setup:
+
+- one fixed tool-use scenario subset;
+- one fixed scenario order and one optional order-permutation stress point;
+- same model, prompt scaffold, seed, temperature, context length, and maximum
+  turn count across methods;
+- methods: `fullkv`, `triattention`, `cask`;
+- optional additional rows only after the first three rows are stable.
+
+Required outputs:
+
+1. token-level replay metrics against full-KV continuation where available;
+2. action-trace category: equivalent, soft drift, moderate drift, critical
+   drift, improvement, or artifact;
+3. mechanism labels such as workflow truncation, semantic argument drift,
+   entity-resolution drift, redundant expansion, and acceptable variation;
+4. same-config duplicate controls for at least one method/configuration;
+5. a small joint table mapping replay-fidelity changes to action-trace
+   outcomes.
+
+Stop rule:
+if same-config duplicates are not stable under fixed order and fixed runtime
+settings, do not use the action-trace bridge as evidence for CASK. Treat it as
+a harness/debugging result instead.
+
+Safe conclusion:
+
+> Action-trace evaluation is a downstream layer. CASK improves token-level
+> replay fidelity under KV compression, and a small bridge can test whether
+> those improvements correspond to fewer downstream trace changes. This is a
+> follow-up behavioral validation, not the core CASK contribution.
+
 ## 10. Minimum Matrix Needed To Upgrade The Submission
 
 The submission should not be upgraded from the current v1 package to v2 unless
@@ -549,7 +633,7 @@ Required:
 If any of these are missing, the paper is still closer to strengthened v1 than
 to true v2.
 
-## 11. Stop Rules For The B200 Queue
+## 11. Stop Rules For The Large-GPU Queue
 
 The queue should not be allowed to grow without decision checkpoints.
 
@@ -599,8 +683,8 @@ Primary entry points:
 This matters because v2 should be reproducible as a package, not as a sequence
 of one-off terminal sessions.
 
-The v2 helper scripts are Linux/Bash oriented and intended for the B200
-handoff. They share one pattern:
+The v2 helper scripts are Linux/Bash oriented and intended for handoff to a
+larger CUDA box. They share one pattern:
 
 1. run any shared reference step first
 2. fan out independent method or sweep jobs with `MAX_PARALLEL`
@@ -962,9 +1046,66 @@ Default behavior:
 5. writes a compact bridge table through
    `scripts/build_v2_bridge_system_summary.py`
 
-### 12.8 Packaging Rule
+### 12.8 Action-Trace Bridge Command Skeleton
 
-For B200 execution, every completed group should emit:
+The action-trace bridge is intentionally a thin integration layer. It should
+not be merged into the core replay scripts until the external harness format is
+stable.
+
+Minimum command shape:
+
+```bash
+python scripts/export_action_trace_prompts.py \
+  --scenario-source external/tool-eval-bench \
+  --scenario-subset tc31_boundary \
+  --out experiments/analysis/v2/group7/action_trace_prompts.jsonl
+
+python scripts/cli.py run-one \
+  --model "$MODEL_ALIAS" \
+  --dataset action_trace_prompts \
+  --method fullkv \
+  --run-tag v2_group7_fullkv \
+  --input-jsonl experiments/analysis/v2/group7/action_trace_prompts.jsonl \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE"
+
+python scripts/cli.py run-one \
+  --model "$MODEL_ALIAS" \
+  --dataset action_trace_prompts \
+  --method triattention \
+  --budget 384 \
+  --stats-path "$STATS_PATH" \
+  --run-tag v2_group7_tri384 \
+  --input-jsonl experiments/analysis/v2/group7/action_trace_prompts.jsonl \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE"
+
+python scripts/cli.py run-one \
+  --model "$MODEL_ALIAS" \
+  --dataset action_trace_prompts \
+  --method cask \
+  --budget 384 \
+  --stats-path "$STATS_PATH" \
+  --run-tag v2_group7_cask384 \
+  --input-jsonl experiments/analysis/v2/group7/action_trace_prompts.jsonl \
+  --attn-implementation "$ATTN_IMPL" \
+  --load-dtype "$DTYPE"
+
+python scripts/build_action_trace_bridge_table.py \
+  --fullkv experiments/outputs/action_trace_prompts/Qwen3-8B/sample1/fullkv/full_v2_group7_fullkv/merged/merged.jsonl \
+  --triattention experiments/outputs/action_trace_prompts/Qwen3-8B/sample1/triattention/budget_384_v2_group7_tri384/merged/merged.jsonl \
+  --cask experiments/outputs/action_trace_prompts/Qwen3-8B/sample1/cask/budget_384_v2_group7_cask384/merged/merged.jsonl \
+  --out-json experiments/analysis/v2/group7/action_trace_bridge.json \
+  --out-md experiments/analysis/v2/group7/action_trace_bridge.md
+```
+
+The script names above are the desired interface. If they do not exist yet,
+they should be implemented as isolated adapters around the external harness
+rather than by modifying the core CASK compression code.
+
+### 12.9 Packaging Rule
+
+For large-GPU execution, every completed group should emit:
 
 1. a manifest or command log
 2. compact CSV/JSON summaries
@@ -976,7 +1117,8 @@ paper.
 
 ## 13. What Not To Do
 
-To avoid burning B200 time, do not spend the next round on the following:
+To avoid burning expensive GPU time, do not spend the next round on the
+following:
 
 1. more scorer variants without keep-set churn analysis
 2. more witness rows that do not isolate a new regime
@@ -1042,7 +1184,7 @@ If any of these remain answered only by intuition, v2 is not finished.
 
 The next concrete actions should be:
 
-1. Define exact B200 commands for Group 1, Group 2, and Group 3.
+1. Define exact large-GPU commands for Group 1, Group 2, and Group 3.
 2. Freeze one reasoning slice and one prompt-heavy slice for the sensitivity
    package.
 3. Promote Phase 1 keep-set churn analysis from background note to a tracked
