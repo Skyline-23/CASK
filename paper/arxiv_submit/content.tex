@@ -1,5 +1,5 @@
 \begin{abstract}
-In large language models performing long-form reasoning, the KV cache grows rapidly with decode length, creating bottlenecks in both memory and stability. Existing reasoning-oriented KV compression has largely remained within an eviction-centered perspective that estimates per-token importance more precisely in order to discard less important tokens. However, our preliminary analysis showed that scorer refinement alone struggles to substantially reorganize the actual keep-set and therefore may not be the primary lever governing reasoning behavior. Building on this observation, this paper redefines reasoning KV compression not as a simple ranking problem but as a \textbf{behavior-preserving structured consolidation problem}. CASK partitions the decode-time reasoning trace into a \textbf{protected core} that directly contributes to answer formation and state anchoring, and \textbf{mergeable scratch} with high redundancy. The core is protected, and selective consolidation is applied only to the scratch. To address the failure mode in prompt-heavy regimes where the prefix pre-empts the budget and deactivates decode-stage compression, CASK further introduces \textbf{two-stage compression} that applies eviction to the prefix and selective consolidation to the decode stage. On the H100 reasoning gate, CASK shows higher full-KV continuation fidelity than TriAttention at the same budget on both AIME24 and AIME25, with recurring \textbf{cask@384 > triattention@512} crossings. In prompt-heavy replay, \textbf{multi\_news} and \textbf{vcsum} emerge as replay-level decode-active same-budget witnesses, while \textbf{qmsum} and \textbf{gov\_report} reveal the \textbf{prefix\_budget\_exhausted} boundary. Moreover, the actual-output layer is not summarized by a single lexical-overlap metric; instead, it is read separately through \textbf{official task metric}, \textbf{lexical overlap}, and \textbf{semantic/reference similarity}. The most defensible conclusion supported by current evidence is therefore that the key to reasoning KV compression lies not in more complex scorer engineering but in \textbf{combining core preservation with selective scratch consolidation to lower the usable budget frontier}.
+In large language models performing long-form reasoning, the KV cache grows rapidly with decode length, creating bottlenecks in both memory and stability. Existing reasoning-oriented KV compression has largely remained within an eviction-centered perspective: estimate per-token importance more precisely, keep the highest-ranked states, and discard the rest. Our analysis suggests that scorer refinement alone can leave the actual keep-set largely unchanged, making it an incomplete lever for preserving reasoning behavior. We instead frame reasoning KV compression as \textbf{representative construction under a fixed KV budget}: build compressed KV states that preserve future full-KV behavior rather than only selecting tokens to retain. CASK partitions the decode-time reasoning trace into a \textbf{protected core} that anchors answer formation and intermediate state, and \textbf{mergeable scratch} with high redundancy. The core is protected, while scratch is folded into representative states through selective consolidation. To address prompt-heavy regimes where the prefix can pre-empt the budget and deactivate decode-stage compression, CASK further introduces \textbf{two-stage compression}: prefix eviction followed by decode-stage consolidation. On the H100 reasoning gate, CASK shows higher full-KV continuation fidelity than TriAttention at matched budgets on both AIME24 and AIME25, with recurring \textbf{cask@384 > triattention@512} crossings. In prompt-heavy replay, \textbf{multi\_news} and \textbf{vcsum} emerge as replay-level decode-active witnesses, while \textbf{qmsum} and \textbf{gov\_report} reveal the \textbf{prefix\_budget\_exhausted} boundary. The overall evidence supports a bounded but direct conclusion: effective reasoning KV compression should be treated less as better scalar ranking and more as \textbf{core preservation plus mass-preserving scratch folding that lowers the usable budget frontier}.
 \end{abstract}
 
 \section{Introduction}
@@ -17,17 +17,19 @@ The starting point of this work is precisely this observation of role differenti
 This observation directly motivated the pivot. If scorer refinement cannot substantially change the actual keep-set, then the key lever for reasoning behavior may not lie in more sophisticated scalar ranking itself. In other words, the problem is not only about better predicting "which token is more important"; it may instead lie in having \textbf{incorrectly defined what constitutes the preservation target versus the consolidatable target} in the first place. CASK's current core-aware selective consolidation perspective arose directly from this failure. Phase 1 is not a discarded predecessor but an analytical foundation that supplied the rationale for why-not-scorer and enabled the transition to the current policy design. \textbf{The motivation, goals, failure points, and pivot rationale of Phase 1 are detailed in Appendix A; the mathematical assets of Phase 1 are in Appendix B.}
 
 
-This paper re-poses reasoning KV compression as follows: rather than treating all non-core tokens as candidates for discard, can we first determine what must be preserved and what can be safely merged? To answer this question, we propose CASK, Core-Aware Selective KV Compression for Reasoning Traces. CASK decomposes the decode-time trace into protected core and mergeable scratch, preserves the core, and performs selective consolidation only on the scratch. Additionally, in prompt-heavy regimes, it introduces a two-stage design combining prefix eviction and decode consolidation to prevent method coverage itself from being blocked.
+This paper re-poses reasoning KV compression as a representative-construction problem. Given a fixed physical KV budget, the goal is not merely to choose which tokens survive, but to construct a representative KV set that preserves future full-KV behavior. Under this view, discard-only selection is only one possible primitive, and it is incomplete when scratch states are redundant but still carry recoverable mass. To answer this question, we propose CASK, Core-Aware Selective KV Compression for Reasoning Traces. CASK decomposes the decode-time trace into protected core and mergeable scratch, preserves the core, and folds scratch into representative states through selective consolidation. Additionally, in prompt-heavy regimes, it introduces a two-stage design combining prefix eviction and decode consolidation to prevent method coverage itself from being blocked.
 
 
 The contributions supported by current evidence can be conservatively summarized as follows.
 
 
 \begin{enumerate}
+\item We formulate reasoning KV compression as fixed-budget representative construction rather than discard-only token selection.
 \item We propose a core-aware selective consolidation perspective that decomposes the reasoning trace into protected core and mergeable scratch.
+\item We make scratch folding a first-class compression primitive: redundant scratch is folded into representative states instead of being treated as unrecoverable discard.
 \item We propose two-stage compression combining prefix eviction and decode consolidation to handle prompt-heavy regimes.
 \item We present a bounded empirical interpretation that jointly reads representative-set mass, regime guard, and decode activity.
-\item We organize the H100 reasoning gate, prompt-heavy replay, and actual-output bridge into a single claim-disciplined empirical package.
+\item We organize the H100 reasoning gate, prompt-heavy replay, and actual-output bridge into a single claim-disciplined empirical package, while identifying the scale-up ablations needed for a full generality claim.
 \end{enumerate}
 
 
@@ -37,7 +39,7 @@ Here, teacher-forced replay should be positioned not as an independent contribut
 This boundary also separates CASK from downstream action-trace fidelity evaluation. CASK measures whether a compressed representative KV set preserves the full-KV token-level continuation distribution. Action-level trace fidelity instead asks whether tool calls, action choices, or other downstream traces remain stable when runtime KV/V-cache configurations change. These layers are complementary but not identical: CASK provides a compression method and a token-level replay probe, while action-trace fidelity is a downstream behavioral audit layer.
 
 
-The headline directly supported by current results should also align with this contribution structure. CASK's strength does not lie in compressing most aggressively across all settings. Rather, it lies in lowering the minimum usable budget required to maintain the same full-KV behavior. Accordingly, this paper should position CASK not as a more aggressive compressor but as a behavior-preserving policy that shifts the usable budget frontier downward.
+The headline directly supported by current results should also align with this contribution structure. CASK's strength does not lie in compressing most aggressively across all settings. Rather, it lies in lowering the minimum usable budget required to maintain the same full-KV behavior. Accordingly, this paper positions CASK not as a more aggressive compressor but as a behavior-preserving representative-construction policy that shifts the usable budget frontier downward.
 
 
 \section{Method}
@@ -94,6 +96,15 @@ $$
 
 
 Here, $C$ is the protected core, $R$ is the final representative set, and $B$ is the available physical budget. The important constraint in this expression is $C \subseteq R$: the protected core must be included in the final representative set. Scratch is consolidated into representatives only within the remaining budget. This formulation clearly shows that CASK is not a method that learns a better ranking function but one that first reflects role differentiation within the reasoning trace.
+
+
+\subsection{Discard, preserve-only, and preserve-plus-fold}
+
+
+The representative-set view separates three policies that are often conflated in KV compression. The first is \textbf{discard}: select a subset of tokens and remove everything else. This is the default primitive in eviction-centered compression. The second is \textbf{preserve-only}: protect an estimated core but treat all non-core states as discard. This avoids the most damaging core collapse but still loses recoverable scratch mass. The third is \textbf{preserve-plus-fold}: protect the core and fold redundant scratch into representative states.
+
+
+CASK is designed as the third policy. This distinction matters because "core is important" is not a complete explanation of the method. In healthy regimes, the protected core alone may preserve only a fraction of oracle-relevant mass, while the final representative set can recover additional mass from scratch. Thus the main mechanism is not protection alone, and not folding alone, but the combination of \textbf{protect what must remain exact} and \textbf{fold what can be represented}. The strongest version of the empirical claim should therefore isolate discard-only, preserve-only, and preserve-plus-fold controls rather than comparing only two named methods.
 
 
 \subsection{Basic m-folding construction}
@@ -615,7 +626,16 @@ This framing is particularly important for reasoning compression. In reasoning w
 Simultaneously, unresolved points are clear. First, the current package is beyond single-witness level but still not a broad matrix covering an entire full benchmark sweep. Second, output-level bridge is limited to some witnesses, with clean decode-active output bridge effectively having \textbf{multi\_news} as core. Third, coverage-sensitive multi-hop QA like \textbf{2wikimqa} shows that CASK is not a policy that always achieves clean wins.
 
 
-These unresolved points are not elements that weaken the current paper but rather boundaries that indicate how far to claim and where to leave as future work. That is, the current package is sufficiently strong, but its strength lies in well-bounded, well-interpreted evidence, not universal dominance.
+These unresolved points are not elements that weaken the current paper but rather boundaries that indicate how far to claim and where to extend the evidence package. That is, the current package is sufficiently strong, but its strength lies in well-bounded, well-interpreted evidence, not universal dominance.
+
+
+\subsection{Scale-up evidence blocks}
+
+
+The next empirical closure should not merely add more selected witnesses. It should test whether the observed gains are structural. The scale-up package is organized around five evidence axes. First, \textbf{structure advantage}: compare the same scorer under discard-only, preserve-only, and preserve-plus-fold policies, and compare the same CASK structure under multiple scorers. Second, \textbf{model generalization}: repeat the representative-construction tests across more than one model family or instruction style. Third, \textbf{regime map}: classify active, merge-inactive, prefix-budget-exhausted, and collapse regimes using prefix length, available slots, compression event count, and representative mass recovery. Fourth, \textbf{output bridge}: measure when replay fidelity transfers to actual generation metrics and when it does not. Fifth, \textbf{system package}: report memory, latency, throughput, and merge overhead after the behavioral claim is locked.
+
+
+The intended role of these blocks is narrow but important. They are not new claims already settled by the current paper. They are the ablations required to upgrade the current conclusion from "CASK moves the budget-fidelity frontier in the present package" to "the preserve-plus-fold structure is a general mechanism rather than a witness-specific artifact."
 
 
 \section{Related Work}
@@ -649,6 +669,15 @@ That is, the safest claim this paper can make is that CASK shows a stronger budg
 
 
 Conversely, claims not yet directly supported by current evidence are also clear. First, consistent absolute accuracy superiority across all reasoning benchmarks is not yet guaranteed. Second, one cannot claim decode-stage merge is front-and-center across all witnesses. Third, one cannot say higher fixed-budget savings are shown across all budgets. Fourth, one cannot conclude that the current correction set or reserve schedule is already optimal.
+
+
+\subsection{Ablations required for a full generality claim}
+
+
+The strongest version of CASK's claim requires more than a larger sample of the same runs. It requires isolating the causal role of structure. The first missing piece is a \textbf{same-scorer / different-structure} ablation: keep the scorer fixed and compare discard-only selection, core preservation without folding, degraded scratch folding, and full preserve-plus-fold CASK. The second is a \textbf{same-structure / different-scorer} ablation: keep CASK's preserve-plus-fold structure fixed and vary the scalar scorer to test whether the gain survives scorer substitution. The third is a \textbf{regime-map} ablation: explicitly separate active, inactive, prefix-exhausted, and collapse regimes instead of averaging them into one number.
+
+
+These ablations are listed as limitations because they define the boundary between the present evidence package and a broader generality claim. The present paper supports the representative-construction framing and shows that it moves the budget-fidelity frontier in the reported package. It does not yet prove that every scorer, model, task family, or serving regime will benefit equally.
 
 
 \subsection{Prompt-heavy regime must be split by regime}
@@ -696,16 +725,16 @@ The claim discipline of this paper should therefore be fixed by the following st
 \section{Conclusion}
 
 
-This paper resets the central question of reasoning KV compression. The problem does not lie solely in more precisely predicting which token is more important. The more fundamental question is which tokens must be preserved and which can be safely consolidated. From this perspective, we proposed CASK, which decomposes the reasoning trace into protected core and mergeable scratch, preserves the core, and performs selective consolidation only on the scratch. Additionally, in prompt-heavy regimes, we restructured the design through a two-stage policy separating prefix eviction and decode consolidation to prevent method coverage itself from collapsing.
+This paper resets the central question of reasoning KV compression. The problem does not lie solely in more precisely predicting which token is more important. The more fundamental question is how to construct a representative KV set that preserves future full-KV behavior under a fixed physical budget. From this perspective, we proposed CASK, which decomposes the reasoning trace into protected core and mergeable scratch, preserves the core, and folds scratch into representative states through selective consolidation. Additionally, in prompt-heavy regimes, we restructured the design through a two-stage policy separating prefix eviction and decode consolidation to prevent method coverage itself from collapsing.
 
 
 The conclusion most strongly supported by current evidence is that CASK can show same-budget fidelity advantage, and its core value lies not in absolute superiority of fixed-budget savings but in lowering the minimum usable budget frontier. In the reasoning gate, same-budget superiority and partial budget crossings recurred, and in the prompt-heavy replay package, strong gains, limited but real decode-active witnesses, and retained boundary cases were jointly observed. The actual-output bridge also shows that replay-level fidelity gains are not an artifact entirely separated from actual generation.
 
 
-Simultaneously, this paper does not make claims beyond the scope of current evidence. CASK does not aim for universal superiority across all benchmarks or always more aggressive compression. Rather, what the current package directly supports is that reflecting role differentiation of reasoning traces in policy can form a stronger budget-fidelity frontier. This conclusion is also consistent with the process of pushing scorer-side refinement in Phase 1, confirming the limited nature of actual keep-set churn, and pivoting to preserve/consolidate separation.
+Simultaneously, this paper does not make claims beyond the scope of current evidence. CASK does not aim for universal superiority across all benchmarks or always more aggressive compression. Rather, what the current package directly supports is that reflecting role differentiation of reasoning traces in policy can form a stronger budget-fidelity frontier. The next required closure is to isolate the structure itself: same scorer with different structures, same structure with different scorers, broader model coverage, regime maps, output bridges, and system overhead. This conclusion is also consistent with the process of pushing scorer-side refinement in Phase 1, confirming the limited nature of actual keep-set churn, and pivoting to preserve/consolidate separation.
 
 
-The most honest conclusion of this paper is therefore as follows. Reasoning KV compression should be treated not as a ranking-only problem but as a behavior-preserving structured consolidation problem. Within the current evidence package, CASK demonstrates that this directional shift can lead to substantive fidelity gains and a lower minimum usable budget.
+The most honest conclusion of this paper is therefore as follows. Reasoning KV compression should be treated not as a ranking-only problem but as behavior-preserving representative construction. Within the current evidence package, CASK demonstrates that core preservation plus mass-preserving scratch folding can lead to substantive fidelity gains and a lower minimum usable budget.
 
 
 \appendix
@@ -1068,4 +1097,34 @@ This placement is not merely an editorial preference. The center of the current 
 
 
 The final rule for organizing the evaluation structure in the current draft is as follows. The main text should contain only the minimum tables, equations, and graphs needed to build the claims. The appendix should hold the raw tables, measured counts, and mathematical archive that support those core claims. Maintaining this structure allows the main text to read as a paper while the appendix provides the necessary detailed evidence.
+
+
+\section{Scale-up Experiment Map}
+
+
+This appendix records the experiment map needed to turn the current bounded evidence package into a broader generality claim. It is included to make the next empirical closure explicit and reproducible, not to imply that all blocks are already completed.
+
+
+\subsection{Structure advantage}
+
+
+The first block isolates whether the gain comes from structure rather than score tuning. The required comparison is two-sided: same scorer with different structures, and same structure with different scorers. The same-scorer rows should include discard-only selection, core preservation without folding, degraded scratch folding, and full CASK. The same-structure rows should keep the preserve-plus-fold policy fixed while replacing the scalar scorer.
+
+
+\subsection{Model generalization}
+
+
+The second block checks whether protected core and mergeable scratch remain useful outside the original model slice. The purpose is not to maximize the number of models but to test whether the same representative-construction pattern survives changes in model family, instruction tuning, and reasoning style.
+
+
+\subsection{Regime map}
+
+
+The third block turns witness labels into measured regimes. Each run should report prefix length ratio, available slots, compression event count, active decode-stage merge frequency, representative mass recovery, and collapse status. Runs should be categorized as active, merge-inactive, prefix-budget-exhausted, or collapse regimes before headline averaging.
+
+
+\subsection{Output bridge and system package}
+
+
+The fourth block connects replay fidelity to actual generation. It should report official task metric, lexical overlap, semantic/reference similarity, and representative failure cases where replay is good but output is not. The fifth block reports system behavior: memory, latency, throughput, merge overhead, and separate prefix-stage versus decode-stage costs. These system measurements should support, not replace, the behavioral claim.
 
