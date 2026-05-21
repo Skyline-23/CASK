@@ -154,3 +154,7 @@ experiments/outputs/longbench_multi_news/
 experiments/outputs/longbench_qasper/
 experiments/outputs/math500/
 experiments/outputs/math500_actual_witnesses/
+
+# But keep curated raw snapshots under artifacts/.
+!artifacts/raw_outputs_*/
+!artifacts/raw_outputs_*/**
