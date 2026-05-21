@@ -34,6 +34,9 @@ The contributions supported by current evidence can be conservatively summarized
 Here, teacher-forced replay should be positioned not as an independent contribution but as an evaluation protocol required at the current stage. This distinction matters. The center of this paper lies not in proposing a new evaluation framework but in the structural argument that preservation and consolidation must be separated within reasoning traces.
 
 
+This boundary also separates CASK from downstream action-trace fidelity evaluation. CASK measures whether a compressed representative KV set preserves the full-KV token-level continuation distribution. Action-level trace fidelity instead asks whether tool calls, action choices, or other downstream traces remain stable when runtime KV/V-cache configurations change. These layers are complementary but not identical: CASK provides a compression method and a token-level replay probe, while action-trace fidelity is a downstream behavioral audit layer.
+
+
 The headline directly supported by current results should also align with this contribution structure. CASK's strength does not lie in compressing most aggressively across all settings. Rather, it lies in lowering the minimum usable budget required to maintain the same full-KV behavior. Accordingly, this paper should position CASK not as a more aggressive compressor but as a behavior-preserving policy that shifts the usable budget frontier downward.
 
 

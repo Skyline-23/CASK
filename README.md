@@ -173,7 +173,7 @@ python scripts/replay_reference_fidelity.py \
 | `scripts/sync_reasoning_gate.py` | sync replay reports into the tracked reasoning-gate summaries |
 | `scripts/build_paper_figures.py` | generate the current paper-facing figure pack under `docs/assets/` |
 | `scripts/refresh_paper_figures.ps1` | optional sync + figure refresh wrapper |
-| `paper/` | NeurIPS paper source, bibliography, and style files |
+| `paper/` | venue-neutral paper source, bibliography, and build entrypoints |
 | `cask/methods/triattention.py` | TriAttention baseline implementation |
 | `cask/methods/cask.py` | CASK implementation |
 | `artifacts/` | tracked paper-facing summaries |

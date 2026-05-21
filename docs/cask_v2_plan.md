@@ -7,6 +7,33 @@ the paper from "CASK is somewhat better than TriAttention on selected regimes"
 into "reasoning KV compression is primarily a structured consolidation problem,
 and folding is the main behavior-preserving lever."
 
+## 0. Target Strategy
+
+The target for v2 is a top-tier 2027 main-track submission. This changes the
+paper target from "a stronger engineering report" to "a clearer learning-systems
+problem reframing." The method should not be presented merely as a better policy
+on top of TriAttention. It should be presented as evidence that the correct
+primitive for reasoning KV compression is representative construction:
+
+> Given a fixed KV budget, construct representative KV states that preserve
+> future model behavior, rather than selecting tokens to keep and discarding the
+> rest.
+
+This does not make the system evidence irrelevant. It changes the order of the
+argument:
+
+1. define the representative-construction problem;
+2. show why discard-only selection is an insufficient primitive;
+3. show that preserve/fold structure moves the behavior-fidelity frontier;
+4. show that the result is not tied to one scorer, one witness, or one runtime
+   slice.
+
+The fallback target should be chosen only after the evidence package is clear.
+If the final package is strongest on latency, memory, throughput, and serving
+integration, the paper should lean toward a systems venue. If the strongest
+evidence is task-facing reasoning behavior, it should lean toward an NLP venue.
+This public plan intentionally avoids naming specific submission targets.
+
 ## 1. V2 Headline
 
 The v2 paper should make one primary claim:
@@ -39,6 +66,31 @@ The practical goal is to lock one sentence:
 
 If a proposed run does not strengthen one of these five axes, it is not
 v2-critical.
+
+## 1.2 Boundary With Action-Level Trace Fidelity
+
+External work around runtime KV/V-cache configuration fidelity is adjacent but
+not competing with CASK if the boundary is kept explicit.
+
+CASK studies:
+
+- compressed representative KV construction;
+- reasoning-cache compression under a fixed budget;
+- token-level full-KV continuation fidelity;
+- representative mass recovery and budget-fidelity frontier movement.
+
+Action-level trace fidelity studies:
+
+- paired runtime KV/V-cache configuration changes;
+- tool/action trace equivalence or drift;
+- downstream action-level regressions, improvements, and artifacts;
+- scenario-order sensitivity under fixed runtime builds.
+
+The bridge is conceptual, not a shared contribution. Both layers reject the idea
+that final-task accuracy alone is sufficient to measure behavior preservation,
+but CASK should not claim action-trace fidelity as a main contribution. In v2,
+action-level trace fidelity should be cited or discussed only as a downstream
+evaluation layer that can consume CASK-style token-level replay evidence.
 
 ## 2. What V1 Already Established
 
@@ -144,6 +196,24 @@ The paper should visibly tie each object to one concrete failure mode.
 
 V2 should be organized around experiment blocks, not ad hoc tables.
 
+The minimum test package should be run in this order:
+
+1. `discard vs fold`: prove that folding, not a small scorer tweak, is the
+   behavior-preserving lever.
+2. `same scorer / different structure`: isolate preserve+fold structure from
+   scoring effects.
+3. `same structure / different scorer`: show the structural gain is not tied to
+   one scorer.
+4. `regime map`: separate active, inactive, prefix-exhausted, and collapse
+   regimes.
+5. `replay -> output bridge`: show that token-level replay fidelity is not an
+   isolated diagnostic artifact.
+6. `system package`: measure latency, memory, throughput, and merge overhead
+   after the behavioral claim is locked.
+
+Do not spend large compute on model scaling before Blocks A--D produce clean
+answers. Scaling a weak causal story only makes a larger weak story.
+
 ### Block A. Scorer Failure Study
 
 Purpose:
@@ -218,6 +288,23 @@ Minimum requirement:
 The current `multi_news`, `qasper`, and one reasoning task are acceptable as a
 base, but v2 should present them as a deliberate bridge set, not scattered
 supporting evidence.
+
+### Block F. Evaluation-Layer Boundary
+
+Purpose:
+make clear that CASK's primary evaluation layer is token-level full-KV
+continuation fidelity, while action/tool trace fidelity is a downstream layer.
+
+Minimum output:
+
+1. A short taxonomy separating token-level replay, output-level bridge, and
+   action-level trace fidelity.
+2. A statement that CASK does not claim to solve action-trace fidelity.
+3. A follow-up experiment hook showing how CASK traces could be passed to an
+   action-level harness, without making that harness part of the core method.
+
+This block prevents the v2 paper from sprawling into a second paper while still
+acknowledging the adjacent evaluation direction.
 
 ## 7. V2 Evidence Requirements
 
