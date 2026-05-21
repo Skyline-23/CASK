@@ -40,7 +40,6 @@ This is the main reason the repo reports fidelity and saved ratio together rathe
 | `triattention` | Original eviction baseline | primary baseline |
 | `cask` | CASK mainline implementation | primary paper method |
 | `expectedattention` | Closest prior-style comparison kept in-tree | optional baseline |
-| `horizonkv` | Legacy internal alias for archived Phase 1 scorer work | not paper-facing |
 
 If you are running the current paper candidate, use `--method cask`.
 

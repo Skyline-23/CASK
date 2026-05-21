@@ -23,7 +23,7 @@ def parse_args() -> tuple[argparse.Namespace, list[str]]:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cli-model", type=str, required=True, help="Model alias used by scripts/cli.py (e.g. Qwen3-8B).")
     parser.add_argument("--model-path", type=Path, required=True, help="Local HF model path used by suite runners.")
-    parser.add_argument("--method", type=str, required=True, choices=["fullkv", "triattention", "horizonkv", "cask", "expectedattention", "r1kv", "snapkv"])
+    parser.add_argument("--method", type=str, required=True, choices=["fullkv", "triattention", "cask", "expectedattention", "r1kv", "snapkv"])
     parser.add_argument("--output-root", type=Path, default=REPO_ROOT / "experiments" / "bundle")
     parser.add_argument("--python", type=str, default=sys.executable)
     parser.add_argument("--run-tag", type=str, default="bundle")
@@ -76,7 +76,7 @@ def main() -> None:
     args, passthrough = parse_args()
     if args.method != "fullkv" and args.suite_kv_budget is None:
         raise ValueError("--suite-kv-budget is required for non-fullkv methods.")
-    if args.method in {"triattention", "horizonkv", "cask"} and args.stats_path is None:
+    if args.method in {"triattention", "cask"} and args.stats_path is None:
         raise ValueError("--stats-path is required for triattention-family bundle runs.")
 
     bundle_root = args.output_root / args.cli_model / args.method / args.run_tag

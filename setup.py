@@ -44,7 +44,7 @@ setup(
     },
     entry_points={
         "vllm.general_plugins": [
-            "cask = cask.vllm.plugin:register_triattention_backend",
+            "cask = cask.vllm.plugin:register_cask_backend",
         ],
     },
 )

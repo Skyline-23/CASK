@@ -61,7 +61,7 @@ HF_DATASET_SPECS: Dict[str, Dict[str, object]] = {
 }
 
 DATASETS = ["aime24", "aime25", "math500"]
-MODES = ["fullkv", "r1kv", "snapkv", "triattention", "horizonkv", "cask", "expectedattention"]
+MODES = ["fullkv", "r1kv", "snapkv", "triattention", "cask", "expectedattention"]
 
 
 def str2bool(value: str | bool) -> bool:
@@ -345,7 +345,7 @@ def validate_stats_path_for_runner_args(
     runner_args: dict,
     stats_path: Path | None,
 ) -> None:
-    if mode not in {"triattention", "horizonkv", "cask"} or stats_path is None or not stats_path.exists():
+    if mode not in {"triattention", "cask"} or stats_path is None or not stats_path.exists():
         return
     norm_mode = str(runner_args.get("triattention_norm_mode", "tri")).strip().lower()
     if mode == "cask" and norm_mode != "tri":
@@ -468,7 +468,7 @@ def build_config(
 
     if mode == "fullkv":
         runner_args["kv_budget"] = None
-    if mode in {"triattention", "horizonkv", "cask"}:
+    if mode in {"triattention", "cask"}:
         if stats_path is None and "triattention_stats_file" not in runner_args:
             raise ValueError(f"stats_path is required for {mode} mode")
         runner_args.setdefault("triattention_stats_file", str(stats_path) if stats_path else None)
@@ -484,10 +484,7 @@ def build_config(
         runner_args.setdefault("triattention_frequency_window", 65536)
         runner_args.setdefault("triattention_score_aggregation", "mean")
         runner_args.setdefault("pruning_seed", 0)
-        if mode == "horizonkv":
-            runner_args.setdefault("triattention_horizon_mode", "adaptive")
-            runner_args.setdefault("triattention_norm_mode", "tri")
-        elif mode == "cask":
+        if mode == "cask":
             runner_args.setdefault("triattention_horizon_mode", "fixed")
             runner_args.setdefault("triattention_norm_mode", "tri")
             runner_args.setdefault("cask_prefix_coverage_ratio", 0.0625)
@@ -586,7 +583,7 @@ def run_one(
     resolved_run_tag = resolve_run_tag(extra_config, run_tag)
 
     stats_path = None
-    if mode in {"triattention", "horizonkv", "cask"}:
+    if mode in {"triattention", "cask"}:
         if budget is None:
             raise ValueError(f"budget is required for {mode} runs")
         stats_override = resolve_stats_override(extra_config, stats_path_arg)
@@ -1249,7 +1246,7 @@ def main() -> None:
             args.model,
             args.method,
             budget,
-            require_stats=(args.method in {"triattention", "horizonkv", "cask"}),
+            require_stats=(args.method in {"triattention", "cask"}),
             stats_path_arg=args.stats_path,
             run_tag=args.run_tag,
             defaults=defaults,

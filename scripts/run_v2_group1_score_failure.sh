@@ -20,14 +20,14 @@ MAX_PARALLEL="${MAX_PARALLEL:-1}"
 
 REF_TAG="${TAG_PREFIX}_ref_${DATASET}"
 TRI_TAG="${TAG_PREFIX}_tri${BUDGET}_${DATASET}"
-HORIZON_TAG="${TAG_PREFIX}_horizon${BUDGET}_${DATASET}"
+ADAPTIVE_TAG="${TAG_PREFIX}_tri_adaptive_rms2_${BUDGET}_${DATASET}"
 CASK_TAG="${TAG_PREFIX}_cask${BUDGET}_${DATASET}"
 
 TRI_DUMP_DIR="${DUMP_ROOT}/${DATASET}_triattention"
-HORIZON_DUMP_DIR="${DUMP_ROOT}/${DATASET}_horizonkv"
+ADAPTIVE_DUMP_DIR="${DUMP_ROOT}/${DATASET}_triattention_adaptive_rms2"
 CASK_DUMP_DIR="${DUMP_ROOT}/${DATASET}_cask"
 
-mkdir -p "$TRI_DUMP_DIR" "$HORIZON_DUMP_DIR" "$CASK_DUMP_DIR"
+mkdir -p "$TRI_DUMP_DIR" "$ADAPTIVE_DUMP_DIR" "$CASK_DUMP_DIR"
 
 PIDS=()
 
@@ -90,17 +90,17 @@ run_with_limit "$PYTHON_BIN" scripts/cli.py run-one \
 run_with_limit "$PYTHON_BIN" scripts/cli.py run-one \
   --model "$MODEL_ALIAS" \
   --dataset "$DATASET" \
-  --method horizonkv \
+  --method triattention \
   --budget "$BUDGET" \
   --stats-path "$STATS_PATH" \
-  --run-tag "$HORIZON_TAG" \
+  --run-tag "$ADAPTIVE_TAG" \
   --max-examples "$MAX_EXAMPLES" \
   --num-samples "$NUM_SAMPLES" \
   --attn-implementation "$ATTN_IMPL" \
   --load-dtype "$DTYPE" \
   --triattention-horizon-mode adaptive \
   --triattention-norm-mode rms2 \
-  --score-dump-dir "$HORIZON_DUMP_DIR" \
+  --score-dump-dir "$ADAPTIVE_DUMP_DIR" \
   --score-dump-max-events 16
 
 run_with_limit "$PYTHON_BIN" scripts/cli.py run-one \
@@ -121,8 +121,8 @@ wait_all
 
 "$PYTHON_BIN" scripts/diff_score_dumps.py \
   --baseline-dir "$TRI_DUMP_DIR" \
-  --candidate-dir "$HORIZON_DUMP_DIR" \
-  --json-output "${DUMP_ROOT}/${DATASET}_tri_vs_horizonkv.json"
+  --candidate-dir "$ADAPTIVE_DUMP_DIR" \
+  --json-output "${DUMP_ROOT}/${DATASET}_tri_vs_adaptive_rms2.json"
 
 "$PYTHON_BIN" scripts/summarize_selection_dumps.py \
   --dump-dir "$CASK_DUMP_DIR" \

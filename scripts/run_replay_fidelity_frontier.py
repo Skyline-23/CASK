@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Tuple
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REPLAY_SCRIPT = REPO_ROOT / "scripts" / "replay_reference_fidelity.py"
 FRONTIER_ROOT = REPO_ROOT / "experiments" / "frontier"
-METHODS = ("fullkv", "triattention", "horizonkv", "cask", "snapkv", "r1kv", "expectedattention")
+METHODS = ("fullkv", "triattention", "cask", "snapkv", "r1kv", "expectedattention")
 
 
 def sanitize_tag(value: str) -> str:
@@ -77,9 +77,9 @@ def build_command(
         if budget is None:
             raise ValueError(f"budget is required for {method}")
         cmd.extend(["--budget", str(int(budget))])
-    if method in {"triattention", "horizonkv", "cask"}:
+    if method in {"triattention", "cask"}:
         if args.triattention_stats_file is None:
-            raise SystemExit("--triattention-stats-file is required for triattention/horizonkv/cask.")
+            raise SystemExit("--triattention-stats-file is required for triattention/cask.")
         cmd.extend(["--triattention-stats-file", str(args.triattention_stats_file)])
     cmd.extend(passthrough)
     return cmd

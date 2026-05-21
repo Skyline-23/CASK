@@ -56,5 +56,5 @@ If a reviewer asks where a row came from, the intended path is:
 The tracked raw snapshot in [`raw_outputs_2026_05_21/`](raw_outputs_2026_05_21/)
 keeps compact evidence that would otherwise remain only in ignored local output
 directories. It intentionally excludes the legacy exploratory `math500` tree
-because that directory contains obsolete `scratchmergekv` runs that are not part
-of the current CASK paper package.
+because that directory contains obsolete pre-CASK exploratory runs that are not
+part of the current paper package.

@@ -16,10 +16,9 @@ Excluded snapshots:
 
 - `experiments/outputs/math500`
 
-The excluded `math500` tree contains legacy exploratory `scratchmergekv` runs
-from the pre-CASK naming period. It is intentionally left out of this public
-artifact snapshot to avoid mixing obsolete method names into the paper-facing
-evidence package.
+The excluded `math500` tree contains legacy exploratory runs from the pre-CASK
+naming period. It is intentionally left out of this public artifact snapshot to
+avoid mixing obsolete method names into the paper-facing evidence package.
 
 ## Why This Exists
 
@@ -33,4 +32,3 @@ This directory is therefore an audit snapshot, not a new headline result.
 
 `MANIFEST.sha256.csv` records SHA-256 hashes, byte sizes, and repository-relative
 paths for every file in the snapshot.
-

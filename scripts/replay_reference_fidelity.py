@@ -53,7 +53,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--method",
         required=True,
-        choices=["fullkv", "triattention", "horizonkv", "cask", "r1kv", "snapkv", "expectedattention"],
+        choices=["fullkv", "triattention", "cask", "r1kv", "snapkv", "expectedattention"],
         help="Candidate method to replay under.",
     )
     parser.add_argument("--budget", type=int, default=None, help="KV budget for candidate method.")
@@ -62,7 +62,7 @@ def parse_args() -> argparse.Namespace:
         dest="triattention_stats_file",
         type=str,
         default=None,
-        help="Stats file for cask/horizonkv/cask.",
+        help="Stats file for triattention/cask.",
     )
     parser.add_argument("--load-dtype", default="float16")
     parser.add_argument("--attn-implementation", default="sdpa")
@@ -187,7 +187,7 @@ def apply_candidate_method(
     else:
         model_path_value = args.model_path.replace("\\", "/")
 
-    if method in {"triattention", "horizonkv", "cask"}:
+    if method in {"triattention", "cask"}:
         if args.triattention_stats_file is None:
             raise ValueError(f"--triattention-stats-file is required for {method}.")
         stats_path = resolve_under_rkv(args.triattention_stats_file)
@@ -240,7 +240,7 @@ def apply_candidate_method(
         )
         return
 
-    if method in {"triattention", "horizonkv"}:
+    if method == "triattention":
         from cask.methods.triattention import apply_triattention_patch
 
         apply_triattention_patch(

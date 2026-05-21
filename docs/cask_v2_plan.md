@@ -442,7 +442,7 @@ convert Phase 1 into an explicit negative result.
 Required comparison:
 
 - `triattention`
-- `horizonkv`
+- `triattention` with adaptive horizon / RMS2 scorer flags
 - any retained scorer-side variant already in-tree
 
 Required outputs:
@@ -749,17 +749,17 @@ python scripts/cli.py run-one \
 python scripts/cli.py run-one \
   --model "$MODEL_ALIAS" \
   --dataset aime24 \
-  --method horizonkv \
+  --method triattention \
   --budget 384 \
   --stats-path "$STATS_PATH" \
-  --run-tag v2_group1_horizon384 \
+  --run-tag v2_group1_tri_adaptive_rms2_384 \
   --max-examples 6 \
   --num-samples 1 \
   --attn-implementation "$ATTN_IMPL" \
   --load-dtype "$DTYPE" \
   --triattention-horizon-mode adaptive \
   --triattention-norm-mode rms2 \
-  --score-dump-dir experiments/analysis/v2/group1/aime24_horizonkv \
+  --score-dump-dir experiments/analysis/v2/group1/aime24_triattention_adaptive_rms2 \
   --score-dump-max-events 16
 
 python scripts/cli.py run-one \
@@ -782,8 +782,8 @@ Step 3: summarize the resulting dumps.
 ```bash
 python scripts/diff_score_dumps.py \
   --baseline-dir experiments/analysis/v2/group1/aime24_triattention \
-  --candidate-dir experiments/analysis/v2/group1/aime24_horizonkv \
-  --json-output experiments/analysis/v2/group1/aime24_tri_vs_horizonkv.json
+  --candidate-dir experiments/analysis/v2/group1/aime24_triattention_adaptive_rms2 \
+  --json-output experiments/analysis/v2/group1/aime24_tri_vs_adaptive_rms2.json
 
 python scripts/summarize_selection_dumps.py \
   --dump-dir experiments/analysis/v2/group1/aime24_cask \

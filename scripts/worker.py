@@ -355,7 +355,7 @@ def parse_arguments() -> argparse.Namespace:
         "--method",
         type=str,
         default=None,
-        choices=["r1kv", "fullkv", "snapkv", "triattention", "horizonkv", "cask", "expectedattention"],
+        choices=["r1kv", "fullkv", "snapkv", "triattention", "cask", "expectedattention"],
     )
     parser.add_argument("--kv_budget", "--kv-budget", dest="kv_budget", type=int, default=None)
     parser.add_argument("--window_size", "--window-size", dest="window_size", type=int, default=8)
@@ -410,7 +410,7 @@ def parse_arguments() -> argparse.Namespace:
         "--triattention_stats_file",
         type=str,
         default=None,
-        help="Stats file for TriAttention-family scoring (required for cask/horizonkv/cask).",
+        help="Stats file for TriAttention-family scoring (required for triattention/cask).",
     )
     parser.add_argument(
         "--round_window",
@@ -788,7 +788,7 @@ def main(args: argparse.Namespace) -> None:
     output_root = Path(args.output_dir)
 
     method_lower = args.method.lower() if args.method else ""
-    patch_family = {"triattention", "horizonkv", "cask"}
+    patch_family = {"triattention", "cask"}
     is_triattention_family = method_lower in patch_family
     if is_triattention_family:
         if args.kv_budget is None:
@@ -893,7 +893,7 @@ def main(args: argparse.Namespace) -> None:
         "compression_content": args.compression_content,
     }
 
-    if method_name and method_name not in {"fullkv", "triattention", "horizonkv", "cask"}:
+    if method_name and method_name not in {"fullkv", "triattention", "cask"}:
         if "llama" in args.model_path.lower():
             replace_llama(compression_config)
         elif "qwen3" in args.model_path.lower():
@@ -935,7 +935,7 @@ def main(args: argparse.Namespace) -> None:
         if not patched:
             sys.stderr.write("[qk_capture] failed to patch LlamaAttention for capture; proceeding without QK dumps.\n")
 
-    if method_name and method_name not in {"fullkv", "triattention", "horizonkv", "cask"}:
+    if method_name and method_name not in {"fullkv", "triattention", "cask"}:
         model.newline_token_ids = [
             tokenizer.encode("\n")[-1],
             tokenizer.encode(".\n")[-1],
@@ -956,9 +956,6 @@ def main(args: argparse.Namespace) -> None:
         metadata_expectations = {}
         horizon_mode = args.triattention_horizon_mode or "fixed"
         norm_mode = args.triattention_norm_mode or "tri"
-        if method_lower == "horizonkv":
-            horizon_mode = args.triattention_horizon_mode or "adaptive"
-            norm_mode = args.triattention_norm_mode or "tri"
         if method_lower == "cask":
             if horizon_mode != "fixed":
                 raise ValueError("cask does not support adaptive/variational horizon modes.")

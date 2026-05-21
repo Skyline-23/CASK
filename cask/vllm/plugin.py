@@ -1,7 +1,7 @@
-"""vLLM plugin entrypoint for TriAttention runtime (V2) integration.
+"""vLLM plugin entrypoint for the CASK runtime integration.
 
 Default behavior:
-- Install runtime scheduler/worker monkeypatches for TriAttention V2 path.
+- Install runtime scheduler/worker monkeypatches for the CASK runtime path.
 - Bridge legacy `TRIATTENTION_*` env vars into `TRIATTN_RUNTIME_*` when needed.
 
 Legacy V1 custom backend registration is retired.
@@ -55,8 +55,8 @@ def _bridge_legacy_env_to_runtime() -> None:
             os.environ["TRIATTN_RUNTIME_PRUNING_MODE"] = mode
 
 
-def register_triattention_backend():
-    """Install TriAttention runtime integration when plugin is loaded by vLLM."""
+def register_cask_backend():
+    """Install CASK runtime integration when plugin is loaded by vLLM."""
     # Allow baseline mode: skip all integration when explicitly disabled.
     if not _truthy(os.environ.get("ENABLE_TRIATTENTION"), default=True):
         return
@@ -67,7 +67,7 @@ def register_triattention_backend():
     if interface_mode in {"legacy", "legacy_custom", "v1", "custom"}:
         if not quiet:
             print(
-                "[TriAttention] Legacy V1 backend plugin registration is retired; "
+                "[CASK] Legacy V1 backend plugin registration is retired; "
                 "use runtime interface (TRIATTENTION_INTERFACE=runtime)."
             )
         return
@@ -94,11 +94,12 @@ def register_triattention_backend():
         )
         if not quiet:
             print(
-                "[TriAttention] Runtime (V2) plugin activated: "
+                "[CASK] Runtime plugin activated: "
                 f"patch_scheduler={patch_scheduler} patch_worker={patch_worker}"
             )
     except Exception as exc:  # pragma: no cover - safety guard
         if not quiet:
-            print(f"[TriAttention] Runtime plugin activation failed: {type(exc).__name__}: {exc}")
+            print(f"[CASK] Runtime plugin activation failed: {type(exc).__name__}: {exc}")
         raise
+
 
